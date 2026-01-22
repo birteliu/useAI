@@ -1,10 +1,40 @@
+// Import Firebase SDKs (using ES Modules)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// --- FIREBASE CONFIGURATION ---
+// TODO: 1. Go to https://console.firebase.google.com/
+// TODO: 2. Create a new project
+// TODO: 3. Add a Web App and copy the config object below
+const firebaseConfig = {
+  apiKey: "AIzaSyDN5wETSKrkk0F9_o1GjC8QfbW9sBKubsI",
+  authDomain: "designhub-a6a2e.firebaseapp.com",
+  projectId: "designhub-a6a2e",
+  storageBucket: "designhub-a6a2e.firebasestorage.app",
+  messagingSenderId: "149196974349",
+  appId: "1:149196974349:web:e0c4f8348919717c122844",
+  measurementId: "G-7RSX04VG4D"
+};
+
+// Initialize Firebase
+let db;
+try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+} catch (e) {
+    console.error("Firebase not initialized. Make sure to update firebaseConfig.", e);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if config is set
+    if (firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
+        alert("Firebase is not configured! Please open js/app.js and set your firebaseConfig.");
+    }
+
     const feedContainer = document.getElementById('feed-container');
     const submitBtn = document.getElementById('submit-btn');
     const urlInput = document.getElementById('resource-url');
-    // const categoryInput = document.getElementById('resource-category'); // Handled dynamically now
     const noteInput = document.getElementById('resource-note');
-    // const filterButtons = document.querySelectorAll('.filter-btn'); // Handled dynamically now
     
     // Category Management Elements
     const categorySelect = document.getElementById('resource-category');
@@ -24,36 +54,85 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUserAvatar = document.getElementById('current-user-avatar');
     const currentUserNameDisplay = document.getElementById('current-user-name');
 
-    // --- Category Management ---
-    const initialCategories = ['Frontend', 'UI Design', 'UX Research', 'AI Tools'];
-    let categories = JSON.parse(localStorage.getItem('designHubCategories')) || initialCategories;
+    // --- State ---
+    let categories = []; // Array of objects { id, name }
+    let users = [];      // Array of objects { id, name }
+    let posts = [];      // Array of objects { id, ...data }
+    
     let activeFilter = 'All Posts';
+    // Current user is still stored locally as it's a "session" preference
+    let currentUser = localStorage.getItem('designHubCurrentUser') || 'Me';
 
-    const saveCategories = () => {
-        localStorage.setItem('designHubCategories', JSON.stringify(categories));
-        renderCategories();
+    // --- Real-time Listeners ---
+
+    // 1. Listen for Categories
+    if (db) {
+        const qCat = query(collection(db, "categories"), orderBy("name"));
+        onSnapshot(qCat, (snapshot) => {
+            categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // If empty (fresh DB), add defaults
+            if (categories.length === 0 && !localStorage.getItem('catsInitialized')) {
+                initializeDefaults();
+            } else {
+                renderCategories();
+            }
+        });
+
+        // 2. Listen for Users
+        const qUser = query(collection(db, "users"), orderBy("name"));
+        onSnapshot(qUser, (snapshot) => {
+            users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+             if (users.length === 0 && !localStorage.getItem('usersInitialized')) {
+                 // Defaults handled in initializeDefaults
+            } else {
+                updateUserUI(); // Update UI in case current user was deleted
+                renderUserDropdownList();
+            }
+        });
+
+        // 3. Listen for Posts
+        const qPosts = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        onSnapshot(qPosts, (snapshot) => {
+            posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderFeed(activeFilter);
+        });
+    }
+
+    // Helper: Initialize Defaults for fresh DB
+    const initializeDefaults = async () => {
+        localStorage.setItem('catsInitialized', 'true');
+        localStorage.setItem('usersInitialized', 'true');
+        
+        const defaultCats = ['Frontend', 'UI Design', 'UX Research', 'AI Tools'];
+        for (const cat of defaultCats) {
+            await addDoc(collection(db, "categories"), { name: cat });
+        }
+        
+        const defaultUsers = ['Me', 'Sarah', 'Tom H.', 'Mike R.'];
+        for (const user of defaultUsers) {
+            await addDoc(collection(db, "users"), { name: user });
+        }
     };
 
-    // Helper: Badge Color Mapping (Dynamic now)
-    const getBadgeClass = (category) => {
-        // Deterministic color assignment based on string length/char codes
-        // Returns one of the predefined badge classes
+
+    // Helper: Badge Color Mapping
+    const getBadgeClass = (categoryName) => {
         const styles = ['badge-ui', 'badge-ux', 'badge-fe', 'badge-ai'];
         let hash = 0;
-        for (let i = 0; i < category.length; i++) {
-            hash = category.charCodeAt(i) + ((hash << 5) - hash);
+        for (let i = 0; i < categoryName.length; i++) {
+            hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
         }
         return styles[Math.abs(hash) % styles.length];
     };
 
-    // Render Categories in Select, Filters, and Manager
+    // Render Categories
     const renderCategories = () => {
         // 1. Render Select Options
         categorySelect.innerHTML = '';
         categories.forEach(cat => {
             const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
+            option.value = cat.name;
+            option.textContent = cat.name;
             categorySelect.appendChild(option);
         });
 
@@ -64,19 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
         allBtn.textContent = 'All Posts';
         allBtn.addEventListener('click', () => {
              activeFilter = 'All Posts';
-             renderCategories(); // Re-render to update active state
+             renderCategories(); // Update active state
              renderFeed('All Posts');
         });
         filterContainer.appendChild(allBtn);
 
         categories.forEach(cat => {
             const btn = document.createElement('button');
-            btn.className = `clay-btn-secondary filter-btn text-xs whitespace-nowrap ${activeFilter === cat ? 'active' : ''}`;
-            btn.textContent = cat;
+            btn.className = `clay-btn-secondary filter-btn text-xs whitespace-nowrap ${activeFilter === cat.name ? 'active' : ''}`;
+            btn.textContent = cat.name;
             btn.addEventListener('click', () => {
-                activeFilter = cat;
+                activeFilter = cat.name;
                 renderCategories();
-                renderFeed(cat);
+                renderFeed(cat.name);
             });
             filterContainer.appendChild(btn);
         });
@@ -85,31 +164,32 @@ document.addEventListener('DOMContentLoaded', () => {
         catManagerList.innerHTML = '';
         categories.forEach(cat => {
             const tag = document.createElement('div');
-            // Use getBadgeClass for consistent look, but add padding for button
             tag.className = `inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-200 shadow-sm text-slate-600`;
             tag.innerHTML = `
-                ${cat}
-                <button class="delete-cat-btn text-slate-400 hover:text-red-500 transition-colors" data-cat="${cat}">
+                ${cat.name}
+                <button class="delete-cat-btn text-slate-400 hover:text-red-500 transition-colors" data-id="${cat.id}" data-name="${cat.name}">
                     <i data-lucide="x" class="w-3 h-3"></i>
                 </button>
             `;
             catManagerList.appendChild(tag);
         });
 
-        // Attach listeners for delete buttons in manager
+        // Attach listeners
         document.querySelectorAll('.delete-cat-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const catToDelete = e.currentTarget.dataset.cat;
-                if(confirm(`Delete category "${catToDelete}"?`)) {
-                    categories = categories.filter(c => c !== catToDelete);
-                    if (activeFilter === catToDelete) {
+            btn.addEventListener('click', async (e) => {
+                const catId = e.currentTarget.dataset.id;
+                const catName = e.currentTarget.dataset.name;
+                if(confirm(`Delete category "${catName}"?`)) {
+                    await deleteDoc(doc(db, "categories", catId));
+                    if (activeFilter === catName) {
                         activeFilter = 'All Posts';
                         renderFeed('All Posts');
                     }
-                    saveCategories();
                 }
             });
         });
+        
+        lucide.createIcons();
     };
 
     // Event: Toggle Category Manager
@@ -118,12 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Event: Add Category
-    const handleAddCategory = () => {
-        const newCat = newCatInput.value.trim();
-        if (newCat) {
-            if (!categories.includes(newCat)) {
-                categories.push(newCat);
-                saveCategories();
+    const handleAddCategory = async () => {
+        const newCatName = newCatInput.value.trim();
+        if (newCatName) {
+            const exists = categories.some(c => c.name.toLowerCase() === newCatName.toLowerCase());
+            if (!exists) {
+                await addDoc(collection(db, "categories"), { name: newCatName });
                 newCatInput.value = '';
             } else {
                 alert('Category already exists!');
@@ -133,40 +213,36 @@ document.addEventListener('DOMContentLoaded', () => {
     addCatBtn.addEventListener('click', handleAddCategory);
     
     // --- User State Management ---
-    const initialUsers = ['Me', 'Sarah', 'Tom H.', 'Mike R.'];
-    let users = JSON.parse(localStorage.getItem('designHubUsers')) || initialUsers;
-    let currentUser = localStorage.getItem('designHubCurrentUser') || 'Me';
-
-    // Helper: Save User State
-    const saveUserState = () => {
-        localStorage.setItem('designHubUsers', JSON.stringify(users));
-        localStorage.setItem('designHubCurrentUser', currentUser);
-        updateUserUI();
-    };
-
+    
     // Helper: Update User UI (Navbar)
     const updateUserUI = () => {
+        // Validate if current user still exists in DB
+        const userExists = users.some(u => u.name === currentUser);
+        if (!userExists && users.length > 0) {
+            currentUser = users[0].name; // Fallback
+            localStorage.setItem('designHubCurrentUser', currentUser);
+        }
+        
         currentUserNameDisplay.textContent = currentUser;
         currentUserAvatar.textContent = currentUser.charAt(0).toUpperCase();
-        renderUserDropdownList();
     };
 
-    // Helper: Render Dropdown List
+    // Helper: Render Dropdown
     const renderUserDropdownList = () => {
         userListContainer.innerHTML = '';
         users.forEach(user => {
-            const isCurrent = user === currentUser;
+            const isCurrent = user.name === currentUser;
             const div = document.createElement('div');
             div.className = `flex justify-between items-center p-2 rounded-lg cursor-pointer transition-colors ${isCurrent ? 'bg-indigo-50 text-indigo-600 font-bold' : 'hover:bg-slate-100 text-slate-600'}`;
             div.innerHTML = `
-                <div class="flex items-center gap-2 flex-1 user-select-item" data-user="${user}">
+                <div class="flex items-center gap-2 flex-1 user-select-item" data-user="${user.name}">
                     <div class="w-6 h-6 rounded-full ${isCurrent ? 'bg-indigo-500 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center text-xs font-bold">
-                        ${user.charAt(0).toUpperCase()}
+                        ${user.name.charAt(0).toUpperCase()}
                     </div>
-                    <span>${user}</span>
+                    <span>${user.name}</span>
                 </div>
                 ${!isCurrent && users.length > 1 ? `
-                <button class="text-slate-300 hover:text-red-500 transition-colors delete-user-btn p-1" data-user="${user}">
+                <button class="text-slate-300 hover:text-red-500 transition-colors delete-user-btn p-1" data-id="${user.id}" data-name="${user.name}">
                     <i data-lucide="x" class="w-3 h-3"></i>
                 </button>` : ''}
             `;
@@ -177,18 +253,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.user-select-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 currentUser = e.currentTarget.dataset.user;
-                saveUserState();
-                userDropdown.classList.add('hidden'); // Close dropdown
+                localStorage.setItem('designHubCurrentUser', currentUser);
+                updateUserUI();
+                renderUserDropdownList();
+                userDropdown.classList.add('hidden');
             });
         });
 
         document.querySelectorAll('.delete-user-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const userToDelete = e.currentTarget.dataset.user;
-                if(confirm(`Remove user "${userToDelete}"?`)) {
-                    users = users.filter(u => u !== userToDelete);
-                    saveUserState(); // Will re-render
+                const userId = e.currentTarget.dataset.id;
+                const userName = e.currentTarget.dataset.name;
+                if(confirm(`Remove user "${userName}"?`)) {
+                    await deleteDoc(doc(db, "users", userId));
                 }
             });
         });
@@ -196,13 +274,12 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     };
 
-    // Event: Toggle Dropdown
+    // User Menu Toggle
     userMenuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         userDropdown.classList.toggle('hidden');
     });
 
-    // Event: Close Dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
             userDropdown.classList.add('hidden');
@@ -210,64 +287,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Event: Add User
-    const handleAddUser = () => {
+    const handleAddUser = async () => {
         const newName = newUserNameInput.value.trim();
         if (newName) {
-            if (!users.includes(newName)) {
-                users.push(newName);
-                currentUser = newName; // Switch to new user
-                saveUserState();
+            const exists = users.some(u => u.name.toLowerCase() === newName.toLowerCase());
+            if (!exists) {
+                await addDoc(collection(db, "users"), { name: newName });
+                currentUser = newName;
+                localStorage.setItem('designHubCurrentUser', currentUser);
                 newUserNameInput.value = '';
             } else {
                 alert('User already exists!');
             }
         }
     };
-
     addUserBtn.addEventListener('click', handleAddUser);
     newUserNameInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleAddUser();
     });
 
-    // Initialize UI
-    updateUserUI();
+    // --- Feed Management ---
 
-
-    // Initial Data (if localStorage is empty)
-    const initialData = [
-        {
-            id: 1,
-            url: 'https://www.nngroup.com/articles/skeleton-screens/',
-            category: 'UX Research',
-            title: 'NNGroup: The Psychology of Loading Screens',
-            note: 'Skeleton screens are better than spinners because they reduce perceived wait time. Keep animations under 400ms.',
-            author: 'Tom H.',
-            time: '2h ago'
-        },
-        {
-            id: 2,
-            url: 'https://github.com/upscaler/model-v4',
-            category: 'AI Tools',
-            title: 'New Upscaler Model v4',
-            note: 'Found this new open-source model for upscaling low-res client assets. Works better on text than the current paid tool.',
-            author: 'Sarah',
-            time: '5h ago'
-        },
-        {
-            id: 3,
-            url: 'https://developer.apple.com/design/',
-            category: 'UI Design',
-            title: 'Apple\'s Bento Grid Analysis',
-            note: 'Key to the "bento" feel is consistent gap sizing (usually 16px or 24px) and varying relative container aspect ratios (1:1 vs 2:1).',
-            author: 'Me',
-            time: '1d ago'
-        }
-    ];
-
-    // Load posts from localStorage or use initial data
-    let posts = JSON.parse(localStorage.getItem('designHubPosts')) || initialData;
-
-    // Helper: Format URL to Title (Mock title generator)
+    // Helper: Format URL to Title
     const formatUrlTitle = (url) => {
         try {
             const domain = new URL(url).hostname.replace('www.', '');
@@ -277,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Render Function
+    // Render Feed
     const renderFeed = (filter = activeFilter) => {
         feedContainer.innerHTML = '';
         
@@ -327,23 +368,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     </a>
                 </div>
             `;
-            feedContainer.prepend(article); // Newer posts first
+            feedContainer.appendChild(article); // Prepending is handled by ordering in Firestore
         });
 
-        // Re-initialize icons for new elements
         lucide.createIcons();
 
         // Attach Delete Listeners
         document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.currentTarget.dataset.id);
-                deletePost(id);
+            btn.addEventListener('click', async (e) => {
+                const id = e.currentTarget.dataset.id;
+                if(confirm('Are you sure you want to delete this resource?')) {
+                    await deleteDoc(doc(db, "posts", id));
+                }
             });
         });
     };
 
     // Add New Post
-    const addNewPost = () => {
+    const addNewPost = async () => {
         const url = urlInput.value.trim();
         const category = categorySelect.value;
         const note = noteInput.value.trim();
@@ -353,41 +395,28 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const newPost = {
-            id: Date.now(),
-            url: url,
-            category: category,
-            title: formatUrlTitle(url),
-            note: note,
-            author: currentUser, 
-            time: 'Just now'
-        };
-
-        posts.unshift(newPost); // Add to beginning of array
-        localStorage.setItem('designHubPosts', JSON.stringify(posts));
-        
-        // Reset Form
-        urlInput.value = '';
-        noteInput.value = '';
-        
-        renderFeed(activeFilter);
-    };
-
-    // Delete Post
-    const deletePost = (id) => {
-        if(confirm('Are you sure you want to delete this resource?')) {
-            posts = posts.filter(post => post.id !== id);
-            localStorage.setItem('designHubPosts', JSON.stringify(posts));
-            renderFeed(activeFilter);
+        try {
+            await addDoc(collection(db, "posts"), {
+                url: url,
+                category: category,
+                title: formatUrlTitle(url),
+                note: note,
+                author: currentUser, 
+                time: new Date().toLocaleDateString(), // Use current date for display
+                createdAt: serverTimestamp() // Use server timestamp for sorting
+            });
+            
+            // Reset Form (Feed updates automatically via listener)
+            urlInput.value = '';
+            noteInput.value = '';
+        } catch (e) {
+            console.error("Error adding post: ", e);
+            alert("Failed to save post online.");
         }
     };
 
-    // Event Listeners
     submitBtn.addEventListener('click', addNewPost);
-
-    // Filter Logic Removed (Now handled by renderCategories)
-
-    // Initial Render
-    renderCategories();
-    renderFeed();
+    
+    // Initial calls
+    updateUserUI();
 });
