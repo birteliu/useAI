@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesignHub - Team Knowledge</title>
+    
+    <!-- Tailwind CSS (for layout efficiency) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Claymorphism Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- App Logic -->
+    <script src="js/app.js" defer></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-[#f0f4f8]/80 backdrop-blur-md border-b border-white/20 mb-8">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white shadow-lg">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+                <span class="font-display font-bold text-lg text-slate-700">DesignHub</span>
+            </div>
+            <div class="relative" id="user-menu-container">
+                <button id="user-menu-btn" class="flex items-center gap-2 clay-btn-secondary pl-2 pr-4 py-1.5 rounded-full transition-all hover:bg-white">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-sm" id="current-user-avatar">
+                        U
+                    </div>
+                    <span class="text-sm font-bold text-slate-700" id="current-user-name">User</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                </button>
+                
+                <!-- Dropdown -->
+                <div id="user-dropdown" class="hidden absolute right-0 top-12 w-64 bg-[#f0f4f8] rounded-xl shadow-[8px_8px_16px_rgba(163,177,198,0.4),-8px_-8px_16px_rgba(255,255,255,0.8)] border border-white/50 p-3 z-50 animate-fade-in">
+                    <div class="mb-2 px-2 text-xs font-bold text-slate-400 uppercase">Switch User</div>
+                    <div id="user-list" class="space-y-1 max-h-48 overflow-y-auto mb-3 scroll-hide">
+                        <!-- User items injected here -->
+                    </div>
+                    
+                    <div class="border-t border-slate-200 pt-3">
+                         <div class="flex gap-2">
+                            <input type="text" id="new-username-input" placeholder="New name" class="bg-white border-none rounded-lg px-3 py-2 text-sm w-full shadow-inner outline-none text-slate-600">
+                            <button id="add-user-btn" class="bg-indigo-500 text-white rounded-lg p-2 shadow-md hover:bg-indigo-600 transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4">
+        
+        <!-- Input Section: "Share Knowledge" -->
+        <section class="mb-12">
+            <div class="clay-card p-6">
+                <h2 class="font-display font-bold text-xl mb-4 text-slate-700 flex items-center gap-2">
+                    <i data-lucide="pen-tool" class="w-5 h-5 text-indigo-500"></i>
+                    Share New Resource
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 ml-1 uppercase">Resource URL</label>
+                            <div class="relative">
+                                <i data-lucide="link" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
+                                <input type="text" id="resource-url" placeholder="https://..." class="clay-input pl-10">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 ml-1 uppercase">Category</label>
+                            <select id="resource-category" class="clay-input appearance-none bg-no-repeat bg-[right_1rem_center]">
+                                <!-- Options injected by JS -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                         <label class="block text-xs font-bold text-slate-500 mb-1 ml-1 uppercase">Key Takeaways / Notes</label>
+                        <textarea id="resource-note" rows="3" placeholder="What's the main insight? Why is this useful for the team?" class="clay-input resize-none"></textarea>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button id="submit-btn" class="clay-btn-primary flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            Post to Team
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feed Control -->
+        <div class="flex flex-col sm:flex-row justify-between items-end sm:items-center mb-4 gap-4">
+            <div class="flex items-center gap-3">
+                 <h3 class="font-display font-bold text-2xl text-slate-800">Team Feed</h3>
+                 <button id="manage-cats-btn" class="text-slate-400 hover:text-indigo-500 transition-colors bg-white p-2 rounded-full shadow-sm" title="Edit Categories">
+                    <i data-lucide="settings-2" class="w-5 h-5"></i>
+                 </button>
+            </div>
+            
+            <div id="filter-container" class="flex gap-2 overflow-x-auto pb-2 w-full sm:w-auto scroll-hide">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+
+        <!-- Category Manager (Hidden by default) -->
+        <div id="category-manager" class="hidden mb-8 bg-white/50 p-4 rounded-xl border border-white/50 animate-fade-in relative z-10">
+             <h4 class="font-bold text-xs text-slate-500 mb-3 uppercase tracking-wider">Manage Categories</h4>
+             <div class="flex flex-wrap gap-2 mb-4" id="cat-manager-list">
+                <!-- Tags with delete buttons injected here -->
+             </div>
+             <div class="flex gap-2">
+                <input type="text" id="new-cat-input" placeholder="New Category Name" class="clay-input py-2 text-sm w-full md:w-64">
+                <button id="add-cat-btn" class="clay-btn-primary py-2 px-4 text-sm whitespace-nowrap">Add</button>
+             </div>
+        </div>
+
+        <!-- Masonry Grid of Resources -->
+        <div id="feed-container" class="grid md:grid-cols-2 gap-6">
+            <!-- Content will be injected by js/app.js -->
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
