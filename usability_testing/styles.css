@@ -1,7 +1,7 @@
 /* Global Reset & Fonts */
 :root {
-    --bg-color: #f9fafb; /* 非常淺的灰白背景 */
-    --primary: #0BA26B; /* NexusAI 藍紫色 */
+    --bg-color: #f9fafb; 
+    --primary: #0BA26B; 
     --primary-hover: #097E5E;
     --secondary: #64748b;
     --accent: #f43f5e;
@@ -178,7 +178,7 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #33553e;
+    color: #343A40;
     font-size: 0.95rem;
 }
 input[type="text"], select, textarea {
@@ -399,7 +399,7 @@ textarea {
     font-weight: 800;
 }
 .step-badge {
-    background: #eff6ff;
+    background: #F1F8ED;
     color: var(--primary);
     padding: 8px 16px;
     border-radius: 99px;
@@ -555,9 +555,6 @@ textarea {
     background: #f0f3f5;
     border-radius: 16px;
     padding: 20px;
-    box-shadow: 
-        8px 8px 16px #d1d9e6, 
-        -8px -8px 16px #ffffff;
     transition: transform 0.2s;
 }
 
