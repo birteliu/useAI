@@ -1,65 +1,90 @@
-// --- 1. Tab Switching Logic | 分頁切換 ---
-function switchTab(tabId) {
-    // Hide all sections
-    const sections = document.querySelectorAll('.content-section');
-    sections.forEach(section => {
-        section.classList.remove('active');
-    });
+// --- 1. Firebase Imports (必須在檔案最上方) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    onSnapshot, 
+    deleteDoc, 
+    doc,
+    query, 
+    orderBy 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Deactivate all buttons
-    const buttons = document.querySelectorAll('.nav-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-    });
+// --- 2. Firebase Config & Init ---
 
-    // Show selected section
-    const targetSection = document.getElementById(tabId);
-    if (targetSection) {
-        targetSection.classList.add('active');
+// 請確認這是您剛剛複製的 config
+const firebaseConfig = {
+  apiKey: "AIzaSyDe3jkHEaIh2mK46Pkk0j9EA5TXl_M5Wfc",
+  authDomain: "usability-ca90b.firebaseapp.com",
+  projectId: "usability-ca90b",
+  storageBucket: "usability-ca90b.firebasestorage.app",
+  messagingSenderId: "363915399435",
+  appId: "1:363915399435:web:5b8a94660b291172c2120e",
+  measurementId: "G-RTESBD3WQF"
+};
+
+// 初始化 Firebase (使用上方 CDN 引入的 initializeApp)
+// 注意：不要再 import { ... } from "firebase/app"
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const DB_COLLECTION = "usability_records";
+
+// 全域變數：用來暫存從雲端抓下來的資料
+let allTestRecords = [];
+
+// --- 3. 監聽 Cloud Firestore 資料變化 ---
+onSnapshot(
+    query(collection(db, DB_COLLECTION), orderBy("timestamp", "desc")), 
+    (snapshot) => {
+        allTestRecords = []; // 清空暫存
+        snapshot.forEach((doc) => {
+            // 將文件 ID (doc.id) 併入資料中
+            allTestRecords.push({ docId: doc.id, ...doc.data() });
+        });
+        
+        console.log("資料庫更新，目前筆數:", allTestRecords.length);
+        renderAnalysisGrid();
+        updateDashboard();
+    }, 
+    (error) => {
+        console.error("讀取資料失敗:", error);
+        // 若出現此錯誤，通常是 Firebase Console 的 Rules 沒設為 Test Mode，或 Config 錯誤
     }
+);
+
+// --- 4. UI Logic: Tabs & Carousel ---
+
+// Tab Switching
+function switchTab(tabId) {
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => section.classList.remove('active'));
+
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    const targetSection = document.getElementById(tabId);
+    if (targetSection) targetSection.classList.add('active');
     
     // Highlight button
-    const activeBtn = Array.from(buttons).find(btn => {
+    buttons.forEach(btn => {
         const onClick = btn.getAttribute('onclick');
-        return onClick && onClick.includes(tabId);
+        if(onClick && onClick.includes(tabId)) btn.classList.add('active');
     });
-    if (activeBtn) activeBtn.classList.add('active');
 }
 
-// --- 2. Live Update for Sliders | 滑桿數值即時顯示 ---
-document.addEventListener('DOMContentLoaded', () => {
-    const sliderIds = ['q1', 'q2', 'q3'];
-    sliderIds.forEach(id => {
-        const slider = document.getElementById(id);
-        const display = document.getElementById(id + '-val');
-        
-        if (slider && display) {
-            slider.addEventListener('input', function() {
-                display.textContent = this.value;
-            });
-        }
-    });
-
-    // 新增：頁面載入時，直接渲染範例資料，讓您可以預覽效果
-    renderAnalysisGrid();
-    updateDashboard();
-});
-
-// --- 3. User Card Carousel Logic | 使用者卡片輪播 ---
+// Carousel Logic
 let currentCardIndex = 1;
 const totalCards = 5;
 
 function updateCardDisplay() {
-    // Hide all cards
     for (let i = 1; i <= totalCards; i++) {
         const card = document.getElementById(`card-${i}`);
         if(card) card.classList.remove('active');
     }
-    // Show current
     const currentCard = document.getElementById(`card-${currentCardIndex}`);
     if(currentCard) currentCard.classList.add('active');
     
-    // Update indicator
     const indicator = document.getElementById('card-indicator');
     if(indicator) indicator.textContent = `${currentCardIndex} / ${totalCards}`;
 }
@@ -78,140 +103,136 @@ function prevCard() {
     }
 }
 
-// --- 4. Data Storage | 資料儲存與管理 ---
-// 修改：將原本的 [] 改為包含一筆範例物件
-let allTestRecords = [
-    {
-        id: '範例_阿土伯',
-        age: '60 歲以上',
-        gender: '男',
-        crop: '茶葉',
-        device: 'OPPO Reno',
-        successCount: 3, // 3/5 成功
-        taskNotes: [
-            '找不到註冊入口，誤觸廣告 banner', // Task 1
-            '掃描 QR Code 時手不太穩，對焦很久', // Task 2
-            '-', // Task 3
-            '不知道「審核中」是什麼意思，卡住', // Task 4
-            '順利完成' // Task 5
-        ], 
-        q1: 3, // 信心
-        q2: 5, // 難易
-        q3: 7, // 推薦
-        pros: '按鈕很大，綠色看起來很舒服。', 
-        cons: '字還是太小了，要一直戴眼鏡。步驟有點多，記不住。', 
-        ideas: '能不能用語音說話就好？不要打字。', 
-        notes: '操作動作較緩慢，對於輸入文字感到焦慮，需要旁人協助。'
-    }
-];
+// Sliders Initialization
+document.addEventListener('DOMContentLoaded', () => {
+    const sliderIds = ['q1', 'q2', 'q3'];
+    sliderIds.forEach(id => {
+        const slider = document.getElementById(id);
+        const display = document.getElementById(id + '-val');
+        if (slider && display) {
+            slider.addEventListener('input', function() {
+                display.textContent = this.value;
+            });
+        }
+    });
+});
 
-// Save Function
-function saveData() {
+// --- 5. Data Logic: Save, Delete, Render ---
+
+// Save to Firebase
+async function saveData() {
     const form = document.getElementById('testForm');
     if (!form) return;
     
-    // --- 1. Basic Info ---
+    // 1. Basic Info
     const userNameInput = form.querySelector('input[placeholder="例如: User_01"]');
     const userName = userNameInput ? userNameInput.value.trim() : '';
     
     if (!userName) {
-        alert("⚠️ 請至少填寫受訪者編號 (例如: User_01)");
+        alert("⚠️ 請至少填寫受訪者編號");
         if(userNameInput) userNameInput.focus();
         return;
     }
 
-    // Selectors
     const selects = form.querySelectorAll('select');
     const age = selects[0] ? selects[0].value : '-';
     const gender = selects[1] ? selects[1].value : '-';
-
-    const cropInput = form.querySelector('input[placeholder="例如: 水稻、茶葉"]');
-    const crop = cropInput ? cropInput.value : '-';
+    const crop = form.querySelector('input[placeholder="例如: 水稻、茶葉"]')?.value || '-';
     
     // Attempt to find device input safely
-    const deviceInput = form.querySelector('input[placeholder*="iPhone"]') || (form.querySelectorAll('input[type="text"]')[2]);
-    const device = deviceInput ? deviceInput.value : '-';
+    const allInputs = form.querySelectorAll('input[type="text"]');
+    const device = allInputs[2] ? allInputs[2].value : '-';
     
-    // --- 2. Task Observations (Success & Notes) ---
+    // 2. Task Stats
     const taskCards = document.querySelectorAll('.task-card');
     let successCount = 0;
-    let taskNotes = []; // Array to store notes for Task 1-5
+    let taskNotes = [];
 
     taskCards.forEach((card) => {
-        // Checkbox
         const checkbox = card.querySelector('input[type="checkbox"]');
         if (checkbox && checkbox.checked) successCount++;
-
-        // Note Textarea
         const textarea = card.querySelector('textarea');
-        const note = textarea ? textarea.value.trim() : '';
-        taskNotes.push(note || '-'); // Default to hyphen if empty
+        taskNotes.push(textarea ? textarea.value.trim() || '-' : '-');
     });
 
-    // --- 3. Scores ---
-    const q1 = document.getElementById('q1') ? document.getElementById('q1').value : 0;
-    const q2 = document.getElementById('q2') ? document.getElementById('q2').value : 0;
-    const q3 = document.getElementById('q3') ? document.getElementById('q3').value : 0;
+    // 3. Scores & Qualitative
+    const q1 = document.getElementById('q1')?.value || 0;
+    const q2 = document.getElementById('q2')?.value || 0;
+    const q3 = document.getElementById('q3')?.value || 0;
 
-    // --- 4. Qualitative Interview Text ---
-    const textPros = document.getElementById('text-pros') ? document.getElementById('text-pros').value : '-';
-    const textCons = document.getElementById('text-cons') ? document.getElementById('text-cons').value : '-';
-    const textIdeas = document.getElementById('text-ideas') ? document.getElementById('text-ideas').value : '-';
-    const textNotes = document.getElementById('text-notes') ? document.getElementById('text-notes').value : '-';
+    const textPros = document.getElementById('text-pros')?.value || '-';
+    const textCons = document.getElementById('text-cons')?.value || '-';
+    const textIdeas = document.getElementById('text-ideas')?.value || '-';
+    const textNotes = document.getElementById('text-notes')?.value || '-';
 
-    // 5. Create Record Object
+    // Build Record
     const currentRecord = {
         id: userName,
-        age: age,
-        gender: gender,
-        crop: crop,
-        device: device,
-        successCount: successCount,
-        taskNotes: taskNotes, // Array of 5 strings
+        age, gender, crop, device,
+        successCount,
+        taskNotes,
         q1: parseInt(q1),
         q2: parseInt(q2),
         q3: parseInt(q3),
-        pros: textPros || '-',
-        cons: textCons || '-',
-        ideas: textIdeas || '-',
-        notes: textNotes || '-'
+        pros: textPros,
+        cons: textCons,
+        ideas: textIdeas,
+        notes: textNotes,
+        timestamp: new Date().toISOString()
     };
 
-    // 6. Store, Render Table, Update Charts
-    allTestRecords.push(currentRecord);
-    renderAnalysisGrid(); // 修改函數名稱
-    updateDashboard();
+    // Upload
+    try {
+        const btn = document.querySelector('.cta-btn');
+        if(btn) { btn.disabled = true; btn.textContent = "儲存中..."; }
 
-    // 7. Feedback
-    alert(`🎉 資料已儲存！\n編號: ${userName}\n成功任務: ${successCount} 個`);
+        await addDoc(collection(db, DB_COLLECTION), currentRecord);
+        
+        alert(`🎉 資料已上傳雲端！\n編號: ${userName}`);
+        // form.reset(); // 可選：清空表單
+    } catch (e) {
+        console.error("Error adding document: ", e);
+        alert("儲存失敗，請檢查網路連線");
+    } finally {
+        const btn = document.querySelector('.cta-btn');
+        if(btn) { btn.disabled = false; btn.textContent = "儲存本位測試者資料"; }
+    }
 }
 
+// Delete from Firebase
+async function deleteRecord(docId) {
+    if(!docId) return;
+    if(confirm(`確定要從雲端永久刪除這筆資料嗎？`)) {
+        try {
+            await deleteDoc(doc(db, DB_COLLECTION, docId));
+        } catch(e) {
+            console.error("刪除失敗", e);
+            alert("刪除失敗: " + e.message);
+        }
+    }
+}
 
+// Render Grid
 function renderAnalysisGrid() {
     const gridContainer = document.getElementById('analysisGrid');
     if (!gridContainer) return;
     
-    gridContainer.innerHTML = ''; // 清空舊資料
+    gridContainer.innerHTML = '';
 
     if (allTestRecords.length === 0) {
         gridContainer.innerHTML = `
             <p style="text-align:center; grid-column: 1/-1; color:#666; padding: 20px;">
-                尚無資料，請至「測試執行」頁面儲存數據
+                目前無資料，請等待讀取或新增資料
             </p>`;
         return;
     }
 
-    // 反轉陣列，讓最新的資料顯示在最前面
-    // 注意：為了方便刪除，我們需要知道原始 index，這裡我們用 filter 或直接操作原陣列 ID 比較好
-    // 這裡改用 forEach 搭配 index 處理
-    [...allTestRecords].reverse().forEach((record) => {
+    allTestRecords.forEach((record) => {
         const card = document.createElement('div');
         card.className = 'record-card';
         
-        // 判斷成功率顏色
         const badgeColor = record.successCount >= 4 ? 'orange' : (record.successCount >= 3 ? 'yellow' : 'red');
 
-        // 產生任務筆記 HTML
         const taskHtml = record.taskNotes.map((note, index) => `
             <div class="task-item">
                 <strong>任務 ${index + 1}:</strong> ${note}
@@ -219,15 +240,13 @@ function renderAnalysisGrid() {
         `).join('');
 
         card.innerHTML = `
-            <!-- 新增刪除按鈕 -->
             <div class="card-actions">
-                <button class="delete-btn" onclick="deleteRecord('${record.id}')" title="刪除此紀錄">✖</button>
+                <button class="delete-btn" onclick="deleteRecord('${record.docId}')" title="刪除">✖</button>
             </div>
 
             <div class="record-header">
                 <h4>${record.id}</h4>
                 <span class="badge ${badgeColor}" style="margin-right: 25px;">${record.successCount} / 5 成功</span> 
-                <!-- margin-right 是為了避開右上角的刪除按鈕 -->
             </div>
             
             <div class="user-tags">
@@ -238,9 +257,9 @@ function renderAnalysisGrid() {
             </div>
 
             <div class="score-row">
-                <div class="score-item"><span>Q1信心</span>${record.q1}</div>
-                <div class="score-item"><span>Q2難易</span>${record.q2}</div>
-                <div class="score-item"><span>Q3推薦</span>${record.q3}</div>
+                <div class="score-item"><span>Q1信心</span>${record.q1 || 0}</div>
+                <div class="score-item"><span>Q2難易</span>${record.q2 || 0}</div>
+                <div class="score-item"><span>Q3推薦</span>${record.q3 || 0}</div>
             </div>
 
             <details>
@@ -253,32 +272,24 @@ function renderAnalysisGrid() {
             <details>
                 <summary>質化訪談回饋</summary>
                 <div class="detail-content">
-                    <div class="qa-item"><span class="qa-label">優點：</span>${record.pros}</div>
-                    <div class="qa-item"><span class="qa-label">改進：</span>${record.cons}</div>
-                    <div class="qa-item"><span class="qa-label">想法：</span>${record.ideas}</div>
-                    <div class="qa-item"><span class="qa-label">觀察：</span>${record.notes}</div>
+                    <div class="qa-item"><span class="qa-label">優點：</span>${record.pros || '-'}</div>
+                    <div class="qa-item"><span class="qa-label">改進：</span>${record.cons || '-'}</div>
+                    <div class="qa-item"><span class="qa-label">想法：</span>${record.ideas || '-'}</div>
+                    <div class="qa-item"><span class="qa-label">觀察：</span>${record.notes || '-'}</div>
                 </div>
             </details>
         `;
-        
         gridContainer.appendChild(card);
     });
 }
 
-// 新增：刪除功能
-function deleteRecord(recordId) {
-    if(confirm(`確定要刪除「${recordId}」的這筆資料嗎？此動作無法復原。`)) {
-        // 使用 filter 移除指定 ID 的資料
-        allTestRecords = allTestRecords.filter(record => record.id !== recordId);
-        
-        // 重新渲染畫面
-        renderAnalysisGrid();
-        updateDashboard();
-    }
+function updateDashboard() {
+    console.log("Dashboard update triggered.");
 }
 
-// Placeholder for missing updateDashboard function
-function updateDashboard() {
-    console.log("Dashboard updated. Total records:", allTestRecords.length);
-    // 此處應放入 Chart.js 的更新邏輯，若之後需要可再補上
-}
+// --- 6. Export to Window (for HTML onclick) ---
+window.switchTab = switchTab;
+window.saveData = saveData;
+window.deleteRecord = deleteRecord;
+window.nextCard = nextCard;
+window.prevCard = prevCard;
