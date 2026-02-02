@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyFarm Usability Test Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header / Hero Section -->
+        <header class="hero">
+            <h1>易用性測試</h1>
+            <p>讓我們一起讓 APP 變得更好用！</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="clay-nav">
+            <button class="nav-btn active" onclick="switchTab('prep')">前置準備</button>
+            <button class="nav-btn" onclick="switchTab('execution')">測試執行 & 紀錄</button>
+            <button class="nav-btn" onclick="switchTab('user-cards')">受訪者任務卡</button> <!-- 新增 -->
+            <button class="nav-btn" onclick="switchTab('analysis')">數據統計</button>
+        </nav>
+
+        <!-- Section 1: Preparation -->
+        <section id="prep" class="content-section active">
+            <div class="card-grid">
+                <div class="clay-card warning">
+                    <h3>受訪者招募目標 (共 8 位)</h3>
+                    <ul class="task-list">
+                        <li><span class="badge yellow">20-40 歲</span> 3 位 (青年農民)</li>
+                        <li><span class="badge orange">40-60 歲</span> 3 位 (壯年農民)</li>
+                        <li><span class="badge red">60 歲以上</span> 2 位 (資深農民)</li>
+                    </ul>
+                </div>
+                <div class="clay-card info">
+                    <h3>設備與環境準備</h3>
+                    <ul class="task-list">
+                        <li>測試手機 (安裝好受測 APP)</li>
+                        <li>螢幕錄影軟體 (紀錄操作手勢)</li>
+                        <li>安靜的訪談空間 (或是農友習慣的休息處)</li>
+                        <li>紙筆與此數位紀錄表單</li>
+                        <li>訪談謝禮 (禮券或農用物資)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Execution (The Recording Form) -->
+        <section id="execution" class="content-section">
+            <form id="testForm">
+                <!-- User Profile -->
+                <div class="clay-card profile-card">
+                    <h2>受訪者輪廓 (User Profile)</h2>
+                    <div class="form-group">
+                        <label>受訪者編號 / 姓名</label>
+                        <input type="text" placeholder="例如: User_01" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>年齡層</label>
+                            <select>
+                                <option>20-40 歲</option>
+                                <option>40-60 歲</option>
+                                <option>60 歲以上</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>性別</label>
+                            <select>
+                                <option>男</option>
+                                <option>女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>主要種植作物</label>
+                            <input type="text" placeholder="例如: 水稻、茶葉">
+                        </div>
+                        <div class="form-group">
+                            <label>手機型號</label>
+                            <input type="text" placeholder="例如: iPhone 12, Samsung A52">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Cards -->
+                <div class="task-container">
+                    <!-- Task 1 -->
+                    <div class="clay-card task-card">
+                        <div class="task-header">
+                            <span class="task-num">01</span>
+                            <h3>註冊成為進階會員</h3>
+                        </div>
+                        <p class="desc">路徑：從首頁 > 會員 > 立即註冊 (三種方式擇一：行動電話/身分證/一般)</p>
+                        <div class="observation-area">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                任務成功
+                            </label>
+                            <textarea placeholder="紀錄猶豫點、按錯的地方、或是用戶的碎碎念..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Task 2 -->
+                    <div class="clay-card task-card">
+                        <div class="task-header">
+                            <span class="task-num">02</span>
+                            <h3>農藥與肥料開通</h3>
+                        </div>
+                        <p class="desc">路徑：下滑 > 跨店購買 > 同意開通 > 補齊資料</p>
+                        <div class="observation-area">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                任務成功
+                            </label>
+                            <textarea placeholder="觀察用戶是否找得到按鈕..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Task 3 -->
+                    <div class="clay-card task-card">
+                        <div class="task-header">
+                            <span class="task-num">03</span>
+                            <h3>查詢紀錄 (退休金/肥料)</h3>
+                        </div>
+                        <p class="desc">路徑：首頁 > 查詢 > 觀看內容</p>
+                        <div class="observation-area">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                任務成功
+                            </label>
+                            <textarea placeholder="紀錄用戶查詢時的反應..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Task 4 -->
+                    <div class="clay-card task-card">
+                        <div class="task-header">
+                            <span class="task-num">04</span>
+                            <h3>查看案件審查進度</h3>
+                        </div>
+                        <p class="desc">路徑：會員 > 我的案件管理 > 點選案件</p>
+                        <div class="observation-area">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                任務成功
+                            </label>
+                            <textarea placeholder="紀錄用戶是否理解案件狀態..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Task 5 -->
+                    <div class="clay-card task-card">
+                        <div class="task-header">
+                            <span class="task-num">05</span>
+                            <h3>E 文件庫新增土地</h3>
+                        </div>
+                        <p class="desc">路徑：E 文件 > 新增 > 填寫資料 > 確定 (需建立一塊地對應騰本)</p>
+                        <div class="observation-area">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                任務成功
+                            </label>
+                            <textarea placeholder="這是最難的任務，請詳細記錄..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post-Test Interview (Existing Quantative) -->
+                <div class="clay-card survey-card">
+                    <h2>測後滿意度量表</h2>
+                    
+                    <div class="rating-group">
+                        <label>1. 您對於『使用農業數位 APP』有多大的信心？</label>
+                        <div class="range-labels">
+                            <span>沒信心 (1)</span>
+                            <span>非常有信心 (5)</span>
+                        </div>
+                        <input type="range" min="1" max="5" step="1" class="slider" id="q1">
+                        <div class="score-display">分數: <span id="q1-val">3</span></div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>2. 整體而言，您覺得完成這些任務有多難或多容易？ (SEQ)</label>
+                        <div class="range-labels">
+                            <span>非常困難 (1)</span>
+                            <span>非常容易 (10)</span>
+                        </div>
+                        <input type="range" min="1" max="10" step="1" class="slider" id="q2">
+                        <div class="score-display">分數: <span id="q2-val">5</span></div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>3. 請問您有多大意願將這個 APP 推薦給您的農友？ (NPS)</label>
+                        <div class="range-labels">
+                            <span>不推薦 (0)</span>
+                            <span>非常推薦 (10)</span>
+                        </div>
+                        <input type="range" min="0" max="10" step="1" class="slider" id="q3">
+                        <div class="score-display">分數: <span id="q3-val">5</span></div>
+                    </div>
+                </div>
+
+                <!-- 新增：質化訪談記錄 (Qualitative Questions) -->
+                <div class="clay-card chat-card">
+                    <h2>測後閒聊與質化訪談</h2>
+                    
+                    <div class="form-group">
+                        <label>1. 您覺得這個 APP 最大的優點是什麼？</label>
+                        <textarea id="text-pros" placeholder="例如：字體很大、顏色很清楚..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. 您覺得這個 APP 最需要改進的地方是什麼？</label>
+                        <textarea id="text-cons" placeholder="例如：註冊步驟太多、按鈕找不到..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3. 有沒有任何其他建議或想法？</label>
+                        <textarea id="text-ideas" placeholder="受訪者的任何天馬行空想法..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4. 其他補充記錄 (觀察員筆記)</label>
+                        <textarea id="text-notes" placeholder="觀察員的現場觀察補充..."></textarea>
+                    </div>
+                </div>
+
+                <div class="cta-container">
+                    <button type="button" class="cta-btn" onclick="saveData()">儲存本位測試者資料</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 新增 Section: User Task Cards (Carousel View) -->
+        <section id="user-cards" class="content-section">
+            <!-- 修改：將標題移出 clay-card 之外，並加入置中樣式 -->
+            <div class="carousel-header" style="text-align: center; margin-bottom: 20px;">
+                <p style="color: #666;">請將此畫面展示給受訪者，點擊下方按鈕切換任務</p>
+            </div>
+
+            <div class="clay-card carousel-container">
+                <!-- 原本這裡的 header 已移除 -->
+                
+                <div class="card-display">
+                    <!-- Card 1 -->
+                    <div class="big-task active" id="card-1">
+                        <span class="step-badge">任務 1</span>
+                        <h1>請註冊成為「進階會員」</h1>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="big-task" id="card-2">
+                        <span class="step-badge">任務 2</span>
+                        <h1>請開通農藥與肥料<br>「跨店購買」功能</h1>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="big-task" id="card-3">
+                        <span class="step-badge">任務 3</span>
+                        <h1>查詢自己的<br>「退休儲金」和<br>「農藥、肥料購買記錄」</h1>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="big-task" id="card-4">
+                        <span class="step-badge">任務 4</span>
+                        <h1>查看透過 APP 送申請的<br>案件「審查進度」</h1>
+                    </div>
+                    <!-- Card 5 -->
+                    <div class="big-task" id="card-5">
+                        <span class="step-badge">任務 5</span>
+                        <h1>查看自己的 E 文件<br>並「新增一筆土地資料」</h1>
+                    </div>
+                </div>
+
+                <div class="carousel-controls">
+                    <button type="button" class="ctrl-btn" onclick="prevCard()">上一個</button>
+                    <span id="card-indicator">1 / 5</span>
+                    <button type="button" class="ctrl-btn" onclick="nextCard()">下一個</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Analysis Output -->
+        <section id="analysis" class="content-section">
+            <div class="clay-card result-card">
+                <h3>綜合數據儀表板</h3>
+                <p>目前共收集 <span id="total-users" style="font-weight:bold; color:var(--primary)">0</span> 位受測者數據</p>
+                
+                <div class="stats-grid">
+                    <!-- Q1 Confidene -->
+                    <div class="stat-box">
+                        <h4>Q1. 信心指數 (1-5)</h4>
+                        <div class="big-number" id="avg-q1">-</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-q1" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Q2 SEQ -->
+                    <div class="stat-box">
+                        <h4>Q2. 容易度 SEQ (1-10)</h4>
+                        <div class="big-number" id="avg-q2">-</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-q2" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Q3 NPS -->
+                    <div class="stat-box">
+                        <h4>Q3. 推薦意願 NPS (0-10)</h4>
+                        <div class="big-number" id="avg-q3">-</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-q3" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 修改這裡：將 inline style 移除，讓它恢復成原本的卡片外觀 -->
+            <div class="clay-card result-card">
+                <h3 style="margin-bottom: 15px;">詳細訪談記錄總表</h3>
+                
+                <!-- 這裡是新的卡片容器 -->
+                <div id="analysisGrid" class="record-grid">
+                    <p style="text-align:center; grid-column: 1/-1; color:#666;">
+                        尚無資料，請至「測試執行」頁面儲存數據
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
