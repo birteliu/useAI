@@ -202,7 +202,9 @@ function renderAnalysisGrid() {
     }
 
     // 反轉陣列，讓最新的資料顯示在最前面
-    [...allTestRecords].reverse().forEach(record => {
+    // 注意：為了方便刪除，我們需要知道原始 index，這裡我們用 filter 或直接操作原陣列 ID 比較好
+    // 這裡改用 forEach 搭配 index 處理
+    [...allTestRecords].reverse().forEach((record) => {
         const card = document.createElement('div');
         card.className = 'record-card';
         
@@ -217,9 +219,15 @@ function renderAnalysisGrid() {
         `).join('');
 
         card.innerHTML = `
+            <!-- 新增刪除按鈕 -->
+            <div class="card-actions">
+                <button class="delete-btn" onclick="deleteRecord('${record.id}')" title="刪除此紀錄">✖</button>
+            </div>
+
             <div class="record-header">
                 <h4>${record.id}</h4>
-                <span class="badge ${badgeColor}">${record.successCount} / 5 成功</span>
+                <span class="badge ${badgeColor}" style="margin-right: 25px;">${record.successCount} / 5 成功</span> 
+                <!-- margin-right 是為了避開右上角的刪除按鈕 -->
             </div>
             
             <div class="user-tags">
@@ -230,9 +238,9 @@ function renderAnalysisGrid() {
             </div>
 
             <div class="score-row">
-                <div class="score-item"><span>Q1 信心</span>${record.q1}</div>
-                <div class="score-item"><span>Q2 難易</span>${record.q2}</div>
-                <div class="score-item"><span>Q3 推薦</span>${record.q3}</div>
+                <div class="score-item"><span>Q1信心</span>${record.q1}</div>
+                <div class="score-item"><span>Q2難易</span>${record.q2}</div>
+                <div class="score-item"><span>Q3推薦</span>${record.q3}</div>
             </div>
 
             <details>
@@ -243,7 +251,7 @@ function renderAnalysisGrid() {
             </details>
 
             <details>
-                <summary>訪談回饋</summary>
+                <summary>質化訪談回饋</summary>
                 <div class="detail-content">
                     <div class="qa-item"><span class="qa-label">優點：</span>${record.pros}</div>
                     <div class="qa-item"><span class="qa-label">改進：</span>${record.cons}</div>
@@ -255,6 +263,18 @@ function renderAnalysisGrid() {
         
         gridContainer.appendChild(card);
     });
+}
+
+// 新增：刪除功能
+function deleteRecord(recordId) {
+    if(confirm(`確定要刪除「${recordId}」的這筆資料嗎？此動作無法復原。`)) {
+        // 使用 filter 移除指定 ID 的資料
+        allTestRecords = allTestRecords.filter(record => record.id !== recordId);
+        
+        // 重新渲染畫面
+        renderAnalysisGrid();
+        updateDashboard();
+    }
 }
 
 // Placeholder for missing updateDashboard function

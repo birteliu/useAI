@@ -548,7 +548,7 @@ textarea {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* 自動適應寬度，最小350px */
     gap: 20px;
-    padding: 10px;
+    padding: 0; /* 修改：將原本的 10px 改為 0，移除內縮，讓左右邊緣對齊標題 */
 }
 
 .record-card {
@@ -657,4 +657,33 @@ details[open] summary::after {
     font-weight: bold;
     color: #555;
     display: block;
+}
+
+/* --- 新增：卡片刪除按鈕樣式 --- */
+.card-actions {
+    position: absolute; /* 絕對定位 */
+    top: 15px;
+    right: 15px;
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: #e74c3c; /* 紅色 */
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    padding: 5px;
+}
+
+.delete-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* 確保卡片本身相對定位，讓刪除按鈕可以對齊 */
+.record-card {
+    position: relative; /* 加入這行 */
+    /* ...existing properties... */
 }
