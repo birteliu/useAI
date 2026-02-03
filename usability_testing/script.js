@@ -522,7 +522,7 @@ async function saveData() {
     const userName = userNameInput ? userNameInput.value.trim() : '';
     
     if (!userName) {
-        alert("⚠️ 請至少填寫受訪者編號");
+        alert("請至少填寫受訪者編號");
         if(userNameInput) userNameInput.focus();
         return;
     }
@@ -535,7 +535,7 @@ async function saveData() {
     const allInputs = form.querySelectorAll('input[type="text"]');
     const device = allInputs[2] ? allInputs[2].value : '-';
     
-    // 2. 任務數據 (修改這裡：增加 taskSuccess 陣列)
+    // 2. 任務數據 (包含計時器與成功狀態)
     const taskCards = document.querySelectorAll('.task-card');
     let successCount = 0;
     let taskNotes = [];
@@ -547,7 +547,7 @@ async function saveData() {
         const isSuccess = checkbox && checkbox.checked;
         
         if (isSuccess) successCount++;
-        taskSuccess.push(isSuccess); // 儲存 true/false
+        taskSuccess.push(isSuccess); 
         
         const textarea = card.querySelector('textarea');
         taskNotes.push(textarea ? textarea.value.trim() || '-' : '-');
@@ -575,7 +575,7 @@ async function saveData() {
         id: userName,
         age, gender, crop, device,
         successCount,
-        taskSuccess, // 新增欄位：詳細的任務成功狀態
+        taskSuccess, // 新增欄位
         taskNotes,
         taskTimes,
         q1: parseInt(q1),
@@ -595,20 +595,14 @@ async function saveData() {
 
         await addDoc(collection(db, DB_COLLECTION), currentRecord);
         
-        alert(`資料已上傳雲端！\n編號: ${userName}`);
-        
-        Object.keys(taskTimers).forEach(taskId => {
-            const display = document.getElementById(`timer-${taskId}`);
-            const tBtn = document.querySelector(`#timer-${taskId}`)?.parentElement.querySelector('.start-btn');
-            if (display && tBtn) {
-                resetTimer(taskId, tBtn, display);
-            }
-        });
+        // 成功提示後刷新頁面
+        alert(`資料已上傳雲端！\n受訪者: ${userName}\n\n點擊確定後將重新整理頁面。`);
+        location.reload();
         
     } catch (e) {
         console.error("Error adding document: ", e);
         alert("儲存失敗，請檢查網路連線");
-    } finally {
+        // 失敗時恢復按鈕狀態
         const btn = document.querySelector('.cta-btn');
         if(btn) { btn.disabled = false; btn.textContent = "儲存本位測試者資料"; }
     }
