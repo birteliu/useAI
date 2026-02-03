@@ -242,24 +242,28 @@
 
         <!-- 新增 Section: User Task Cards (Carousel View) -->
         <section id="user-cards" class="content-section">
-            <!-- 修改：將標題移出 clay-card 之外，並加入置中樣式 -->
             <div class="carousel-header" style="text-align: center; margin-bottom: 20px;">
-                <p style="color: #666;">請將此畫面展示給受訪者，點擊下方按鈕切換任務</p>
+                <p style="color: #666; margin-bottom: 10px;">請將此畫面展示給受訪者，點擊按鈕切換任務</p>
+                
+                <!-- 修改：加入 outline class，並移除 inline style 的顏色設定 -->
+                <button type="button" class="cta-btn outline" style="width: auto; padding: 8px 20px;" onclick="toggleFullScreenMode()">
+                    <span>⛶</span> 開啟全螢幕展示模式
+                </button>
             </div>
 
-            <div class="clay-card carousel-container">
-                <!-- 原本這裡的 header 已移除 -->
-                
+            <div class="clay-card carousel-container" id="card-view-area">
+                <!-- 這就是全螢幕時的關閉按鈕 -->
+                <button class="exit-fs-btn" onclick="toggleFullScreenMode()">✕</button>
                 <div class="card-display">
                     <!-- Card 1 -->
                     <div class="big-task active" id="card-1">
                         <span class="step-badge">任務 1</span>
-                        <h1>請註冊成為「進階會員」</h1>
+                        <h1>請註冊成為<br>「進階會員」</h1>
                     </div>
                     <!-- Card 2 -->
                     <div class="big-task" id="card-2">
                         <span class="step-badge">任務 2</span>
-                        <h1>請開通農藥與肥料<br>「跨店購買」功能</h1>
+                        <h1>請開通農藥與<br>肥料「跨店購買」功能</h1>
                     </div>
                     <!-- Card 3 -->
                     <div class="big-task" id="card-3">
@@ -322,21 +326,26 @@
                 </div>
             </div>
 
-            <!-- 修改這裡：將 inline style 移除，讓它恢復成原本的卡片外觀 -->
             <div class="clay-card result-card">
                 <h3 style="margin-bottom: 15px;">詳細訪談記錄總表</h3>
                 
-                <!-- 這裡是新的卡片容器 -->
                 <div id="analysisGrid" class="record-grid">
                     <p style="text-align:center; grid-column: 1/-1; color:#666;">
                         尚無資料，請至「測試執行」頁面儲存數據
                     </p>
                 </div>
             </div>
+
+            <div class="clay-card result-card" style="margin-top: 20px;">
+                <h3>各任務成功率分析</h3>
+                <div id="task-success-chart" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                    <!-- JS 將會自動生成內容 -->
+                    <p style="color: #999;">等待數據中...</p>
+                </div>
+            </div>
         </section>
     </div>
 
-    <!-- 修改：加入 type="module" -->
     <script type="module" src="script.js"></script>
 </body>
 </html>

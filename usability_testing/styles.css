@@ -687,3 +687,233 @@ details[open] summary::after {
     position: relative; /* 加入這行 */
     /* ...existing properties... */
 }
+
+/* --- Quick Tags (JS生成) --- */
+.quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+.quick-tag-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-tag-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.05);
+}
+
+.quick-tag-btn.clicked {
+    background: #ffd700;
+}
+
+/* --- Timers (JS生成) --- */
+.timer-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.timer-display {
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: bold;
+    color: #666;
+    min-width: 60px;
+}
+
+.timer-display.running {
+    color: #FF9800;
+}
+
+.timer-btn {
+    padding: 6px 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timer-btn:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
+.timer-btn.start-btn {
+    background: #4CAF50;
+}
+
+/* 當計時器正在運行時，開始按鈕的樣式 (暫停狀態) */
+.timer-btn.start-btn.running {
+    background: #FF9800;
+}
+
+.timer-btn.reset-btn {
+    background: #f44336;
+}
+
+/* --- 全螢幕展示模式樣式 --- */
+
+/* 當 section 加上 fullscreen-mode class 時觸發 */
+#user-cards.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f0f4f8; /* 背景色 */
+    z-index: 9999;
+    display: flex !important; /* 強制顯示 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+/* 隱藏全螢幕模式下的 header 說明文字與開啟按鈕 */
+#user-cards.fullscreen-mode .carousel-header {
+    display: none;
+}
+
+/* 調整卡片本身的大小 */
+#user-cards.fullscreen-mode .carousel-container {
+    width: 90%;
+    height: 85%; /* 原本是 90%，稍微縮小一點留空間給上方 */
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    margin-top: 40px; /* 新增：增加頂部距離 */
+}
+
+/* 放大文字內容 */
+#user-cards.fullscreen-mode .big-task h1 {
+    font-size: 5rem; /* 字體變得超級大 */
+    line-height: 1.4;
+    margin-top: 30px;
+}
+
+#user-cards.fullscreen-mode .step-badge {
+    font-size: 2rem;
+    padding: 10px 30px;
+}
+
+/* 控制按鈕樣式調整 */
+#user-cards.fullscreen-mode .carousel-controls {
+    margin-top: auto; /* 推到底部 */
+    padding-bottom: 40px;
+}
+
+#user-cards.fullscreen-mode .ctrl-btn {
+    padding: 20px 40px;
+    font-size: 1.5rem;
+}
+
+#user-cards.fullscreen-mode #card-indicator {
+    font-size: 2rem;
+}
+
+#user-cards.fullscreen-mode .exit-fs-btn {
+    display: none !important;
+}
+
+/* 2. 全螢幕模式狀態：才顯示出來 */
+#user-cards.fullscreen-mode .exit-fs-btn {
+    display: block !important;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    
+    /* 灰色、低調風格 */
+    background: transparent;
+    color: #999;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    z-index: 20000; /* 確保在最上層 */
+    padding: 10px;
+    line-height: 1;
+}
+
+/* 按鈕滑鼠互動效果 */
+#user-cards.fullscreen-mode .exit-fs-btn:hover {
+    color: #333;
+    transform: scale(1.1);
+}
+
+/* 響應式調整：手機版全螢幕 */
+@media (max-width: 768px) {
+    #user-cards.fullscreen-mode .big-task h1 {
+        font-size: 2.5rem;
+    }
+}
+
+/* 新增：外框風格按鈕 (白底綠框綠字) */
+.cta-btn.outline {
+    background: white;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cta-btn.outline:hover {
+    background: #f0fdf4; /* 極淺的綠色背景 */
+    color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* 輕微陰影 */
+}
+
+/* ========================================= */
+/* --- 終極修正：全螢幕退出按鈕樣式 --- */
+/* ========================================= */
+
+/* 1. 預設狀態 (非全螢幕)：絕對隱藏 */
+/* 使用 ID 選擇器 #card-view-area 增加權重 */
+#card-view-area .exit-fs-btn {
+    display: none !important;
+}
+
+/* 2. 全螢幕模式狀態：顯示 */
+/* 只有當父層 #user-cards 有 fullscreen-mode 時才顯示 */
+#user-cards.fullscreen-mode .exit-fs-btn {
+    display: block !important;
+    
+    /* 按鈕樣式 */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    
+    background: transparent;
+    color: #999;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    line-height: 1;
+}
+
+/* 3. 滑鼠移過去的效果 */
+#user-cards.fullscreen-mode .exit-fs-btn:hover {
+    color: #333;
+    transform: scale(1.2);
+}
