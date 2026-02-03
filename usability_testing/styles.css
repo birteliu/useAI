@@ -30,7 +30,7 @@ body {
 /* Header */
 .hero {
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
 }
 .hero h1 {
     font-size: 3rem;
@@ -38,6 +38,7 @@ body {
     margin-bottom: 16px;
     font-weight: 800;
     letter-spacing: -0.025em;
+    margin-top: 0;
 }
 .hero h1 span {
     color: var(--primary);
@@ -375,6 +376,11 @@ textarea {
     flex-direction: column;
     justify-content: center;
     border: 1px solid var(--border-color);
+}
+.carousel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
 }
 .carousel-header h3 {
     color: var(--secondary);
