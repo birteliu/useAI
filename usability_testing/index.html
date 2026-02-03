@@ -88,6 +88,7 @@
 
                 <!-- Task Cards -->
                 <div class="task-container">
+                    <h2 style="margin-bottom: 15px;">測試執行記錄</h2>
                     <!-- Task 1 -->
                     <div class="clay-card task-card">
                         <div class="task-header">
@@ -211,7 +212,7 @@
 
                 <!-- 新增：質化訪談記錄 (Qualitative Questions) -->
                 <div class="clay-card chat-card">
-                    <h2>測後閒聊與質化訪談</h2>
+                    <h2>測後閒聊與訪談</h2>
                     
                     <div class="form-group">
                         <label>1. 您覺得這個 APP 最大的優點是什麼？</label>
@@ -235,7 +236,7 @@
                 </div>
 
                 <div class="cta-container">
-                    <button type="button" class="cta-btn" onclick="saveData()">儲存本位測試者資料</button>
+                    <button type="button" class="cta-btn" onclick="saveData()">儲存資料</button>
                 </div>
             </form>
         </section>
@@ -292,7 +293,7 @@
         <!-- Section 3: Analysis Output -->
         <section id="analysis" class="content-section">
             <div class="clay-card result-card">
-                <h3>綜合數據儀表板</h3>
+                <h2>綜合數據儀表板</h2>
                 <p>目前共收集 <span id="total-users" style="font-weight:bold; color:var(--primary)">0</span> 位受測者數據</p>
                 
                 <div class="stats-grid">
@@ -326,7 +327,7 @@
             </div>
 
             <div class="clay-card result-card">
-                <h3 style="margin-bottom: 15px;">詳細訪談記錄總表</h3>
+                <h2 style="margin-bottom: 15px;">詳細訪談記錄總表</h2>
                 
                 <div id="analysisGrid" class="record-grid">
                     <p style="text-align:center; grid-column: 1/-1; color:#666;">
@@ -336,7 +337,7 @@
             </div>
 
             <div class="clay-card result-card" style="margin-top: 20px;">
-                <h3>各任務成功率分析</h3>
+                <h2>各任務成功率分析</h2>
                 <div id="task-success-chart" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
                     <!-- JS 將會自動生成內容 -->
                     <p style="color: #999;">等待數據中...</p>
