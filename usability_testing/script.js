@@ -327,22 +327,39 @@ function renderAnalysisGrid() {
         
         const badgeColor = record.successCount >= 4 ? 'orange' : (record.successCount >= 3 ? 'yellow' : 'red');
 
-        // 修改：在迴圈中同時讀取筆記與時間
+        // 修改：在迴圈中同時讀取筆記、時間與成功狀態
         const taskHtml = record.taskNotes.map((note, index) => {
-            // 取得對應任務的時間 (如果有的話)
-            // 檢查 record.taskTimes 是否存在且是否有值
+            // 取得對應任務的時間
             const timeVal = (record.taskTimes && record.taskTimes[index] !== undefined) ? record.taskTimes[index] : 0;
             const timeStr = formatTime(timeVal);
             
-            // 根據時間長短設定顏色 (可選)
-            let timeColorStyle = 'color: #999;'; // 預設淺灰
-            if (timeVal > 180) timeColorStyle = 'color: #d32f2f; font-weight: bold;'; // 超過3分鐘 (紅)
-            else if (timeVal > 0) timeColorStyle = 'color: #2e7d32; font-weight: bold;'; // 有紀錄 (綠)
+            // 根據時間長短設定顏色
+            let timeColorStyle = 'color: #999;'; 
+            if (timeVal > 180) timeColorStyle = 'color: #d32f2f; font-weight: bold;'; 
+            else if (timeVal > 0) timeColorStyle = 'color: #2e7d32; font-weight: bold;'; 
+
+            // 新增：取得任務成功狀態
+            // 舊資料可能沒有 taskSuccess 欄位，預設為 null 或 false
+            let statusHtml = '';
+            if (record.taskSuccess && Array.isArray(record.taskSuccess) && record.taskSuccess[index] !== undefined) {
+                const isSuccess = record.taskSuccess[index];
+                if (isSuccess) {
+                    statusHtml = `<span style="color: #4CAF50; font-weight: bold; font-size: 14px; margin-right: 8px;">成功</span>`;
+                } else {
+                    statusHtml = `<span style="color: #F44336; font-weight: bold; font-size: 14px; margin-right: 8px;">失敗</span>`;
+                }
+            } else {
+                // 舊資料沒有紀錄個別狀態
+                statusHtml = `<span style="color: #ccc; font-size: 12px; margin-right: 8px;">(無狀態)</span>`;
+            }
 
             return `
             <div class="task-item">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 4px;">
-                    <strong style="color: #444;">任務 ${index + 1}</strong>
+                    <div style="display: flex; align-items: center;">
+                        <strong style="color: #444; margin-right: 10px;">任務 ${index + 1}</strong>
+                        ${statusHtml}
+                    </div>
                     <span style="font-family: 'Courier New', monospace; font-size: 14px; background: #f5f5f5; padding: 2px 6px; border-radius: 4px; ${timeColorStyle}">⏱ ${timeStr}</span>
                 </div>
                 <div style="color: #666; line-height: 1.5;">${note}</div>
@@ -389,7 +406,7 @@ function renderAnalysisGrid() {
             </details>
 
             <details>
-                <summary>質化訪談回饋</summary>
+                <summary>訪談回饋</summary>
                 <div class="detail-content">
                     <div class="qa-item"><span class="qa-label">優點：</span>${record.pros || '-'}</div>
                     <div class="qa-item"><span class="qa-label">改進：</span>${record.cons || '-'}</div>
@@ -518,22 +535,51 @@ async function saveData() {
     if (!form) return;
     
     // 1. 基本資料
-    const userNameInput = form.querySelector('input[placeholder="例如: User_01"]');
-    const userName = userNameInput ? userNameInput.value.trim() : '';
+    // 修改：改用 getElementById 來抓取，比較安全
+    const userNameInput = document.getElementById('user-id');
+    
+    // 如果找不到 ID，嘗試用舊方法 (向下相容)，但建議您一定要去改 HTML
+    const finalInput = userNameInput || form.querySelector('input[placeholder="例如：User_01"]') || form.querySelector('input[placeholder="例如: User_01"]');
+    
+    const userName = finalInput ? finalInput.value.trim() : '';
     
     if (!userName) {
         alert("請至少填寫受訪者編號");
-        if(userNameInput) userNameInput.focus();
+        if(finalInput) finalInput.focus();
         return;
     }
 
-    const selects = form.querySelectorAll('select');
-    const age = selects[0] ? selects[0].value : '-';
-    const gender = selects[1] ? selects[1].value : '-';
+    // --- 修改開始：更新讀取邏輯 ---
+    
+    // 讀取年齡 (原本的第一個 select)
+    const ageSelect = form.querySelector('select'); // 因為少了一個 select，現在只剩下年齡是 select
+    const age = ageSelect ? ageSelect.value : '-';
+
+    // 讀取性別 (新的 radio button 讀取方式)
+    const genderEl = form.querySelector('input[name="gender"]:checked');
+    const gender = genderEl ? genderEl.value : '-';
+
+    // --- 修改結束 ---
+
     const crop = form.querySelector('input[placeholder="例如: 水稻、茶葉"]')?.value || '-';
     
-    const allInputs = form.querySelectorAll('input[type="text"]');
-    const device = allInputs[2] ? allInputs[2].value : '-';
+    // --- 修改開始：更新讀取手機型號邏輯 ---
+    // 舊的寫法 (依賴順序，容易出錯)：
+    // const allInputs = form.querySelectorAll('input[type="text"]');
+    // const device = allInputs[2] ? allInputs[2].value : '-';
+
+    // 新的寫法 (明確抓取 ID 並合併)：
+    const brandSelect = document.getElementById('phone-brand');
+    const modelInput = document.getElementById('phone-model');
+    
+    let device = '-';
+    if (brandSelect && modelInput) {
+        const brand = brandSelect.value;
+        const model = modelInput.value.trim();
+        // 組合字串，例如 "Apple 14 Pro"
+        device = (brand && model) ? `${brand} ${model}` : (brand || model || '-');
+    }
+    // --- 修改結束 ---
     
     // 2. 任務數據 (包含計時器與成功狀態)
     const taskCards = document.querySelectorAll('.task-card');

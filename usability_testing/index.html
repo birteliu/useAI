@@ -38,10 +38,10 @@
                     <h3>設備與環境準備</h3>
                     <ul class="task-list">
                         <li>測試手機 (安裝好受測 APP)</li>
-                        <li>螢幕錄影軟體 (紀錄操作手勢)</li>
+                        <li>螢幕錄影或錄音軟體 (紀錄操作手勢和 murmur)</li>
                         <li>安靜的訪談空間 (或是農友習慣的休息處)</li>
                         <li>紙筆與此數位紀錄表單</li>
-                        <li>訪談謝禮 (禮券或農用物資)</li>
+                        <li>訪談謝禮 (禮券或物資)</li>
                     </ul>
                 </div>
             </div>
@@ -55,7 +55,8 @@
                     <h2>受訪者輪廓 (User Profile)</h2>
                     <div class="form-group">
                         <label>受訪者編號 / 姓名</label>
-                        <input type="text" placeholder="例如: User_01" required>
+                        <!-- 修改：加上 id="user-id" -->
+                        <input type="text" id="user-id" placeholder="例如：User_01" required>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -68,20 +69,47 @@
                         </div>
                         <div class="form-group">
                             <label>性別</label>
-                            <select>
-                                <option>男</option>
-                                <option>女</option>
-                            </select>
+                            <!-- 修改：將 select 改為兩個 radio button -->
+                            <div style="display: flex; gap: 20px; align-items: center; min-height: 42px;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: normal;">
+                                    <input type="radio" name="gender" value="男" checked>
+                                    <span>男</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: normal;">
+                                    <input type="radio" name="gender" value="女">
+                                    <span>女</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>主要種植作物</label>
-                            <input type="text" placeholder="例如: 水稻、茶葉">
+                            <input type="text" placeholder="例如：水稻、茶葉">
                         </div>
                         <div class="form-group">
-                            <label>手機型號</label>
-                            <input type="text" placeholder="例如: iPhone 12, Samsung A52">
+                            <!-- 將原本單一輸入框，改為左右排列的兩個欄位 -->
+                            <div style="display: flex; gap: 10px;">
+                                <div style="flex: 1;">
+                                    <label>手機廠牌</label>
+                                    <select id="phone-brand">
+                                        <option value="" disabled selected>請選擇</option>
+                                        <option value="Apple">Apple (iPhone)</option>
+                                        <option value="Samsung">Samsung</option>
+                                        <option value="OPPO">OPPO</option>
+                                        <option value="Vivo">Vivo</option>
+                                        <option value="Xiaomi">小米 / 紅米</option>
+                                        <option value="ASUS">ASUS</option>
+                                        <option value="Sony">Sony</option>
+                                        <option value="Pixel">Google Pixel</option>
+                                        <option value="Other">其他</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label>型號</label>
+                                    <input type="text" id="phone-model" placeholder="例如：14 Pro, A54">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
