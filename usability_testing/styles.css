@@ -209,7 +209,8 @@ input[type="text"]:focus, select:focus, textarea:focus {
 .task-header h3 {
     margin: 0;
     margin-left: 10px;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
     color: #2c3e50;
 }
 .task-num {
