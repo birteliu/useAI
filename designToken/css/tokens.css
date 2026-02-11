@@ -1,0 +1,407 @@
+/* ============================================
+   農業數位整合服務平臺 — Design Tokens (CSS Custom Properties)
+   基於 Bootstrap 5.3.8 + 自訂 SCSS 擴展
+   ============================================ */
+
+:root {
+  /* ===========================================
+     COLOR TOKENS — 主色 color01（自然綠）
+     來源: _variables.scss → $color01
+     Bootstrap 類別: .btn-color01-{100~900}, .text-color01-{100~900}, .bg-color01-{100~900}
+     CSS 變數: --bs-color01-{100~900}
+     =========================================== */
+  --bs-color01-100: #f1f8ed;
+  --bs-color01-200: #b7e3cd;
+  --bs-color01-300: #86d0b1;
+  --bs-color01-400: #57bf96;
+  --bs-color01-500: #0ba26b;
+  --bs-color01-600: #0a8f64;
+  --bs-color01-700: #097e5e;
+  --bs-color01-800: #086f59;
+  --bs-color01-900: #075750;
+
+  /* ===========================================
+     COLOR TOKENS — 輔助色 color02（豐收橘）
+     來源: _variables.scss → $color02
+     Bootstrap 類別: .btn-color02-{100~900}, .text-color02-{100~900}, .bg-color02-{100~900}
+     CSS 變數: --bs-color02-{100~900}
+     =========================================== */
+  --bs-color02-100: #fef4e1;
+  --bs-color02-200: #f8d4b4;
+  --bs-color02-300: #f4bd93;
+  --bs-color02-400: #f1a874;
+  --bs-color02-500: #ea8644;
+  --bs-color02-600: #db7937;
+  --bs-color02-700: #c66626;
+  --bs-color02-800: #b35516;
+  --bs-color02-900: #993e01;
+
+  /* ===========================================
+     COLOR TOKENS — Bootstrap 灰階
+     來源: Bootstrap 5 $grays
+     CSS 變數: --bs-gray-{100~900}
+     =========================================== */
+  --bs-gray-100: #f8f9fa;
+  --bs-gray-200: #e9ecef;
+  --bs-gray-300: #dee2e6;
+  --bs-gray-400: #ced4da;
+  --bs-gray-500: #adb5bd;
+  --bs-gray-600: #6c757d;
+  --bs-gray-700: #495057;
+  --bs-gray-800: #343a40;
+  --bs-gray-900: #212529;
+
+  /* ===========================================
+     COLOR TOKENS — 產業別專用色
+     來源: dist/ HTML → .btn-sort-group radio --sort-checked-bg
+     用途: 搜尋頁「產業別」篩選按鈕
+     =========================================== */
+  --industry-agriculture: #0ba26b;   /* 農 Agriculture — color01-500 (預設) */
+  --industry-forestry: #4C956C;      /* 林 Forestry */
+  --industry-fishery: #00B4D8;       /* 漁 Fishery */
+  --industry-livestock: #F07167;     /* 畜 Livestock */
+
+  /* ===========================================
+     COLOR TOKENS — 服務分類專用色
+     來源: dist/index.html → .sort-btn --sort-color
+     用途: 首頁服務分類排序按鈕
+     =========================================== */
+  --sort-fund-loan: #6D4E87;         /* 資金貸款 */
+  --sort-premium-subsidy: #097e5e;   /* 保費補助 */
+  --sort-3q-subsidy: #5B7000;        /* 3章1Q補助 */
+  --sort-environment: #b35516;       /* 環境永續 */
+  --sort-equipment: #097e5e;         /* 設備補助 */
+  --sort-material-record: #097e5e;   /* 資材購買紀錄 */
+  --sort-fishery: #0E5695;           /* 漁業補助 */
+  --sort-disaster: #097e5e;          /* 天然災害 */
+  --sort-other-policy: #097e5e;      /* 其他政策 */
+
+  /* ===========================================
+     COLOR TOKENS — 元件級自訂色彩
+     來源: dist/css/front_style.css 自訂 CSS Properties
+     =========================================== */
+  --card-main-color: #0ba26b;
+  --card-body-bg: #fff3da;
+  --card-hover-color: #0ba26b;
+  --card-title-text-bg: #fef4e1;
+  --register-content-main-color: #db7937;
+  --register-sidebar-bg-color: hsla(35, 51%, 68%, 0.3);
+  --folder-scrollbar-track: #dee2e6;
+  --folder-scrollbar-thumb: #0ba26b;
+  --password-rule-icon-color: #0ba26b;
+  --dropdown-link-active-bg: #e4f4e4;
+
+  /* ===========================================
+     COLOR TOKENS — 背景裝飾漸層
+     來源: dist/ SVG wave 漸層
+     =========================================== */
+  --gradient-wave-start: rgba(161, 215, 131, 0.3);   /* #A1D783 @ 30% */
+  --gradient-wave-end: rgba(245, 245, 245, 0);        /* #F5F5F5 @ 0% */
+
+  /* ===========================================
+     COLOR TOKENS — 語意色彩 (Bootstrap + 自訂映射)
+     =========================================== */
+  --color-success: #0ba26b;    /* 映射 color01-500 */
+  --color-warning: #ea8644;    /* 映射 color02-500 */
+  --color-error: #dc3545;      /* Bootstrap danger */
+  --color-info: #0d6efd;       /* Bootstrap primary */
+
+  /* ===========================================
+     COLOR TOKENS — 文字
+     =========================================== */
+  --color-text-primary: #212529;     /* --bs-gray-900 */
+  --color-text-secondary: #495057;   /* --bs-gray-700 */
+  --color-text-tertiary: #6c757d;    /* --bs-gray-600 */
+  --color-text-disabled: #adb5bd;    /* --bs-gray-500 */
+  --color-text-inverse: #ffffff;
+  --color-text-link: #0ba26b;        /* color01-500 */
+  --color-text-link-hover: #097e5e;  /* color01-700 */
+
+  /* ===========================================
+     COLOR TOKENS — 邊框
+     =========================================== */
+  --color-border-default: #dee2e6;   /* --bs-gray-300 */
+  --color-border-light: #e9ecef;     /* --bs-gray-200 */
+  --color-border-focus: #0ba26b;     /* color01-500 */
+
+  /* ===========================================
+     COLOR TOKENS — 背景
+     =========================================== */
+  --color-bg-base: #ffffff;
+  --color-bg-surface: #ffffff;
+  --color-bg-muted: #f1f8ed;    /* color01-100 */
+  --color-bg-warm: #fef4e1;     /* color02-100 */
+  --color-bg-card-body: #fff3da;
+  --color-bg-card-title: #fef4e1;
+
+  /* ===========================================
+     TYPOGRAPHY — 字型
+     來源: Bootstrap --bs-font-sans-serif (dist/css/front_style.css)
+     =========================================== */
+  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --bs-body-font-family: var(--bs-font-sans-serif);
+  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* ===========================================
+     TYPOGRAPHY — 字級
+     來源: _variables.scss → $font-size map
+     =========================================== */
+  --fs-md: 1rem;        /* 16px — 基礎內文 */
+  --fs-lg: 1.125rem;    /* 18px */
+  --fs-xl: 1.25rem;     /* 20px */
+  --fs-xxl: 1.5rem;     /* 24px */
+  --fs-3xl: 1.75rem;    /* 28px */
+  --fs-4xl: 2rem;       /* 32px */
+  --fs-5xl: 2.5rem;     /* 40px */
+
+  /* 額外通用字級 */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-md: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.75rem;   /* 28px */
+  --font-size-4xl: 2rem;      /* 32px */
+  --font-size-5xl: 2.5rem;    /* 40px */
+
+  /* ===========================================
+     TYPOGRAPHY — 字重與行高
+     =========================================== */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --bs-body-font-size: 1rem;
+  --bs-body-font-weight: 400;
+  --bs-body-line-height: 1.5;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+  --letter-spacing-wider: 0.05em;
+
+  /* ===========================================
+     SPACING — 間距
+     基於 4px 基礎單位 (Bootstrap $spacer: 1rem)
+     =========================================== */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px  */
+  --space-2: 0.5rem;    /* 8px  */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* ===========================================
+     BORDER RADIUS
+     來源: Bootstrap + _variables.scss
+     =========================================== */
+  --bs-border-radius: 0.375rem;      /* 6px — Bootstrap 預設 */
+  --bs-border-radius-sm: 0.25rem;    /* 4px */
+  --bs-border-radius-lg: 0.5rem;     /* 8px */
+  --bs-border-radius-xl: 1rem;       /* 16px */
+  --bs-border-radius-xxl: 2rem;      /* 32px */
+  --bs-border-radius-pill: 50rem;    /* 膠囊型 */
+
+  /* 語意別名 */
+  --radius-none: 0;
+  --radius-sm: 0.25rem;    /* 4px  */
+  --radius-md: 0.5rem;     /* 8px  */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.25rem;   /* 20px */
+  --radius-full: 9999px;
+  --radius-pill: 50rem;    /* Bootstrap pill */
+
+  /* ===========================================
+     SHADOW
+     來源: _variables.scss → $shadow map
+     =========================================== */
+  --shadow-sm:
+    0 4px 4px -2px rgba(19, 25, 39, 0.08),
+    0 2px 4px -2px rgba(19, 25, 39, 0.12);
+  --shadow-md:
+    0 10px 32px -4px rgba(19, 25, 39, 0.1),
+    0 6px 14px -6px rgba(19, 25, 39, 0.12);
+  --shadow-lg:
+    0 18px 88px -4px rgba(19, 25, 39, 0.14),
+    0 8px 28px -6px rgba(19, 25, 39, 0.12);
+
+  /* ===========================================
+     LAYOUT
+     來源: Bootstrap container + 實際頁面結構
+     =========================================== */
+  --layout-container-max: 1320px;    /* Bootstrap .container xxl */
+  --layout-gutter: 1.5rem;           /* --bs-gutter-x / 2 */
+  --layout-header-height: auto;      /* header 高度為自動 */
+  --layout-sidebar-width: 280px;     /* 會員中心側邊欄 */
+
+  /* ===========================================
+     CSS GRID
+     來源: _variables.scss → $enable-cssgrid: true
+     =========================================== */
+  --bs-columns: 12;
+  --bs-gap: 1.5rem;
+
+  /* ===========================================
+     BREAKPOINTS — Bootstrap 5
+     =========================================== */
+  --bp-sm: 576px;
+  --bp-md: 768px;
+  --bp-lg: 992px;
+  --bp-xl: 1200px;
+  --bp-xxl: 1400px;
+
+  /* ===========================================
+     ANIMATION
+     =========================================== */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ===========================================
+     Z-INDEX — Bootstrap 5 預設層級
+     =========================================== */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-offcanvas-backdrop: 1040;
+  --z-offcanvas: 1045;
+  --z-modal-backdrop: 1050;
+  --z-modal: 1055;
+  --z-popover: 1070;
+  --z-tooltip: 1080;
+
+  /* ===========================================
+     COMPONENT TOKENS — 按鈕
+     來源: dist/ HTML 按鈕實作分析
+     =========================================== */
+  --btn-height-sm: 2rem;        /* 32px */
+  --btn-height-md: 2.5rem;      /* 40px */
+  --btn-height-lg: 3rem;        /* 48px */
+  --btn-radius: var(--radius-pill);
+  --btn-padding-x: var(--space-6);
+  --btn-padding-y: var(--space-3);
+  --btn-font-weight: var(--font-weight-medium);
+
+  /* ===========================================
+     COMPONENT TOKENS — 輸入框
+     =========================================== */
+  --input-height: 3rem;
+  --input-radius: var(--radius-md);
+  --input-border: 1px solid var(--color-border-default);
+  --input-padding-x: var(--space-4);
+  --input-padding-y: var(--space-3);
+
+  /* ===========================================
+     COMPONENT TOKENS — 卡片
+     來源: dist/ .card + 自訂 --card-* 變數
+     =========================================== */
+  --card-radius: var(--radius-lg);
+  --card-padding: var(--space-5);
+  --card-shadow: var(--shadow-sm);
+  --card-border: 1px solid var(--color-border-light);
+
+  /* ===========================================
+     COMPONENT TOKENS — Badge / Tag
+     =========================================== */
+  --badge-radius: var(--radius-sm);
+  --badge-padding-x: var(--space-2);
+  --badge-padding-y: var(--space-1);
+  --badge-font-size: var(--font-size-xs);
+  --badge-font-weight: var(--font-weight-medium);
+
+  --tag-radius: var(--radius-sm);
+  --tag-padding-x: var(--space-3);
+  --tag-padding-y: var(--space-1);
+  --tag-font-size: var(--font-size-sm);
+
+  /* ===========================================
+     COMPONENT TOKENS — 麵包屑
+     來源: dist/ .breadcrumb-nav
+     =========================================== */
+  --breadcrumb-font-size: var(--font-size-sm);
+  --breadcrumb-color: var(--color-text-tertiary);
+  --breadcrumb-active-color: var(--color-text-primary);
+  --breadcrumb-separator: '>';
+
+  /* ===========================================
+     COMPONENT TOKENS — 進度時間軸
+     來源: dist/ .status-history
+     =========================================== */
+  --timeline-line-color: var(--color-border-default);
+  --timeline-dot-size: 12px;
+  --timeline-dot-active: #0ba26b;
+  --timeline-dot-inactive: var(--bs-gray-400);
+
+  /* ===========================================
+     COMPONENT TOKENS — 分頁
+     來源: dist/ .pagination
+     =========================================== */
+  --pagination-btn-size: 2.5rem;
+  --pagination-radius: var(--radius-md);
+  --pagination-active-bg: #0ba26b;
+  --pagination-active-color: #ffffff;
+
+  /* ===========================================
+     COMPONENT TOKENS — Header 導覽
+     來源: dist/ header.html → .header-nav-*
+     =========================================== */
+  --header-nav-link-color: var(--color-text-primary);
+  --header-nav-link-hover: #0ba26b;
+  --header-nav-active-border: #0ba26b;
+
+  /* ===========================================
+     INTERNAL ALIASES — 文件站自身樣式用
+     (映射 --bs-color01/02 至簡寫變數名)
+     =========================================== */
+  --color-primary-100: var(--bs-color01-100);
+  --color-primary-200: var(--bs-color01-200);
+  --color-primary-300: var(--bs-color01-300);
+  --color-primary-400: var(--bs-color01-400);
+  --color-primary-500: var(--bs-color01-500);
+  --color-primary-600: var(--bs-color01-600);
+  --color-primary-700: var(--bs-color01-700);
+  --color-primary-800: var(--bs-color01-800);
+  --color-primary-900: var(--bs-color01-900);
+
+  --color-secondary-100: var(--bs-color02-100);
+  --color-secondary-200: var(--bs-color02-200);
+  --color-secondary-300: var(--bs-color02-300);
+  --color-secondary-400: var(--bs-color02-400);
+  --color-secondary-500: var(--bs-color02-500);
+  --color-secondary-600: var(--bs-color02-600);
+  --color-secondary-700: var(--bs-color02-700);
+  --color-secondary-800: var(--bs-color02-800);
+  --color-secondary-900: var(--bs-color02-900);
+
+  --color-gray-100: var(--bs-gray-100);
+  --color-gray-200: var(--bs-gray-200);
+  --color-gray-300: var(--bs-gray-300);
+  --color-gray-400: var(--bs-gray-400);
+  --color-gray-500: var(--bs-gray-500);
+  --color-gray-600: var(--bs-gray-600);
+  --color-gray-700: var(--bs-gray-700);
+  --color-gray-800: var(--bs-gray-800);
+  --color-gray-900: var(--bs-gray-900);
+
+  --font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}

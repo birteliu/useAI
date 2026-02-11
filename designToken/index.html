@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>農業數位整合服務平臺 — Design Tokens</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>">
+</head>
+<body>
+
+<!-- Mobile Toggle -->
+<button class="mobile-toggle" id="mobileToggle" aria-label="Toggle sidebar">☰</button>
+
+<div class="site-wrapper">
+  <!-- ========== Sidebar ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__logo">
+      <div class="sidebar__logo-icon">🌱</div>
+      <div class="sidebar__logo-text">
+        農業數位設計系統
+        <span>Design Tokens v2.0</span>
+      </div>
+    </div>
+
+    <div class="sidebar__section">
+      <div class="sidebar__section-title">基礎</div>
+      <ul class="sidebar__nav">
+        <li><a href="#principles" class="active">設計原則</a></li>
+        <li><a href="#colors">色彩 Colors</a></li>
+        <li><a href="#industry-colors">產業別色彩</a></li>
+        <li><a href="#sort-colors">分類色彩</a></li>
+        <li><a href="#component-colors">元件色彩</a></li>
+        <li><a href="#typography">文字 Typography</a></li>
+        <li><a href="#spacing">間距 Spacing</a></li>
+        <li><a href="#radius">圓角 Radius</a></li>
+        <li><a href="#shadows">陰影 Shadows</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar__section">
+      <div class="sidebar__section-title">語意</div>
+      <ul class="sidebar__nav">
+        <li><a href="#semantic-colors">語意色彩</a></li>
+        <li><a href="#status-colors">狀態色彩</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar__section">
+      <div class="sidebar__section-title">元件</div>
+      <ul class="sidebar__nav">
+        <li><a href="#buttons">按鈕 Buttons</a></li>
+        <li><a href="#sort-buttons">分類排序按鈕</a></li>
+        <li><a href="#industry-tags">產業別標籤</a></li>
+        <li><a href="#inputs">輸入框 Inputs</a></li>
+        <li><a href="#cards">卡片 Cards</a></li>
+        <li><a href="#badges">狀態標籤 Badges</a></li>
+        <li><a href="#timeline">進度時間軸</a></li>
+        <li><a href="#breadcrumb">麵包屑導覽</a></li>
+        <li><a href="#pagination">分頁 Pagination</a></li>
+        <li><a href="#header">Header 頁首</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar__section">
+      <div class="sidebar__section-title">佈局</div>
+      <ul class="sidebar__nav">
+        <li><a href="#layout">佈局 Layout</a></li>
+        <li><a href="#grid">CSS Grid</a></li>
+        <li><a href="#breakpoints">斷點 Breakpoints</a></li>
+        <li><a href="#animation">動態 Animation</a></li>
+        <li><a href="#zindex">層級 Z-index</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar__section">
+      <div class="sidebar__section-title">技術</div>
+      <ul class="sidebar__nav">
+        <li><a href="#tech-stack">技術堆疊</a></li>
+        <li><a href="#naming">命名規範</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- ========== Main Content ========== -->
+  <main class="main-content">
+    <header class="page-header">
+      <h1>🌿 農業數位整合服務平臺 Design Tokens</h1>
+      <p>基於 Bootstrap 5.3.8 + 自訂 SCSS 擴展的統一設計語彙 — 取自產品實際切版檔</p>
+    </header>
+
+    <div class="content-area">
+
+      <!-- ============================
+           設計原則
+           ============================ -->
+      <section class="section" id="principles">
+        <h2 class="section__title">設計原則 Design Principles</h2>
+        <p class="section__desc">以下六項原則指導本設計系統的所有決策，確保農業數位整合服務平臺對農民友善、資訊清晰、操作順暢。</p>
+
+        <div class="principles-grid">
+          <div class="principle-card">
+            <div class="principle-card__number">1</div>
+            <div class="principle-card__title">親和性優先</div>
+            <div class="principle-card__subtitle">Approachable First</div>
+            <div class="principle-card__desc">使用溫暖的自然色系（綠色 color01、橘色 color02）和圓潤的圖形元素（pill 圓角按鈕），降低政府服務的距離感，讓農民感到親切易用。</div>
+          </div>
+          <div class="principle-card">
+            <div class="principle-card__number">2</div>
+            <div class="principle-card__title">資訊層級清晰</div>
+            <div class="principle-card__subtitle">Clear Information Hierarchy</div>
+            <div class="principle-card__desc">透過 .tag-progress / .tag-history 顏色標籤、.status-history-item 時間軸和 .card 卡片式佈局，讓使用者快速識別申請進度和重要資訊。</div>
+          </div>
+          <div class="principle-card">
+            <div class="principle-card__number">3</div>
+            <div class="principle-card__title">多元登入路徑</div>
+            <div class="principle-card__subtitle">Flexible Authentication</div>
+            <div class="principle-card__desc">提供 .login-tabs 切換帳號登入 / QR Code / 自然人憑證，搭配 .header-auth 快速入口，適應不同使用習慣的農民。</div>
+          </div>
+          <div class="principle-card">
+            <div class="principle-card__number">4</div>
+            <div class="principle-card__title">搜尋與篩選並重</div>
+            <div class="principle-card__subtitle">Search &amp; Filter Balance</div>
+            <div class="principle-card__desc">結合 .search-block 關鍵字搜尋和 .btn-sort-group 多維度篩選（產業別 --sort-checked-bg、服務分類 --sort-color），滿足不同查找需求。</div>
+          </div>
+          <div class="principle-card">
+            <div class="principle-card__number">5</div>
+            <div class="principle-card__title">視覺化狀態回饋</div>
+            <div class="principle-card__subtitle">Visual Status Feedback</div>
+            <div class="principle-card__desc">使用 .status-history 進度時間軸、.demo-badge 彩色標籤和產業別專屬色彩（農綠/林深綠/漁藍/畜橘紅），即時傳達案件處理狀態。</div>
+          </div>
+          <div class="principle-card">
+            <div class="principle-card__number">6</div>
+            <div class="principle-card__title">行動優先設計</div>
+            <div class="principle-card__subtitle">Mobile-First Design</div>
+            <div class="principle-card__desc">以 Bootstrap CSS Grid ($enable-cssgrid: true) 打造行動優先佈局，footer 強調 APP 下載入口（QR Code + Google Play + App Store），符合農民田間行動使用場景。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================
+           色彩
+           ============================ -->
+      <section class="section" id="colors">
+        <h2 class="section__title">色彩 Colors</h2>
+        <p class="section__desc">色彩系統以「自然綠 color01」為主色、「豐收橘 color02」為輔助色，由 _variables.scss 定義，經 Bootstrap 編譯為 --bs-color01-* / --bs-color02-* 系列 CSS 變數。</p>
+
+        <div class="info-banner">
+          <strong>📋 命名對照：</strong>
+          SCSS 變數 <code>$color01</code> → CSS 變數 <code>--bs-color01-{100~900}</code> → Bootstrap 類別 <code>.btn-color01-500</code> <code>.bg-color01-100</code> <code>.text-color01-700</code>
+        </div>
+
+        <!-- Primary Green -->
+        <div class="subsection">
+          <h3 class="subsection__title">🟢 主色 Primary — 自然綠 (color01)</h3>
+          <div class="color-grid">
+            <div class="color-swatch" data-token="--bs-color01-100">
+              <div class="color-swatch__preview" style="background:#f1f8ed"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">100</div>
+                <div class="color-swatch__value">#f1f8ed</div>
+                <div class="color-swatch__token">--bs-color01-100</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-200">
+              <div class="color-swatch__preview" style="background:#b7e3cd"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">200</div>
+                <div class="color-swatch__value">#b7e3cd</div>
+                <div class="color-swatch__token">--bs-color01-200</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-300">
+              <div class="color-swatch__preview" style="background:#86d0b1"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">300</div>
+                <div class="color-swatch__value">#86d0b1</div>
+                <div class="color-swatch__token">--bs-color01-300</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-400">
+              <div class="color-swatch__preview" style="background:#57bf96"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">400</div>
+                <div class="color-swatch__value">#57bf96</div>
+                <div class="color-swatch__token">--bs-color01-400</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-500">
+              <div class="color-swatch__preview" style="background:#0ba26b"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">500 ★ 主要</div>
+                <div class="color-swatch__value">#0ba26b</div>
+                <div class="color-swatch__token">--bs-color01-500</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-600">
+              <div class="color-swatch__preview" style="background:#0a8f64"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">600</div>
+                <div class="color-swatch__value">#0a8f64</div>
+                <div class="color-swatch__token">--bs-color01-600</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-700">
+              <div class="color-swatch__preview" style="background:#097e5e"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">700</div>
+                <div class="color-swatch__value">#097e5e</div>
+                <div class="color-swatch__token">--bs-color01-700</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-800">
+              <div class="color-swatch__preview" style="background:#086f59"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">800</div>
+                <div class="color-swatch__value">#086f59</div>
+                <div class="color-swatch__token">--bs-color01-800</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color01-900">
+              <div class="color-swatch__preview" style="background:#075750; color:white"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">900</div>
+                <div class="color-swatch__value">#075750</div>
+                <div class="color-swatch__token">--bs-color01-900</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Orange -->
+        <div class="subsection">
+          <h3 class="subsection__title">🟠 輔助色 Secondary — 豐收橘 (color02)</h3>
+          <div class="color-grid">
+            <div class="color-swatch" data-token="--bs-color02-100">
+              <div class="color-swatch__preview" style="background:#fef4e1"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">100</div>
+                <div class="color-swatch__value">#fef4e1</div>
+                <div class="color-swatch__token">--bs-color02-100</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-200">
+              <div class="color-swatch__preview" style="background:#f8d4b4"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">200</div>
+                <div class="color-swatch__value">#f8d4b4</div>
+                <div class="color-swatch__token">--bs-color02-200</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-300">
+              <div class="color-swatch__preview" style="background:#f4bd93"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">300</div>
+                <div class="color-swatch__value">#f4bd93</div>
+                <div class="color-swatch__token">--bs-color02-300</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-400">
+              <div class="color-swatch__preview" style="background:#f1a874"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">400</div>
+                <div class="color-swatch__value">#f1a874</div>
+                <div class="color-swatch__token">--bs-color02-400</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-500">
+              <div class="color-swatch__preview" style="background:#ea8644"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">500 ★ 主要</div>
+                <div class="color-swatch__value">#ea8644</div>
+                <div class="color-swatch__token">--bs-color02-500</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-600">
+              <div class="color-swatch__preview" style="background:#db7937"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">600</div>
+                <div class="color-swatch__value">#db7937</div>
+                <div class="color-swatch__token">--bs-color02-600</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-700">
+              <div class="color-swatch__preview" style="background:#c66626"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">700</div>
+                <div class="color-swatch__value">#c66626</div>
+                <div class="color-swatch__token">--bs-color02-700</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-800">
+              <div class="color-swatch__preview" style="background:#b35516"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">800</div>
+                <div class="color-swatch__value">#b35516</div>
+                <div class="color-swatch__token">--bs-color02-800</div>
+              </div>
+            </div>
+            <div class="color-swatch" data-token="--bs-color02-900">
+              <div class="color-swatch__preview" style="background:#993e01"></div>
+              <div class="color-swatch__info">
+                <div class="color-swatch__name">900</div>
+                <div class="color-swatch__value">#993e01</div>
+                <div class="color-swatch__token">--bs-color02-900</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gray -->
+        <div class="subsection">
+          <h3 class="subsection__title">⚪ 中性色 Neutral — Bootstrap 灰階</h3>
+          <div class="color-grid">
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#f8f9fa"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 100</div><div class="color-swatch__value">#f8f9fa</div><div class="color-swatch__token">--bs-gray-100</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#e9ecef"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 200</div><div class="color-swatch__value">#e9ecef</div><div class="color-swatch__token">--bs-gray-200</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#dee2e6"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 300</div><div class="color-swatch__value">#dee2e6</div><div class="color-swatch__token">--bs-gray-300</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#ced4da"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 400</div><div class="color-swatch__value">#ced4da</div><div class="color-swatch__token">--bs-gray-400</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#adb5bd"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 500</div><div class="color-swatch__value">#adb5bd</div><div class="color-swatch__token">--bs-gray-500</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#6c757d;color:white"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 600</div><div class="color-swatch__value">#6c757d</div><div class="color-swatch__token">--bs-gray-600</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#495057;color:white"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 700</div><div class="color-swatch__value">#495057</div><div class="color-swatch__token">--bs-gray-700</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#343a40;color:white"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 800</div><div class="color-swatch__value">#343a40</div><div class="color-swatch__token">--bs-gray-800</div></div></div>
+            <div class="color-swatch"><div class="color-swatch__preview" style="background:#212529;color:white"></div><div class="color-swatch__info"><div class="color-swatch__name">Gray 900</div><div class="color-swatch__value">#212529</div><div class="color-swatch__token">--bs-gray-900</div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================
+           產業別色彩
+           ============================ -->
+      <section class="section" id="industry-colors">
+        <h2 class="section__title">產業別色彩 Industry Colors</h2>
+        <p class="section__desc">每種產業使用專屬色彩，透過 HTML inline style <code>--sort-checked-bg</code> 定義。來源：dist/search-scholarship.html 之 .btn-sort-group。</p>
+
+        <div class="color-grid" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#0ba26b; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:700">農</div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">農 Agriculture</div>
+              <div class="color-swatch__value">#0ba26b</div>
+              <div class="color-swatch__token">--industry-agriculture (預設 color01-500)</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#4C956C; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:700">林</div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">林 Forestry</div>
+              <div class="color-swatch__value">#4C956C</div>
+              <div class="color-swatch__token">--industry-forestry</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#00B4D8; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:700">漁</div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">漁 Fishery</div>
+              <div class="color-swatch__value">#00B4D8</div>
+              <div class="color-swatch__token">--industry-fishery</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#F07167; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:700">畜</div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">畜 Livestock</div>
+              <div class="color-swatch__value">#F07167</div>
+              <div class="color-swatch__token">--industry-livestock</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-6)">
+<span class="token-comment">/* 切版 HTML 用法 (dist/search-scholarship.html) */</span>
+&lt;div class="<span class="token-string">btn-sort-group</span>"&gt;
+  &lt;input type="radio" name="industry" id="agriculture"&gt;
+  &lt;label for="agriculture"&gt;農&lt;/label&gt;
+  &lt;input type="radio" name="industry" id="forestry"
+         style="<span class="token-keyword">--sort-checked-bg: #4C956C</span>"&gt;
+  &lt;label for="forestry"&gt;林&lt;/label&gt;
+  &lt;input type="radio" name="industry" id="fishery"
+         style="<span class="token-keyword">--sort-checked-bg: #00B4D8</span>"&gt;
+  &lt;label for="fishery"&gt;漁&lt;/label&gt;
+  &lt;input type="radio" name="industry" id="livestock"
+         style="<span class="token-keyword">--sort-checked-bg: #F07167</span>"&gt;
+  &lt;label for="livestock"&gt;畜&lt;/label&gt;
+&lt;/div&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           服務分類色彩
+           ============================ -->
+      <section class="section" id="sort-colors">
+        <h2 class="section__title">服務分類色彩 Sort Colors</h2>
+        <p class="section__desc">首頁每個服務分類排序按鈕擁有獨立色彩，透過 <code>--sort-color</code> inline style 定義。來源：dist/index.html。</p>
+
+        <div class="color-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#6D4E87"></div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">資金貸款</div>
+              <div class="color-swatch__value">#6D4E87</div>
+              <div class="color-swatch__token">--sort-fund-loan</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#097e5e"></div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">保費補助</div>
+              <div class="color-swatch__value">#097e5e</div>
+              <div class="color-swatch__token">--sort-premium-subsidy</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#5B7000"></div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">3章1Q補助</div>
+              <div class="color-swatch__value">#5B7000</div>
+              <div class="color-swatch__token">--sort-3q-subsidy</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#b35516"></div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">環境永續</div>
+              <div class="color-swatch__value">#b35516</div>
+              <div class="color-swatch__token">--sort-environment</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#0E5695"></div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">漁業補助</div>
+              <div class="color-swatch__value">#0E5695</div>
+              <div class="color-swatch__token">--sort-fishery</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch__preview" style="background:#097e5e"></div>
+            <div class="color-swatch__info">
+              <div class="color-swatch__name">設備補助 / 天然災害 / 其他</div>
+              <div class="color-swatch__value">#097e5e</div>
+              <div class="color-swatch__token">--sort-equipment (color01-700)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-6)">
+<span class="token-comment">/* 切版 HTML 用法 (dist/index.html) */</span>
+&lt;button class="<span class="token-string">sort-btn</span>" style="<span class="token-keyword">--sort-color: #6D4E87</span>"&gt;
+  &lt;span class="sort-btn-icon"&gt;💰&lt;/span&gt;
+  &lt;span class="sort-btn-text"&gt;資金貸款&lt;/span&gt;
+&lt;/button&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           元件級色彩
+           ============================ -->
+      <section class="section" id="component-colors">
+        <h2 class="section__title">元件級色彩 Component Colors</h2>
+        <p class="section__desc">由 front_style.css 定義的元件專屬 CSS Custom Properties，用於卡片、註冊、捲軸等特定情境。</p>
+
+        <table class="token-table">
+          <thead>
+            <tr><th>CSS 變數</th><th>值</th><th>用途</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="token-name">--card-main-color</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#0ba26b"></span>#0ba26b</span></td>
+              <td>卡片主色（邊框/圖示）</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--card-body-bg</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#fff3da"></span>#fff3da</span></td>
+              <td>卡片內容區背景</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--card-title-text-bg</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#fef4e1"></span>#fef4e1</span></td>
+              <td>卡片標題文字底色</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--card-hover-color</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#0ba26b"></span>#0ba26b</span></td>
+              <td>卡片 hover 高亮色</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--register-content-main-color</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#db7937"></span>#db7937</span></td>
+              <td>註冊頁面主色 (color02-600)</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--register-sidebar-bg-color</span></td>
+              <td><span class="token-value">hsla(35,51%,68%,0.3)</span></td>
+              <td>註冊側邊欄背景</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--folder-scrollbar-thumb</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#0ba26b"></span>#0ba26b</span></td>
+              <td>資料夾捲軸拖曳色</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--folder-scrollbar-track</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#dee2e6"></span>#dee2e6</span></td>
+              <td>資料夾捲軸軌道色</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--password-rule-icon-color</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#0ba26b"></span>#0ba26b</span></td>
+              <td>密碼規則圖示色</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">--dropdown-link-active-bg</span></td>
+              <td><span class="token-value" style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#e4f4e4"></span>#e4f4e4</span></td>
+              <td>下拉選單選中項背景</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           語意色彩
+           ============================ -->
+      <section class="section" id="semantic-colors">
+        <h2 class="section__title">語意色彩 Semantic Colors</h2>
+        <p class="section__desc">用於表達功能性語意的顏色，對應 Bootstrap 語意色 + 自訂映射。</p>
+
+        <div class="semantic-grid">
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#0ba26b"></div><div class="semantic-card__info"><div class="semantic-card__label">成功 Success</div><div class="semantic-card__token">--color-success: #0ba26b (= color01-500)</div></div></div>
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#ea8644"></div><div class="semantic-card__info"><div class="semantic-card__label">警告 Warning</div><div class="semantic-card__token">--color-warning: #ea8644 (= color02-500)</div></div></div>
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#dc3545"></div><div class="semantic-card__info"><div class="semantic-card__label">錯誤 Error</div><div class="semantic-card__token">--color-error: #dc3545 (= BS danger)</div></div></div>
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#0d6efd"></div><div class="semantic-card__info"><div class="semantic-card__label">資訊 Info</div><div class="semantic-card__token">--color-info: #0d6efd (= BS primary)</div></div></div>
+        </div>
+      </section>
+
+      <!-- ============================
+           狀態色彩
+           ============================ -->
+      <section class="section" id="status-colors">
+        <h2 class="section__title">狀態色彩 Status Colors</h2>
+        <p class="section__desc">對應產品中 .tag-progress / .tag-history 等申請案件處理狀態標籤。</p>
+
+        <div class="semantic-grid">
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#0ba26b"></div><div class="semantic-card__info"><div class="semantic-card__label">🟢 進度查詢 .tag-progress</div><div class="semantic-card__token">色彩: #0ba26b (color01-500)</div></div></div>
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#0d6efd"></div><div class="semantic-card__info"><div class="semantic-card__label">🔵 歷史查詢 .tag-history</div><div class="semantic-card__token">色彩: #0d6efd (BS primary)</div></div></div>
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#ea8644"></div><div class="semantic-card__info"><div class="semantic-card__label">🟠 待處理 / 審核中</div><div class="semantic-card__token">色彩: #ea8644 (color02-500)</div></div></div>
+          <div class="semantic-card"><div class="semantic-card__dot" style="background:#dc3545"></div><div class="semantic-card__info"><div class="semantic-card__label">🔴 退回 / 不合格</div><div class="semantic-card__token">色彩: #dc3545 (BS danger)</div></div></div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Typography
+           ============================ -->
+      <section class="section" id="typography">
+        <h2 class="section__title">文字 Typography</h2>
+        <p class="section__desc">使用 Bootstrap 預設 system-ui 字型堆疊，包含 Noto Sans 作為 fallback，確保中英文最佳閱讀體驗。</p>
+
+        <div class="info-banner" style="margin-bottom:var(--space-6)">
+          <strong>🔤 字型堆疊：</strong>
+          <code style="font-size:12px">system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif</code>
+        </div>
+
+        <!-- Font Scale -->
+        <div class="subsection">
+          <h3 class="subsection__title">字級 Font Size Scale（來自 _variables.scss $font-size map）</h3>
+          <div class="type-scale">
+            <div class="type-row">
+              <div class="type-row__label">--fs-md (基礎)</div>
+              <div class="type-row__sample" style="font-size:1rem">農民服務整合平臺 Aa Bb 123</div>
+              <div class="type-row__size">16px / 1rem</div>
+            </div>
+            <div class="type-row">
+              <div class="type-row__label">--fs-lg</div>
+              <div class="type-row__sample" style="font-size:1.125rem">農民服務整合平臺 Aa Bb 123</div>
+              <div class="type-row__size">18px / 1.125rem</div>
+            </div>
+            <div class="type-row">
+              <div class="type-row__label">--fs-xl</div>
+              <div class="type-row__sample" style="font-size:1.25rem">農民服務整合平臺 Aa Bb 123</div>
+              <div class="type-row__size">20px / 1.25rem</div>
+            </div>
+            <div class="type-row">
+              <div class="type-row__label">--fs-xxl</div>
+              <div class="type-row__sample" style="font-size:1.5rem">農民服務整合平臺 Aa Bb 123</div>
+              <div class="type-row__size">24px / 1.5rem</div>
+            </div>
+            <div class="type-row">
+              <div class="type-row__label">--fs-3xl</div>
+              <div class="type-row__sample" style="font-size:1.75rem">農民服務整合平臺 Aa Bb 123</div>
+              <div class="type-row__size">28px / 1.75rem</div>
+            </div>
+            <div class="type-row">
+              <div class="type-row__label">--fs-4xl</div>
+              <div class="type-row__sample" style="font-size:2rem">農民服務整合平臺 Aa Bb</div>
+              <div class="type-row__size">32px / 2rem</div>
+            </div>
+            <div class="type-row">
+              <div class="type-row__label">--fs-5xl</div>
+              <div class="type-row__sample" style="font-size:2.5rem">農民服務整合平臺</div>
+              <div class="type-row__size">40px / 2.5rem</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Font Weight -->
+        <div class="subsection">
+          <h3 class="subsection__title">字重 Font Weight</h3>
+          <div class="weight-grid">
+            <div class="weight-card"><div class="weight-card__sample" style="font-weight:400">農業數位 Aa</div><div class="weight-card__name">Regular</div><div class="weight-card__value">400</div></div>
+            <div class="weight-card"><div class="weight-card__sample" style="font-weight:500">農業數位 Aa</div><div class="weight-card__name">Medium</div><div class="weight-card__value">500</div></div>
+            <div class="weight-card"><div class="weight-card__sample" style="font-weight:600">農業數位 Aa</div><div class="weight-card__name">Semibold</div><div class="weight-card__value">600</div></div>
+            <div class="weight-card"><div class="weight-card__sample" style="font-weight:700">農業數位 Aa</div><div class="weight-card__name">Bold</div><div class="weight-card__value">700</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Spacing
+           ============================ -->
+      <section class="section" id="spacing">
+        <h2 class="section__title">間距 Spacing</h2>
+        <p class="section__desc">以 4px 為基礎單位的間距系統（Bootstrap $spacer: 1rem），確保元素間距保持一致的視覺韻律。</p>
+
+        <div class="spacing-scale">
+          <div class="spacing-row"><div class="spacing-row__label">--space-1</div><div class="spacing-row__bar" style="width:4px"></div><div class="spacing-row__value">4px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-2</div><div class="spacing-row__bar" style="width:16px"></div><div class="spacing-row__value">8px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-3</div><div class="spacing-row__bar" style="width:24px"></div><div class="spacing-row__value">12px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-4</div><div class="spacing-row__bar" style="width:40px"></div><div class="spacing-row__value">16px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-5</div><div class="spacing-row__bar" style="width:50px"></div><div class="spacing-row__value">20px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-6</div><div class="spacing-row__bar" style="width:72px"></div><div class="spacing-row__value">24px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-8</div><div class="spacing-row__bar" style="width:112px"></div><div class="spacing-row__value">32px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-10</div><div class="spacing-row__bar" style="width:150px"></div><div class="spacing-row__value">40px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-12</div><div class="spacing-row__bar" style="width:192px"></div><div class="spacing-row__value">48px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-16</div><div class="spacing-row__bar" style="width:256px"></div><div class="spacing-row__value">64px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-20</div><div class="spacing-row__bar" style="width:320px"></div><div class="spacing-row__value">80px</div></div>
+          <div class="spacing-row"><div class="spacing-row__label">--space-24</div><div class="spacing-row__bar" style="width:384px"></div><div class="spacing-row__value">96px</div></div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Radius
+           ============================ -->
+      <section class="section" id="radius">
+        <h2 class="section__title">圓角 Border Radius</h2>
+        <p class="section__desc">Bootstrap 預設圓角 + 膠囊型，產品大量使用 <code>.rounded-pill</code> (50rem) 於按鈕與搜尋列。</p>
+
+        <div class="radius-grid">
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:0"></div><div class="radius-card__label">None</div><div class="radius-card__value">0</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:0.25rem"></div><div class="radius-card__label">SM (BS)</div><div class="radius-card__value">0.25rem / 4px</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:0.375rem"></div><div class="radius-card__label">Default (BS)</div><div class="radius-card__value">0.375rem / 6px</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:0.5rem"></div><div class="radius-card__label">LG (BS)</div><div class="radius-card__value">0.5rem / 8px</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:1rem"></div><div class="radius-card__label">XL (BS)</div><div class="radius-card__value">1rem / 16px</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:2rem"></div><div class="radius-card__label">XXL (BS)</div><div class="radius-card__value">2rem / 32px</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:50rem; width:120px; height:48px"></div><div class="radius-card__label">Pill ★</div><div class="radius-card__value">50rem (.rounded-pill)</div></div>
+          <div class="radius-card"><div class="radius-card__preview" style="border-radius:50%"></div><div class="radius-card__label">Circle</div><div class="radius-card__value">50% (.rounded-circle)</div></div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Shadows
+           ============================ -->
+      <section class="section" id="shadows">
+        <h2 class="section__title">陰影 Shadows</h2>
+        <p class="section__desc">三層陰影系統，由 _variables.scss $shadow map 定義，使用 rgba(19, 25, 39) 作為陰影基色。</p>
+
+        <div class="shadow-grid">
+          <div class="shadow-card" style="box-shadow:0 4px 4px -2px rgba(19,25,39,.08), 0 2px 4px -2px rgba(19,25,39,.12)"><div class="shadow-card__label">Small</div><div class="shadow-card__token">--shadow-sm</div></div>
+          <div class="shadow-card" style="box-shadow:0 10px 32px -4px rgba(19,25,39,.1), 0 6px 14px -6px rgba(19,25,39,.12)"><div class="shadow-card__label">Medium</div><div class="shadow-card__token">--shadow-md</div></div>
+          <div class="shadow-card" style="box-shadow:0 18px 88px -4px rgba(19,25,39,.14), 0 8px 28px -6px rgba(19,25,39,.12)"><div class="shadow-card__label">Large</div><div class="shadow-card__token">--shadow-lg</div></div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Buttons
+           ============================ -->
+      <section class="section" id="buttons">
+        <h2 class="section__title">按鈕 Buttons</h2>
+        <p class="section__desc">按鈕使用 Bootstrap 擴展的 <code>.btn-color01-*</code> / <code>.btn-color02-*</code> 類別，以及 <code>.btn-outline-color01-*</code> 變體。切版亦包含 <code>.btn-cancel</code>、<code>.btn-hover</code> 等自訂按鈕。</p>
+
+        <div class="component-grid">
+          <div class="component-card">
+            <div class="component-card__preview">
+              <button class="demo-btn demo-btn--primary demo-btn--sm">小按鈕</button>
+              <button class="demo-btn demo-btn--primary">查詢</button>
+              <button class="demo-btn demo-btn--primary demo-btn--lg">登入</button>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">Primary — .btn-color01-500</div>
+              <div class="component-card__tokens">bg: #0ba26b | color: #fff | radius: pill</div>
+            </div>
+          </div>
+          <div class="component-card">
+            <div class="component-card__preview">
+              <button class="demo-btn demo-btn--secondary demo-btn--sm">取消</button>
+              <button class="demo-btn demo-btn--secondary">列出全部</button>
+              <button class="demo-btn demo-btn--secondary demo-btn--lg">回前頁</button>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">Outline — .btn-outline-color01-500</div>
+              <div class="component-card__tokens">border: #0ba26b | bg: transparent | hover: fill</div>
+            </div>
+          </div>
+          <div class="component-card">
+            <div class="component-card__preview">
+              <button class="demo-btn demo-btn--warning">補件重送</button>
+              <button class="demo-btn" style="background:#db7937;color:white;border:none;border-radius:50rem">立即升級</button>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">Secondary — .btn-color02-*</div>
+              <div class="component-card__tokens">bg: #ea8644~#db7937 | color: #fff</div>
+            </div>
+          </div>
+          <div class="component-card">
+            <div class="component-card__preview">
+              <button class="demo-btn" style="background:#dee2e6;color:#495057;border:none;border-radius:50rem">取消</button>
+              <button class="demo-btn" style="background:transparent;color:#6c757d;border:1px solid #dee2e6;border-radius:50rem">返回</button>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">Cancel — .btn-cancel / .btn-hover</div>
+              <div class="component-card__tokens">bg: gray-300 | color: gray-700 | 取消/返回情境</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-6)">
+<span class="token-comment">/* 切版實際類別 (dist/) */</span>
+&lt;button class="<span class="token-string">btn btn-color01-500 rounded-pill</span>"&gt;查詢&lt;/button&gt;
+&lt;button class="<span class="token-string">btn btn-outline-color01-500 rounded-pill</span>"&gt;返回&lt;/button&gt;
+&lt;button class="<span class="token-string">btn btn-color02-500 rounded-pill</span>"&gt;補件重送&lt;/button&gt;
+&lt;button class="<span class="token-string">btn btn-cancel rounded-pill</span>"&gt;取消&lt;/button&gt;
+&lt;a class="<span class="token-string">btn btn-color01-500 btn-search rounded-pill</span>"&gt;🔍 搜尋&lt;/a&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Sort Buttons (分類排序)
+           ============================ -->
+      <section class="section" id="sort-buttons">
+        <h2 class="section__title">分類排序按鈕 Sort Buttons</h2>
+        <p class="section__desc">首頁使用 <code>.sort-btn</code> 搭配 <code>--sort-color</code> CSS 變數，每個分類有獨立顏色識別。</p>
+
+        <div class="component-card" style="max-width:700px">
+          <div class="component-card__preview" style="flex-wrap:wrap; gap:var(--space-3)">
+            <span class="demo-sort-btn" style="--sort-color:#6D4E87">💰 資金貸款</span>
+            <span class="demo-sort-btn" style="--sort-color:#097e5e">🛡️ 保費補助</span>
+            <span class="demo-sort-btn" style="--sort-color:#5B7000">✅ 3章1Q補助</span>
+            <span class="demo-sort-btn" style="--sort-color:#b35516">🌱 環境永續</span>
+            <span class="demo-sort-btn" style="--sort-color:#097e5e">🔧 設備補助</span>
+            <span class="demo-sort-btn" style="--sort-color:#0E5695">🐟 漁業補助</span>
+            <span class="demo-sort-btn" style="--sort-color:#097e5e">🌪️ 天然災害</span>
+          </div>
+          <div class="component-card__info">
+            <div class="component-card__name">.sort-btn + --sort-color</div>
+            <div class="component-card__tokens">每個分類以 inline --sort-color 定義專屬色彩</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Industry Tags (產業別標籤)
+           ============================ -->
+      <section class="section" id="industry-tags">
+        <h2 class="section__title">產業別標籤 Industry Tags</h2>
+        <p class="section__desc">搜尋頁的 <code>.btn-sort-group</code> radio 按鈕群組，透過 <code>--sort-checked-bg</code> 為每個產業定義選中色。</p>
+
+        <div class="component-card" style="max-width:500px">
+          <div class="component-card__preview" style="gap:var(--space-2)">
+            <span class="demo-industry-tag" style="--tag-bg:#0ba26b">農</span>
+            <span class="demo-industry-tag" style="--tag-bg:#4C956C">林</span>
+            <span class="demo-industry-tag" style="--tag-bg:#00B4D8">漁</span>
+            <span class="demo-industry-tag" style="--tag-bg:#F07167">畜</span>
+            <span class="demo-industry-tag demo-industry-tag--inactive">全部</span>
+          </div>
+          <div class="component-card__info">
+            <div class="component-card__name">.btn-sort-group radio buttons</div>
+            <div class="component-card__tokens">農: #0ba26b | 林: #4C956C | 漁: #00B4D8 | 畜: #F07167</div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-4)">
+<span class="token-comment">/* 切版實際結構 */</span>
+&lt;div class="<span class="token-string">btn-sort-group</span>"&gt;
+  &lt;input type="radio" name="type" id="all" checked&gt;
+  &lt;label for="all"&gt;全部&lt;/label&gt;
+  &lt;input type="radio" name="type" id="agri"&gt;
+  &lt;label for="agri"&gt;農&lt;/label&gt;
+  &lt;input type="radio" name="type" id="forest"
+    style="<span class="token-keyword">--sort-checked-bg:#4C956C</span>"&gt;
+  &lt;label for="forest"&gt;林&lt;/label&gt;
+  ...
+&lt;/div&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Inputs
+           ============================ -->
+      <section class="section" id="inputs">
+        <h2 class="section__title">輸入框 Inputs</h2>
+        <p class="section__desc">搜尋框使用 Bootstrap <code>.input-group</code> + <code>.rounded-pill</code>，支援關鍵字搜尋 + 語音搜尋 (.btn-microphone) 功能。</p>
+
+        <div class="component-grid">
+          <div class="component-card">
+            <div class="component-card__preview" style="flex-direction:column">
+              <input type="text" class="demo-input" placeholder="請輸入關鍵字搜尋">
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">.form-control (Bootstrap)</div>
+              <div class="component-card__tokens">height: 3rem | border-color: gray-300 | focus: color01-500</div>
+            </div>
+          </div>
+          <div class="component-card">
+            <div class="component-card__preview" style="flex-direction:column">
+              <div class="demo-search-bar">
+                <span class="demo-search-bar__label">關鍵字</span>
+                <input type="text" class="demo-search-bar__input" placeholder="請輸入關鍵字搜尋">
+                <button class="demo-search-bar__btn">🔍</button>
+              </div>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">.search-block .input-group .rounded-pill</div>
+              <div class="component-card__tokens">首頁搜尋列：label + input + search btn + microphone btn</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-6)">
+<span class="token-comment">/* 首頁搜尋列結構 (dist/index.html) */</span>
+&lt;div class="<span class="token-string">search-block</span>"&gt;
+  &lt;div class="<span class="token-string">input-group rounded-pill</span>"&gt;
+    &lt;span class="<span class="token-string">input-group-text bg-color01-500 text-white rounded-pill-start</span>"&gt;關鍵字&lt;/span&gt;
+    &lt;input type="text" class="<span class="token-string">form-control</span>" placeholder="請輸入關鍵字搜尋"&gt;
+    &lt;button class="<span class="token-string">btn btn-color01-500 btn-search</span>"&gt;🔍&lt;/button&gt;
+    &lt;button class="<span class="token-string">btn btn-microphone</span>"&gt;🎤&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Cards
+           ============================ -->
+      <section class="section" id="cards">
+        <h2 class="section__title">卡片 Cards</h2>
+        <p class="section__desc">卡片基於 Bootstrap <code>.card</code>，搭配自訂 <code>--card-main-color</code>、<code>--card-body-bg</code> 等 CSS 變數。首頁使用 Swiper.js 輪播展示。</p>
+
+        <div class="component-grid">
+          <div class="component-card">
+            <div class="component-card__preview">
+              <div class="demo-card">
+                <div style="display:flex; gap:var(--space-2); margin-bottom:var(--space-3)">
+                  <span class="demo-badge demo-badge--progress">🟢 進度查詢</span>
+                </div>
+                <div class="demo-card__title">獎勵農漁民子女獎學金</div>
+                <div class="demo-card__text">查詢申請進度</div>
+                <div style="display:flex; align-items:center; gap:var(--space-2); margin-top:var(--space-3)">
+                  <span class="demo-tag" style="font-size:11px">💰 資金貸款</span>
+                </div>
+              </div>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">.card — 服務卡片</div>
+              <div class="component-card__tokens">--card-main-color: #0ba26b | --card-body-bg: #fff3da</div>
+            </div>
+          </div>
+          <div class="component-card">
+            <div class="component-card__preview">
+              <div class="demo-card" style="max-width:320px">
+                <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-3)">
+                  <span class="demo-badge demo-badge--progress">🟢 線上申請</span>
+                  <span class="demo-badge demo-badge--pending">⏰ 27 天後到期</span>
+                </div>
+                <div class="demo-card__title" style="font-size:var(--font-size-md)">生產環境維護獎勵 - 114 年綠色環境給付</div>
+                <div class="demo-card__text" style="font-size:var(--font-size-xs); margin-top:var(--space-2)">
+                  <div>申請時間：114/01/02～114/02/02</div>
+                  <div>申請對象：農民</div>
+                </div>
+              </div>
+            </div>
+            <div class="component-card__info">
+              <div class="component-card__name">.card — 活動申請卡片</div>
+              <div class="component-card__tokens">含多 badge + .btn-activity (查看更多)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-6)">
+<span class="token-comment">/* 切版卡片結構 (dist/index.html) */</span>
+&lt;div class="<span class="token-string">card card-row</span>"&gt;
+  &lt;div class="<span class="token-string">card-body</span>"&gt;
+    &lt;h5 class="<span class="token-string">card-title</span>"&gt;獎勵農漁民子女獎學金&lt;/h5&gt;
+    &lt;p class="<span class="token-string">card-text</span>"&gt;...&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="<span class="token-string">card-img-overlay</span>"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+<span class="token-comment">/* Swiper 輪播 (首頁活動卡片) */</span>
+&lt;div class="<span class="token-string">swiper</span>"&gt;
+  &lt;div class="<span class="token-string">swiper-wrapper</span>"&gt;
+    &lt;div class="<span class="token-string">swiper-slide</span>"&gt;
+      &lt;div class="<span class="token-string">card</span>"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Badges
+           ============================ -->
+      <section class="section" id="badges">
+        <h2 class="section__title">狀態標籤 Badges</h2>
+        <p class="section__desc">用色彩編碼快速傳達案件狀態，實踐「視覺化狀態回饋」原則。產品中使用 <code>.tag-progress</code> / <code>.tag-history</code> 類別。</p>
+
+        <div class="component-card" style="max-width:600px">
+          <div class="component-card__preview" style="flex-direction:column; align-items:flex-start; gap:var(--space-4)">
+            <div style="display:flex; flex-wrap:wrap; gap:var(--space-3)">
+              <span class="demo-badge demo-badge--progress">🟢 進度查詢</span>
+              <span class="demo-badge demo-badge--history">🔵 歷史查詢</span>
+              <span class="demo-badge demo-badge--pending">🟠 待審核</span>
+              <span class="demo-badge demo-badge--error">🔴 退回</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:var(--space-3)">
+              <span class="demo-badge" style="background:#e8f5e9; color:#2e7d32">線上申請</span>
+              <span class="demo-badge" style="background:#fff3e0; color:#e65100">臨櫃申請</span>
+              <span class="demo-badge" style="background:#e3f2fd; color:#1565c0">已報送</span>
+            </div>
+          </div>
+          <div class="component-card__info">
+            <div class="component-card__name">.tag-progress / .tag-history / 自訂 Badge</div>
+            <div class="component-card__tokens">切版類別：.btn-on-site-apply, .btn-activity, .btn-agrinews</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================
+           Timeline
+           ============================ -->
+      <section class="section" id="timeline">
+        <h2 class="section__title">進度時間軸 Status Timeline</h2>
+        <p class="section__desc">追蹤申請案件的處理歷程，使用 <code>.status-history</code> + <code>.status-history-item</code> 結構，<code>.active</code> 類別標示最新節點。</p>
+
+        <div class="component-card" style="max-width:500px">
+          <div class="component-card__preview" style="justify-content:flex-start; padding:var(--space-6)">
+            <div class="demo-timeline">
+              <div class="demo-timeline__item demo-timeline__item--active">
+                <div class="demo-timeline__date" style="color:#0a8f64; font-weight:600">● 2025/08/25 AM 10:39</div>
+                <div class="demo-timeline__text">公所已受理</div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-tertiary)">公所確實受理</div>
+              </div>
+              <div class="demo-timeline__item">
+                <div class="demo-timeline__date">● 2025/08/23 PM 15:34</div>
+                <div class="demo-timeline__text">退回</div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-tertiary)">公所退回申請書，要求補件</div>
+              </div>
+              <div class="demo-timeline__item">
+                <div class="demo-timeline__date">● 2025/08/20 PM 16:12</div>
+                <div class="demo-timeline__text">已報送</div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-tertiary)">農民送出申請書</div>
+              </div>
+            </div>
+          </div>
+          <div class="component-card__info">
+            <div class="component-card__name">.status-history &gt; .status-history-item.active</div>
+            <div class="component-card__tokens">active dot: #0ba26b | inactive: --bs-gray-400</div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-4)">
+<span class="token-comment">/* 切版結構 (dist/search-scholarship.html) */</span>
+&lt;div class="<span class="token-string">status-history</span>"&gt;
+  &lt;div class="<span class="token-string">status-history-item active</span>"&gt;
+    &lt;div class="<span class="token-string">status-title</span>"&gt;公所已受理&lt;/div&gt;
+    &lt;div class="status-date"&gt;2025/08/25 AM 10:39&lt;/div&gt;
+    &lt;div class="status-desc"&gt;公所確實受理&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="<span class="token-string">status-history-item</span>"&gt;
+    &lt;div class="<span class="token-string">status-title</span>"&gt;已報送&lt;/div&gt;
+    ...
+  &lt;/div&gt;
+&lt;/div&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Breadcrumb
+           ============================ -->
+      <section class="section" id="breadcrumb">
+        <h2 class="section__title">麵包屑導覽 Breadcrumb</h2>
+        <p class="section__desc">使用自訂 <code>.breadcrumb-nav</code> 結構（非 Bootstrap 預設 .breadcrumb），搭配 &gt; 分隔符號。</p>
+
+        <div class="component-card" style="max-width:600px">
+          <div class="component-card__preview" style="justify-content:flex-start">
+            <nav class="demo-breadcrumb">
+              <a href="#">首頁</a>
+              <span class="demo-breadcrumb__sep">&gt;</span>
+              <a href="#">申辦查詢</a>
+              <span class="demo-breadcrumb__sep">&gt;</span>
+              <span class="demo-breadcrumb__current">獎勵農漁民子女獎學金</span>
+            </nav>
+          </div>
+          <div class="component-card__info">
+            <div class="component-card__name">.breadcrumb-nav &gt; .breadcrumb-list &gt; .breadcrumb-item</div>
+            <div class="component-card__tokens">link: color01-500 | current: gray-700 | sep: &gt;</div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-4)">
+<span class="token-comment">/* 切版結構 (dist/search-scholarship.html) */</span>
+&lt;nav class="<span class="token-string">breadcrumb-nav</span>"&gt;
+  &lt;ol class="<span class="token-string">breadcrumb-list</span>"&gt;
+    &lt;li class="<span class="token-string">breadcrumb-item</span>"&gt;
+      &lt;a class="<span class="token-string">breadcrumb-link</span>" href="#"&gt;首頁&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li class="<span class="token-string">breadcrumb-item active</span>"&gt;申辦查詢&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/nav&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Pagination
+           ============================ -->
+      <section class="section" id="pagination">
+        <h2 class="section__title">分頁 Pagination</h2>
+        <p class="section__desc">自訂分頁元件，含上下頁按鈕 + 頁碼 select 下拉選單 + 跳頁 select。</p>
+
+        <div class="component-card" style="max-width:500px">
+          <div class="component-card__preview" style="gap:var(--space-3)">
+            <button class="demo-page-btn" disabled>‹ 上一頁</button>
+            <select class="demo-page-select"><option>第 1 頁</option><option>第 2 頁</option></select>
+            <span style="font-size:var(--font-size-sm);color:var(--color-text-tertiary)">/</span>
+            <select class="demo-page-select"><option>共 5 頁</option></select>
+            <button class="demo-page-btn">下一頁 ›</button>
+          </div>
+          <div class="component-card__info">
+            <div class="component-card__name">.pagination &gt; .page-btn + .page-select</div>
+            <div class="component-card__tokens">包含 prev/next btn + 兩個 select 下拉選單</div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:var(--space-4)">
+<span class="token-comment">/* 切版結構 (dist/templates/components/pagination.html) */</span>
+&lt;nav class="<span class="token-string">pagination</span>"&gt;
+  &lt;button class="<span class="token-string">page-btn prev</span>" disabled&gt;上一頁&lt;/button&gt;
+  &lt;select class="<span class="token-string">page-select</span>"&gt;
+    &lt;option&gt;第 1 頁&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;span&gt;/&lt;/span&gt;
+  &lt;select class="<span class="token-string">page-select</span>"&gt;
+    &lt;option&gt;共 5 頁&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;button class="<span class="token-string">page-btn next</span>"&gt;下一頁&lt;/button&gt;
+&lt;/nav&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Header 頁首
+           ============================ -->
+      <section class="section" id="header">
+        <h2 class="section__title">Header 頁首</h2>
+        <p class="section__desc">頁首包含 Logo、天氣資訊、登入/註冊按鈕、會員中心入口、漢堡選單、主導覽列等元素。</p>
+
+        <div class="info-banner">
+          <strong>📦 Header 組成元素：</strong>
+          .header → .header-right (.header-weather + .header-auth [.header-login + .header-register]) + .header-menu-btn + .header-nav (.header-nav-list &gt; .header-nav-item &gt; .header-nav-link)
+        </div>
+
+        <table class="token-table" style="margin-top:var(--space-4)">
+          <thead>
+            <tr><th>元素</th><th>切版類別</th><th>說明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Logo</td><td><span class="token-name">.header .logo</span></td><td>平臺識別標誌</td></tr>
+            <tr><td>天氣資訊</td><td><span class="token-name">.header-weather</span></td><td>即時天氣溫度顯示</td></tr>
+            <tr><td>登入按鈕</td><td><span class="token-name">.header-login</span></td><td>SVG 圖示 + 文字「登入」</td></tr>
+            <tr><td>註冊按鈕</td><td><span class="token-name">.header-register</span></td><td>SVG 圖示 + 文字「註冊」</td></tr>
+            <tr><td>漢堡選單</td><td><span class="token-name">.header-menu-btn</span></td><td>行動版收合選單觸發器</td></tr>
+            <tr><td>主導覽</td><td><span class="token-name">.header-nav-list &gt; .header-nav-item</span></td><td>各功能頁面導覽連結 + FA6 icon</td></tr>
+            <tr><td>導覽連結</td><td><span class="token-name">.header-nav-link</span></td><td>hover/active 以 color01-500 標示</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           Layout
+           ============================ -->
+      <section class="section" id="layout">
+        <h2 class="section__title">佈局 Layout</h2>
+        <p class="section__desc">核心佈局參數，基於 Bootstrap container 和實際頁面結構。</p>
+
+        <table class="token-table">
+          <thead><tr><th>Token</th><th>值</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="token-name">--layout-container-max</span></td><td><span class="token-value">1320px</span></td><td>Bootstrap .container xxl 最大寬度</td></tr>
+            <tr><td><span class="token-name">--layout-gutter</span></td><td><span class="token-value">1.5rem (24px)</span></td><td>Bootstrap gutter (--bs-gutter-x)</td></tr>
+            <tr><td><span class="token-name">--layout-header-height</span></td><td><span class="token-value">auto</span></td><td>Header 高度隨內容自動展開</td></tr>
+            <tr><td><span class="token-name">--layout-sidebar-width</span></td><td><span class="token-value">280px</span></td><td>會員中心側邊欄 (.member-center-sidebar)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           CSS Grid
+           ============================ -->
+      <section class="section" id="grid">
+        <h2 class="section__title">CSS Grid</h2>
+        <p class="section__desc">透過 _variables.scss 開啟 <code>$enable-cssgrid: true</code>，啟用 Bootstrap CSS Grid 系統。</p>
+
+        <table class="token-table">
+          <thead><tr><th>Token / 設定</th><th>值</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="token-name">$enable-cssgrid</span></td><td><span class="token-value">true</span></td><td>啟用 CSS Grid (取代 Flexbox grid)</td></tr>
+            <tr><td><span class="token-name">--bs-columns</span></td><td><span class="token-value">12</span></td><td>網格欄數</td></tr>
+            <tr><td><span class="token-name">--bs-gap</span></td><td><span class="token-value">1.5rem</span></td><td>網格間距</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-block" style="margin-top:var(--space-4)">
+<span class="token-comment">/* _variables.scss */</span>
+<span class="token-keyword">$enable-cssgrid</span>: <span class="token-string">true</span>;
+
+<span class="token-comment">/* 切版使用方式 */</span>
+&lt;div class="<span class="token-string">grid</span>"&gt;
+  &lt;div class="<span class="token-string">g-col-12 g-col-md-6 g-col-lg-4</span>"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+        </div>
+      </section>
+
+      <!-- ============================
+           Breakpoints
+           ============================ -->
+      <section class="section" id="breakpoints">
+        <h2 class="section__title">斷點 Breakpoints</h2>
+        <p class="section__desc">採用 Bootstrap 5 斷點系統，支援行動優先的響應式設計。</p>
+
+        <table class="token-table">
+          <thead><tr><th>Token</th><th>值</th><th>適用裝置</th></tr></thead>
+          <tbody>
+            <tr><td><span class="token-name">--bp-sm</span></td><td><span class="token-value">576px</span></td><td>📱 大螢幕手機 (landscape)</td></tr>
+            <tr><td><span class="token-name">--bp-md</span></td><td><span class="token-value">768px</span></td><td>📱 平板 (portrait)</td></tr>
+            <tr><td><span class="token-name">--bp-lg</span></td><td><span class="token-value">992px</span></td><td>💻 平板 (landscape) / 小筆電</td></tr>
+            <tr><td><span class="token-name">--bp-xl</span></td><td><span class="token-value">1200px</span></td><td>🖥 桌面螢幕</td></tr>
+            <tr><td><span class="token-name">--bp-xxl</span></td><td><span class="token-value">1400px</span></td><td>🖥 大桌面螢幕</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           Animation
+           ============================ -->
+      <section class="section" id="animation">
+        <h2 class="section__title">動態 Animation</h2>
+        <p class="section__desc">動態效果讓互動更自然，使用合理的時間和緩動曲線。</p>
+
+        <table class="token-table">
+          <thead><tr><th>Token</th><th>值</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><span class="token-name">--duration-fast</span></td><td><span class="token-value">150ms</span></td><td>微互動（hover、active）</td></tr>
+            <tr><td><span class="token-name">--duration-normal</span></td><td><span class="token-value">250ms</span></td><td>一般過渡（展開、折疊）</td></tr>
+            <tr><td><span class="token-name">--duration-slow</span></td><td><span class="token-value">350ms</span></td><td>大範圍動畫（頁面切換）</td></tr>
+            <tr><td><span class="token-name">--easing-standard</span></td><td><span class="token-value">cubic-bezier(0.4, 0, 0.2, 1)</span></td><td>標準緩動</td></tr>
+            <tr><td><span class="token-name">--easing-decelerate</span></td><td><span class="token-value">cubic-bezier(0, 0, 0.2, 1)</span></td><td>進場動畫</td></tr>
+            <tr><td><span class="token-name">--easing-accelerate</span></td><td><span class="token-value">cubic-bezier(0.4, 0, 1, 1)</span></td><td>離場動畫</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           Z-index
+           ============================ -->
+      <section class="section" id="zindex">
+        <h2 class="section__title">層級 Z-index</h2>
+        <p class="section__desc">統一的 z-index 管理，採用 Bootstrap 5 預設值。</p>
+
+        <table class="token-table">
+          <thead><tr><th>Token</th><th>值</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><span class="token-name">--z-dropdown</span></td><td><span class="token-value">1000</span></td><td>下拉選單</td></tr>
+            <tr><td><span class="token-name">--z-sticky</span></td><td><span class="token-value">1020</span></td><td>黏附頁首</td></tr>
+            <tr><td><span class="token-name">--z-fixed</span></td><td><span class="token-value">1030</span></td><td>固定元素</td></tr>
+            <tr><td><span class="token-name">--z-offcanvas-backdrop</span></td><td><span class="token-value">1040</span></td><td>Offcanvas 遮罩</td></tr>
+            <tr><td><span class="token-name">--z-offcanvas</span></td><td><span class="token-value">1045</span></td><td>Offcanvas 面板</td></tr>
+            <tr><td><span class="token-name">--z-modal-backdrop</span></td><td><span class="token-value">1050</span></td><td>Modal 遮罩</td></tr>
+            <tr><td><span class="token-name">--z-modal</span></td><td><span class="token-value">1055</span></td><td>Modal 對話框</td></tr>
+            <tr><td><span class="token-name">--z-popover</span></td><td><span class="token-value">1070</span></td><td>彈出提示</td></tr>
+            <tr><td><span class="token-name">--z-tooltip</span></td><td><span class="token-value">1080</span></td><td>Tooltip</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           技術堆疊
+           ============================ -->
+      <section class="section" id="tech-stack">
+        <h2 class="section__title">技術堆疊 Tech Stack</h2>
+        <p class="section__desc">本產品切版所使用的前端技術框架與函式庫。</p>
+
+        <table class="token-table">
+          <thead><tr><th>技術</th><th>版本</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><span class="token-name">Bootstrap</span></td><td><span class="token-value">5.3.8</span></td><td>CSS 框架 + CSS Grid 系統</td></tr>
+            <tr><td><span class="token-name">Font Awesome</span></td><td><span class="token-value">6 (Free + Brands)</span></td><td>圖示系統 (fa-solid / fa-brands)</td></tr>
+            <tr><td><span class="token-name">Swiper.js</span></td><td><span class="token-value">11</span></td><td>首頁輪播 / 卡片滑動</td></tr>
+            <tr><td><span class="token-name">SCSS</span></td><td><span class="token-value">—</span></td><td>自訂變數 (_variables.scss) 編譯至 front_style.css</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================
+           命名規範
+           ============================ -->
+      <section class="section" id="naming">
+        <h2 class="section__title">命名規範 Naming Convention</h2>
+        <p class="section__desc">切版檔案中使用的 CSS 類別命名模式，便於開發者快速對應。</p>
+
+        <table class="token-table">
+          <thead><tr><th>模式</th><th>範例</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="token-name">Bootstrap 色彩擴展</span></td>
+              <td><span class="token-value">.btn-color01-500, .bg-color02-100, .text-color01-700</span></td>
+              <td>SCSS $color01/$color02 map 自動產生</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">元件前綴</span></td>
+              <td><span class="token-value">.header-*, .footer-*, .login-*, .member-*, .apply-*</span></td>
+              <td>以頁面/功能區塊為前綴</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">搜尋系統</span></td>
+              <td><span class="token-value">.search-block, .search-condition, .search-result, .search-item</span></td>
+              <td>搜尋相關元件家族</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">狀態類別</span></td>
+              <td><span class="token-value">.active, .disabled, .checked</span></td>
+              <td>通用狀態切換</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">自訂按鈕</span></td>
+              <td><span class="token-value">.btn-cancel, .btn-hover, .btn-sort, .btn-search, .btn-microphone</span></td>
+              <td>功能性按鈕變體</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">CSS 變數 inline</span></td>
+              <td><span class="token-value">style="--sort-color:#6D4E87"</span></td>
+              <td>動態色彩以 inline CSS var 傳入</td>
+            </tr>
+            <tr>
+              <td><span class="token-name">頁面佈局</span></td>
+              <td><span class="token-value">.page-section, .page-heading, .page-heading-title</span></td>
+              <td>內頁通用區段結構</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div><!-- .content-area -->
+  </main>
+</div><!-- .site-wrapper -->
+
+<script src="js/main.js"></script>
+</body>
+</html>
