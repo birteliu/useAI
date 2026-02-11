@@ -1,5 +1,5 @@
 /**
- * 農業數位整合服務平臺 — Design Tokens Site
+ * 服務平臺 — Design Tokens Site
  * Interactive JavaScript
  */
 (function () {
