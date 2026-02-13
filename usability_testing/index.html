@@ -29,9 +29,9 @@
                 <div class="clay-card warning">
                     <h3>受訪者招募目標 (共 8 位)</h3>
                     <ul class="task-list">
-                        <li><span class="badge yellow">20-40 歲</span> 3 位 (青年農民)</li>
-                        <li><span class="badge orange">40-60 歲</span> 3 位 (壯年農民)</li>
-                        <li><span class="badge red">60 歲以上</span> 2 位 (資深農民)</li>
+                        <li><span class="badge yellow">45 歲以下</span> 3 位 (青年農民)</li>
+                        <li><span class="badge orange">46-64 歲</span> 3 位 (壯年農民)</li>
+                        <li><span class="badge red">65 歲以上</span> 2 位 (資深農民)</li>
                     </ul>
                 </div>
                 <div class="clay-card info">
@@ -69,15 +69,12 @@
                         </div>
                         <div class="form-group">
                             <label>性別</label>
-                            <!-- 修改：將 select 改為兩個 radio button -->
-                            <div style="display: flex; gap: 20px; align-items: center; min-height: 42px;">
-                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: normal;">
-                                    <input type="radio" name="gender" value="男" checked>
-                                    <span>男</span>
+                            <div class="radio-group" style="display:flex;">
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="男"> 男
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: normal;">
-                                    <input type="radio" name="gender" value="女">
-                                    <span>女</span>
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="女"> 女
                                 </label>
                             </div>
                         </div>
@@ -201,6 +198,23 @@
                             <textarea placeholder="這是最難的任務，請詳細記錄..."></textarea>
                         </div>
                     </div>
+
+                    <!-- Task 6 (New) -->
+                    <div class="clay-card task-card">
+                        <div class="task-header">
+                            <span class="task-num">06</span>
+                            <h3>在地青農入會申請</h3>
+                        </div>
+                        <p class="desc">路徑：首頁 > 申請 > 開始線上申請 > 填寫資料/上傳證件 > 線上簽名 > 送出</p>
+                        <div class="observation-area">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                任務成功
+                            </label>
+                            <textarea placeholder="觀察用戶在上傳證件或線上簽名時是否順利..."></textarea>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Post-Test Interview (Existing Quantative) -->
@@ -308,11 +322,17 @@
                         <span class="step-badge">任務 5</span>
                         <h1>查看自己的 E 文件<br>並「新增一筆土地資料」</h1>
                     </div>
+                    <!-- Card 6 (New) -->
+                    <div class="big-task" id="card-6">
+                        <span class="step-badge">任務 6</span>
+                        <h1>請進行<br>「在地青農入會申請」<br>需完成簽名與送出</h1>
+                    </div>
                 </div>
 
                 <div class="carousel-controls">
                     <button type="button" class="ctrl-btn" onclick="prevCard()">上一個</button>
-                    <span id="card-indicator">1 / 5</span>
+                    <!-- Update indicator from 5 to 6 -->
+                    <span id="card-indicator">1 / 6</span>
                     <button type="button" class="ctrl-btn" onclick="nextCard()">下一個</button>
                 </div>
             </div>

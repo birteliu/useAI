@@ -39,7 +39,8 @@ let taskTimers = {
     task2: { seconds: 0, interval: null, running: false },
     task3: { seconds: 0, interval: null, running: false },
     task4: { seconds: 0, interval: null, running: false },
-    task5: { seconds: 0, interval: null, running: false }
+    task5: { seconds: 0, interval: null, running: false },
+    task6: { seconds: 0, interval: null, running: false }
 };
 
 // --- 3. 監聽 Cloud Firestore 資料變化 ---
@@ -84,7 +85,7 @@ function switchTab(tabId) {
 
 // Carousel Logic
 let currentCardIndex = 1;
-const totalCards = 5;
+const totalCards = 6;
 
 function updateCardDisplay() {
     for (let i = 1; i <= totalCards; i++) {
@@ -381,7 +382,7 @@ function renderAnalysisGrid() {
 
             <div class="record-header">
                 <h4>${record.id}</h4>
-                <span class="badge ${badgeColor}" style="margin-right: 25px;">${record.successCount} / 5 成功</span> 
+                <span class="badge ${badgeColor}" style="margin-right: 25px;">${record.successCount} / 6 成功</span> 
             </div>
             
             <div class="user-tags">
@@ -453,7 +454,7 @@ function updateDashboard() {
     const avgQ3 = allTestRecords.reduce((sum, r) => sum + (r.q3 || 0), 0) / totalTests;
 
     // --- 計算各任務成功率 ---
-    let taskSuccessCounts = [0, 0, 0, 0, 0]; 
+    let taskSuccessCounts = [0, 0, 0, 0, 0, 0]; 
     let validTaskRecords = 0; // 有 taskSuccess 欄位的有效資料筆數
 
     allTestRecords.forEach(record => {
@@ -461,7 +462,7 @@ function updateDashboard() {
         if (record.taskSuccess && Array.isArray(record.taskSuccess) && record.taskSuccess.length > 0) {
             validTaskRecords++;
             record.taskSuccess.forEach((isSuccess, idx) => {
-                if (isSuccess === true && idx < 5) {
+                if (isSuccess === true && idx < 6) {
                     taskSuccessCounts[idx]++;
                 }
             });
@@ -477,7 +478,7 @@ function updateDashboard() {
             taskChartEl.innerHTML = '<div style="color: #64748b;">目前僅有舊格式資料。<br>請新增一筆測試紀錄，圖表將會自動出現。</div>';
         } else {
             let chartHtml = '';
-            const taskNames = ['任務一', '任務二', '任務三', '任務四', '任務五'];
+            const taskNames = ['任務一', '任務二', '任務三', '任務四', '任務五', '任務六'];
             
             taskSuccessCounts.forEach((count, idx) => {
                 const percentage = Math.round((count / validTaskRecords) * 100);
