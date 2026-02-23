@@ -113,23 +113,21 @@ function prevCard() {
     }
 }
 
-// Sliders Initialization
+// Sliders & Init
 document.addEventListener('DOMContentLoaded', () => {
-    const sliderIds = ['q1', 'q2', 'q3'];
-    sliderIds.forEach(id => {
-        const slider = document.getElementById(id);
-        const display = document.getElementById(id + '-val');
-        if (slider && display) {
-            slider.addEventListener('input', function() {
-                display.textContent = this.value;
-            });
-        }
-    });
+    // NPS slider (q3) 數值即時顯示
+    const npsSlider = document.getElementById('q3');
+    const npsDisplay = document.getElementById('q3-val');
+    if (npsSlider && npsDisplay) {
+        npsSlider.addEventListener('input', function() {
+            npsDisplay.textContent = this.value;
+        });
+    }
 
-    // 新增：為每個任務卡加入快速標籤
+    // 為每個任務卡加入快速標籤
     addQuickTagsToTaskCards();
     
-    // 新增：為每個任務卡加入計時器
+    // 為每個任務卡加入計時器
     addTimersToTaskCards();
 });
 
@@ -339,18 +337,18 @@ function renderAnalysisGrid() {
             if (timeVal > 180) timeColorStyle = 'color: #d32f2f; font-weight: bold;'; 
             else if (timeVal > 0) timeColorStyle = 'color: #2e7d32; font-weight: bold;'; 
 
-            // 新增：取得任務成功狀態
-            // 舊資料可能沒有 taskSuccess 欄位，預設為 null 或 false
+            // 新增：取得任務成功狀態（支援新版 3 狀態 & 舊版 boolean）
             let statusHtml = '';
             if (record.taskSuccess && Array.isArray(record.taskSuccess) && record.taskSuccess[index] !== undefined) {
-                const isSuccess = record.taskSuccess[index];
-                if (isSuccess) {
-                    statusHtml = `<span style="color: #4CAF50; font-weight: bold; font-size: 14px; margin-right: 8px;">成功</span>`;
-                } else {
-                    statusHtml = `<span style="color: #F44336; font-weight: bold; font-size: 14px; margin-right: 8px;">失敗</span>`;
+                const val = record.taskSuccess[index];
+                if (val === 'success' || val === true) {
+                    statusHtml = `<span style="color: #4CAF50; font-weight: bold; font-size: 14px; margin-right: 8px;">✓ 成功</span>`;
+                } else if (val === 'fail' || val === false) {
+                    statusHtml = `<span style="color: #F44336; font-weight: bold; font-size: 14px; margin-right: 8px;">✗ 不成功</span>`;
+                } else if (val === 'skipped') {
+                    statusHtml = `<span style="color: #9E9E9E; font-weight: bold; font-size: 14px; margin-right: 8px;">— 未操作</span>`;
                 }
             } else {
-                // 舊資料沒有紀錄個別狀態
                 statusHtml = `<span style="color: #ccc; font-size: 12px; margin-right: 8px;">(無狀態)</span>`;
             }
 
@@ -393,9 +391,8 @@ function renderAnalysisGrid() {
             </div>
 
             <div class="score-row">
-                <div class="score-item"><span>Q1信心</span>${record.q1 || 0}</div>
-                <div class="score-item"><span>Q2難易</span>${record.q2 || 0}</div>
-                <div class="score-item"><span>Q3推薦</span>${record.q3 || 0}</div>
+                <div class="score-item"><span>SUS分數</span>${record.susScore != null ? record.susScore : (record.q1 != null ? '-' : '-')}</div>
+                <div class="score-item"><span>NPS推薦</span>${record.npsScore != null ? record.npsScore : (record.q3 || '-')}</div>
                 <div class="score-item"><span>總耗時</span>${totalTimeStr}</div>
             </div>
 
@@ -403,6 +400,38 @@ function renderAnalysisGrid() {
                 <summary>任務觀察筆記 (${record.taskNotes.filter(n => n !== '-').length} 則)</summary>
                 <div class="detail-content">
                     ${taskHtml}
+                </div>
+            </details>
+
+            <details>
+                <summary>SUS 各題評分明細</summary>
+                <div class="detail-content">
+                    ${(() => {
+                        const susLabels = [
+                            '1. 我想我會經常使用這個產品',
+                            '2. 我覺得這個產品過於複雜',
+                            '3. 我認為這個產品是簡單好用的',
+                            '4. 我想我需要有人協助才能使用',
+                            '5. 我覺得功能整合的很好',
+                            '6. 我覺得有很多不一致的地方',
+                            '7. 我認為其他人能快速學會',
+                            '8. 我覺得使用很麻煩',
+                            '9. 我很有自信地使用',
+                            '10. 我需要學很多才能使用'
+                        ];
+                        if (record.susAnswers && Array.isArray(record.susAnswers)) {
+                            return record.susAnswers.map((val, idx) => {
+                                const score = val != null ? val : '-';
+                                const dots = val != null ? '●'.repeat(val) + '○'.repeat(5 - val) : '○○○○○';
+                                return `<div class="qa-item" style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid #f0f0f0;">
+                                    <span style="color:#555; flex:1;">${susLabels[idx]}</span>
+                                    <span style="font-family:monospace; color:#f59e0b; letter-spacing:2px; margin:0 8px;">${dots}</span>
+                                    <span style="font-weight:bold; color:#2563eb; min-width:20px; text-align:right;">${score}</span>
+                                </div>`;
+                            }).join('');
+                        }
+                        return '<div style="color:#999;">無 SUS 各題明細（舊格式資料）</div>';
+                    })()}
                 </div>
             </details>
 
@@ -424,57 +453,116 @@ function updateDashboard() {
     console.log("正在更新儀表板...");
 
     const totalUsersEl = document.getElementById('total-users');
-    const avgQ1El = document.getElementById('avg-q1');
-    const avgQ2El = document.getElementById('avg-q2');
+    const avgSusEl = document.getElementById('avg-sus');
+    const barSusEl = document.getElementById('bar-sus');
+    const avgNpsEl = document.getElementById('avg-nps');
+    const barNpsEl = document.getElementById('bar-nps');
     const avgQ3El = document.getElementById('avg-q3');
-    const barQ1El = document.getElementById('bar-q1');
-    const barQ2El = document.getElementById('bar-q2');
     const barQ3El = document.getElementById('bar-q3');
-    
-    // 檢查是否有這個容器，如果沒有，請確認 index.html
     const taskChartEl = document.getElementById('task-success-chart'); 
 
     if (allTestRecords.length === 0) {
         if (totalUsersEl) totalUsersEl.textContent = '0';
-        if (avgQ1El) avgQ1El.textContent = '-';
-        if (avgQ2El) avgQ2El.textContent = '-';
+        if (avgSusEl) avgSusEl.textContent = '-';
+        if (barSusEl) barSusEl.style.width = '0%';
+        if (avgNpsEl) avgNpsEl.textContent = '-';
+        if (barNpsEl) barNpsEl.style.width = '0%';
         if (avgQ3El) avgQ3El.textContent = '-';
-        if (barQ1El) barQ1El.style.width = '0%';
-        if (barQ2El) barQ2El.style.width = '0%';
         if (barQ3El) barQ3El.style.width = '0%';
         if (taskChartEl) taskChartEl.innerHTML = '<p style="color:#999">尚無資料</p>';
         return;
     }
 
     const totalTests = allTestRecords.length;
-    
-    // 計算平均分數
-    const avgQ1 = allTestRecords.reduce((sum, r) => sum + (r.q1 || 0), 0) / totalTests;
-    const avgQ2 = allTestRecords.reduce((sum, r) => sum + (r.q2 || 0), 0) / totalTests;
-    const avgQ3 = allTestRecords.reduce((sum, r) => sum + (r.q3 || 0), 0) / totalTests;
+
+    // --- 計算 SUS 平均 ---
+    let totalSus = 0;
+    let validSusCount = 0;
+
+    // --- 計算 NPS ---
+    let promoters = 0;   // 9-10 分
+    let detractors = 0;  // 0-6 分
+    let validNpsCount = 0;
+    let totalNpsRaw = 0; // NPS 原始推薦分數加總
+    let validNpsRawCount = 0;
 
     // --- 計算各任務成功率 ---
     let taskSuccessCounts = [0, 0, 0, 0, 0, 0]; 
-    let validTaskRecords = 0; // 有 taskSuccess 欄位的有效資料筆數
+    let validTaskRecords = 0;
 
     allTestRecords.forEach(record => {
-        // 檢查這筆資料是否有個別任務狀態
+        // SUS
+        if (record.susScore != null) {
+            totalSus += record.susScore;
+            validSusCount++;
+        }
+
+        // NPS (新格式 npsScore 或舊格式 q3)
+        const npsVal = record.npsScore != null ? record.npsScore : (record.q3 != null ? record.q3 : null);
+        if (npsVal != null) {
+            validNpsCount++;
+            totalNpsRaw += npsVal;
+            validNpsRawCount++;
+            if (npsVal >= 9) promoters++;
+            else if (npsVal <= 6) detractors++;
+        }
+
+        // 任務成功率（支援新版 string 'success'/'fail'/'skipped' & 舊版 boolean）
         if (record.taskSuccess && Array.isArray(record.taskSuccess) && record.taskSuccess.length > 0) {
             validTaskRecords++;
-            record.taskSuccess.forEach((isSuccess, idx) => {
-                if (isSuccess === true && idx < 6) {
+            record.taskSuccess.forEach((val, idx) => {
+                if ((val === 'success' || val === true) && idx < 6) {
                     taskSuccessCounts[idx]++;
                 }
             });
         }
     });
 
-    console.log(`統計完成: 總筆數 ${totalTests}, 包含任務細節的筆數 ${validTaskRecords}`, taskSuccessCounts);
+    console.log(`統計完成: 總筆數 ${totalTests}, SUS有效 ${validSusCount}, NPS有效 ${validNpsCount}, 任務細節 ${validTaskRecords}`);
+
+    // 更新總人數
+    if (totalUsersEl) totalUsersEl.textContent = totalTests.toString();
+
+    // 更新 SUS 平均分數
+    if (avgSusEl) {
+        if (validSusCount > 0) {
+            const avgSus = (totalSus / validSusCount).toFixed(1);
+            avgSusEl.textContent = avgSus;
+            if (barSusEl) barSusEl.style.width = `${(avgSus / 100) * 100}%`;
+        } else {
+            avgSusEl.textContent = '-';
+            if (barSusEl) barSusEl.style.width = '0%';
+        }
+    }
+
+    // 更新 NPS 淨推薦值 (-100 ~ 100)
+    if (avgNpsEl) {
+        if (validNpsCount > 0) {
+            const npsResult = Math.round(((promoters - detractors) / validNpsCount) * 100);
+            avgNpsEl.textContent = npsResult;
+            // 進度條：將 -100~100 映射到 0~100%
+            if (barNpsEl) barNpsEl.style.width = `${((npsResult + 100) / 200) * 100}%`;
+        } else {
+            avgNpsEl.textContent = '-';
+            if (barNpsEl) barNpsEl.style.width = '0%';
+        }
+    }
+
+    // 更新 NPS 推薦分數平均 (0-10)
+    if (avgQ3El) {
+        if (validNpsRawCount > 0) {
+            const avgQ3 = (totalNpsRaw / validNpsRawCount).toFixed(1);
+            avgQ3El.textContent = avgQ3;
+            if (barQ3El) barQ3El.style.width = `${(avgQ3 / 10) * 100}%`;
+        } else {
+            avgQ3El.textContent = '-';
+            if (barQ3El) barQ3El.style.width = '0%';
+        }
+    }
 
     // 渲染各任務圖表
     if (taskChartEl) {
         if (validTaskRecords === 0) {
-            // 這是正常現象，如果是舊資料
             taskChartEl.innerHTML = '<div style="color: #64748b;">目前僅有舊格式資料。<br>請新增一筆測試紀錄，圖表將會自動出現。</div>';
         } else {
             let chartHtml = '';
@@ -482,7 +570,6 @@ function updateDashboard() {
             
             taskSuccessCounts.forEach((count, idx) => {
                 const percentage = Math.round((count / validTaskRecords) * 100);
-                // 顏色邏輯: 80%以上綠色, 50%以上黃色, 以下紅色
                 const colorClass = percentage >= 80 ? '#4CAF50' : (percentage >= 50 ? '#FFC107' : '#F44336'); 
                 
                 chartHtml += `
@@ -501,25 +588,7 @@ function updateDashboard() {
     } else {
         console.warn("找不到 id='task-success-chart' 的元素，請檢查 index.html");
     }
-
-    // 更新原本的數字顯示
-    if (totalUsersEl) totalUsersEl.textContent = totalTests.toString();
-    if (avgQ1El) avgQ1El.textContent = avgQ1.toFixed(1);
-    if (avgQ2El) avgQ2El.textContent = avgQ2.toFixed(1);
-    if (avgQ3El) avgQ3El.textContent = avgQ3.toFixed(1);
-
-    // 更新原本的進度條
-    if (barQ1El) barQ1El.style.width = `${(avgQ1 / 5) * 100}%`;
-    if (barQ2El) barQ2El.style.width = `${(avgQ2 / 10) * 100}%`;
-    if (barQ3El) barQ3El.style.width = `${(avgQ3 / 10) * 100}%`;
 }
-
-// --- 6. Export to Window (for HTML onclick) ---
-window.switchTab = switchTab;
-window.saveData = saveData;
-window.deleteRecord = deleteRecord;
-window.nextCard = nextCard;
-window.prevCard = prevCard;
 
 function updateTimerDisplay(taskId, display) {
     const seconds = taskTimers[taskId].seconds;
@@ -590,11 +659,11 @@ async function saveData() {
     let taskSuccess = []; // 新增：記錄每個任務是否成功
 
     taskCards.forEach((card, index) => {
-        const checkbox = card.querySelector('input[type="checkbox"]');
-        const isSuccess = checkbox && checkbox.checked;
+        const statusRadio = card.querySelector(`input[name="task${index + 1}-status"]:checked`);
+        const taskStatus = statusRadio ? statusRadio.value : 'skipped'; // 'success' | 'fail' | 'skipped'
         
-        if (isSuccess) successCount++;
-        taskSuccess.push(isSuccess); 
+        if (taskStatus === 'success') successCount++;
+        taskSuccess.push(taskStatus); 
         
         const textarea = card.querySelector('textarea');
         taskNotes.push(textarea ? textarea.value.trim() || '-' : '-');
@@ -608,10 +677,21 @@ async function saveData() {
         }
     });
 
-    // 3. 評分與質化回饋
-    const q1 = document.getElementById('q1')?.value || 0;
-    const q2 = document.getElementById('q2')?.value || 0;
-    const q3 = document.getElementById('q3')?.value || 0;
+    // 3. SUS 量表計分
+    const susScore = calculateSUS();
+
+    // 3b. SUS 各題原始分數 (1-5)
+    const susAnswers = [];
+    for (let i = 1; i <= 10; i++) {
+        const radio = document.querySelector(`input[name="sus${i}"]:checked`);
+        susAnswers.push(radio ? parseInt(radio.value, 10) : null);
+    }
+
+    // 4. NPS 推薦分數 (slider)
+    const npsSlider = document.getElementById('q3');
+    const npsScore = npsSlider ? parseInt(npsSlider.value, 10) : null;
+
+    // 5. 質化回饋
     const textPros = document.getElementById('text-pros')?.value || '-';
     const textCons = document.getElementById('text-cons')?.value || '-';
     const textIdeas = document.getElementById('text-ideas')?.value || '-';
@@ -622,12 +702,12 @@ async function saveData() {
         id: userName,
         age, gender, crop, device,
         successCount,
-        taskSuccess, // 新增欄位
+        taskSuccess,
         taskNotes,
         taskTimes,
-        q1: parseInt(q1),
-        q2: parseInt(q2),
-        q3: parseInt(q3),
+        susScore: susScore,     // SUS 總分 (0-100)
+        susAnswers: susAnswers, // SUS 各題原始分數 [1-5, ...]
+        npsScore: npsScore,     // NPS 推薦分數 (0-10)
         pros: textPros,
         cons: textCons,
         ideas: textIdeas,
@@ -687,8 +767,33 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// --- SUS 計分函數 ---
+// 奇數題: 填答分數 - 1 / 偶數題: 5 - 填答分數 / 總和 * 2.5 = 0~100
+function calculateSUS() {
+    let totalScore = 0;
+    let answeredCount = 0;
+
+    for (let i = 1; i <= 10; i++) {
+        const radio = document.querySelector(`input[name="sus${i}"]:checked`);
+        if (!radio) continue;
+        answeredCount++;
+        const val = parseInt(radio.value, 10);
+        if (i % 2 !== 0) {
+            totalScore += (val - 1);   // 奇數題
+        } else {
+            totalScore += (5 - val);   // 偶數題
+        }
+    }
+
+    if (answeredCount === 0) return null;
+    // 即使沒填滿 10 題也按比例算 (完整填答才精準)
+    if (answeredCount < 10) {
+        console.warn(`SUS 量表僅填答 ${answeredCount}/10 題`);
+    }
+    return Math.round((totalScore / answeredCount) * 10 * 2.5 * 10) / 10;
+}
+
 // --- 6. Export to Window ---
-// 把新的函數加到這裡
 window.toggleFullScreenMode = toggleFullScreenMode; 
 window.switchTab = switchTab;
 window.saveData = saveData;

@@ -99,11 +99,11 @@ body {
 /* Modern Cards */
 .clay-card {
     background: var(--card-bg);
-    border-radius: 16px; /* Matches NexusAI card radius */
-    padding: 40px;
+    border-radius: 16px;
+    padding: 24px;
     border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
-    margin-bottom: 30px;
+    margin-bottom: 16px;
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -122,9 +122,9 @@ body {
 
 /* Typography styles inside cards */
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     color: #0f172a;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
     font-weight: 700;
     margin-top: 0;
 }
@@ -174,7 +174,7 @@ h3 {
     gap: 24px;
 }
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 label {
     display: block;
@@ -228,25 +228,69 @@ input[type="text"]:focus, select:focus, textarea:focus {
 }
 .desc {
     background: #f8fafc;
-    padding: 16px;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #475569;
     border: 1px dashed var(--border-color);
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 textarea {
-    min-height: 80px;
+    min-height: 56px;
     resize: vertical;
 }
 
 /* Clean Checkbox */
+/* Task Status Radio Group */
+.task-status-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+.task-status-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.2s;
+    user-select: none;
+}
+.task-status-label input[type="radio"] {
+    accent-color: var(--primary);
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+.task-status-label.success:has(input:checked) {
+    background: #e8f5e9;
+    border-color: #4CAF50;
+    color: #2e7d32;
+}
+.task-status-label.fail:has(input:checked) {
+    background: #ffebee;
+    border-color: #F44336;
+    color: #c62828;
+}
+.task-status-label.skipped:has(input:checked) {
+    background: #f5f5f5;
+    border-color: #9E9E9E;
+    color: #616161;
+}
+
+/* Legacy checkbox (kept for compatibility) */
 .checkbox-container {
     display: flex;
     align-items: center;
     position: relative;
     padding-left: 32px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
@@ -300,10 +344,10 @@ textarea {
 /* Sliders */
 .rating-group {
     background: #fff;
-    padding: 24px;
-    border-radius: 12px;
+    padding: 14px 18px;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 .slider {
     -webkit-appearance: none;
@@ -312,7 +356,7 @@ textarea {
     border-radius: 4px;
     background: #e2e8f0;
     outline: none;
-    margin: 30px 0;
+    margin: 14px 0;
 }
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -346,7 +390,7 @@ textarea {
 /* CTA Buttons */
 .cta-container {
     text-align: center;
-    margin: 60px 0;
+    margin: 30px 0;
 }
 .cta-btn {
     background: var(--primary);
@@ -400,11 +444,11 @@ textarea {
     display: block;
 }
 .big-task h1 {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
     color: #0f172a;
     line-height: 1.3;
     margin: 32px 0;
-    font-weight: 800;
+    font-weight: bold;
 }
 .step-badge {
     background: #F1F8ED;

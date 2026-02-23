@@ -122,11 +122,11 @@
                         </div>
                         <p class="desc">路徑：首頁 > 會員 > 立即註冊 (三種方式擇一：行動電話/身分證/一般會員升級)</p>
                         <div class="observation-area">
-                            <label class="checkbox-container">
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                                任務成功
-                            </label>
+                            <div class="task-status-group">
+                                <label class="task-status-label success"><input type="radio" name="task1-status" value="success"> 任務成功</label>
+                                <label class="task-status-label fail"><input type="radio" name="task1-status" value="fail"> 任務不成功</label>
+                                <label class="task-status-label skipped"><input type="radio" name="task1-status" value="skipped"> 未操作此任務</label>
+                            </div>
                             <textarea placeholder="紀錄猶豫點、按錯的地方、或是用戶的 murmur"></textarea>
                         </div>
                     </div>
@@ -139,11 +139,11 @@
                         </div>
                         <p class="desc">路徑：會員 > 下滑到跨店購買 > 同意開通 > 補齊資料</p>
                         <div class="observation-area">
-                            <label class="checkbox-container">
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                                任務成功
-                            </label>
+                            <div class="task-status-group">
+                                <label class="task-status-label success"><input type="radio" name="task2-status" value="success"> 任務成功</label>
+                                <label class="task-status-label fail"><input type="radio" name="task2-status" value="fail"> 任務不成功</label>
+                                <label class="task-status-label skipped"><input type="radio" name="task2-status" value="skipped"> 未操作此任務</label>
+                            </div>
                             <textarea placeholder="觀察用戶是否找得到按鈕"></textarea>
                         </div>
                     </div>
@@ -156,11 +156,11 @@
                         </div>
                         <p class="desc">路徑：首頁 > 查詢 > 選擇項目 > 觀看內容</p>
                         <div class="observation-area">
-                            <label class="checkbox-container">
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                                任務成功
-                            </label>
+                            <div class="task-status-group">
+                                <label class="task-status-label success"><input type="radio" name="task3-status" value="success"> 任務成功</label>
+                                <label class="task-status-label fail"><input type="radio" name="task3-status" value="fail"> 任務不成功</label>
+                                <label class="task-status-label skipped"><input type="radio" name="task3-status" value="skipped"> 未操作此任務</label>
+                            </div>
                             <textarea placeholder="紀錄用戶查詢時的反應"></textarea>
                         </div>
                     </div>
@@ -173,11 +173,11 @@
                         </div>
                         <p class="desc">路徑：會員 > 我的案件管理 > 點選案件編號</p>
                         <div class="observation-area">
-                            <label class="checkbox-container">
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                                任務成功
-                            </label>
+                            <div class="task-status-group">
+                                <label class="task-status-label success"><input type="radio" name="task4-status" value="success"> 任務成功</label>
+                                <label class="task-status-label fail"><input type="radio" name="task4-status" value="fail"> 任務不成功</label>
+                                <label class="task-status-label skipped"><input type="radio" name="task4-status" value="skipped"> 未操作此任務</label>
+                            </div>
                             <textarea placeholder="紀錄用戶是否理解從哪裡可以找到案件狀態..."></textarea>
                         </div>
                     </div>
@@ -190,11 +190,11 @@
                         </div>
                         <p class="desc">路徑：E 文件 > 新增 > 填寫資料 > 確定 (需建立一塊地對應騰本)</p>
                         <div class="observation-area">
-                            <label class="checkbox-container">
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                                任務成功
-                            </label>
+                            <div class="task-status-group">
+                                <label class="task-status-label success"><input type="radio" name="task5-status" value="success"> 任務成功</label>
+                                <label class="task-status-label fail"><input type="radio" name="task5-status" value="fail"> 任務不成功</label>
+                                <label class="task-status-label skipped"><input type="radio" name="task5-status" value="skipped"> 未操作此任務</label>
+                            </div>
                             <textarea placeholder="這是最難的任務，請詳細記錄..."></textarea>
                         </div>
                     </div>
@@ -207,42 +207,137 @@
                         </div>
                         <p class="desc">路徑：首頁 > 申請 > 開始線上申請 > 填寫資料/上傳證件 > 線上簽名 > 送出</p>
                         <div class="observation-area">
-                            <label class="checkbox-container">
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                                任務成功
-                            </label>
+                            <div class="task-status-group">
+                                <label class="task-status-label success"><input type="radio" name="task6-status" value="success"> 任務成功</label>
+                                <label class="task-status-label fail"><input type="radio" name="task6-status" value="fail"> 任務不成功</label>
+                                <label class="task-status-label skipped"><input type="radio" name="task6-status" value="skipped"> 未操作此任務</label>
+                            </div>
                             <textarea placeholder="觀察用戶在上傳證件或線上簽名時是否順利..."></textarea>
                         </div>
                     </div>
                 </div>
 
-                <!-- Post-Test Interview (Existing Quantative) -->
+                <!-- Post-Test: SUS 量表 + NPS -->
                 <div class="clay-card survey-card">
-                    <h2>測後滿意度量表</h2>
-                    
+                    <h2>SUS 系統易用性量表</h2>
+                    <p style="color:#64748b; margin-bottom:15px;">1 分為非常不同意，5 分為非常同意</p>
+
                     <div class="rating-group">
-                        <label>1. 您對於『使用農業數位 APP』有多大的信心？</label>
-                        <div class="range-labels">
-                            <span>沒信心 (1)</span>
-                            <span>非常有信心 (5)</span>
+                        <label>1. 我想我會經常使用這個產品。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus1" value="1"> 1 (很少使用)</label>
+                            <label class="radio-label"><input type="radio" name="sus1" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus1" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus1" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus1" value="5"> 5 (經常使用)</label>
                         </div>
-                        <input type="range" min="1" max="5" step="1" class="slider" id="q1">
-                        <div class="score-display">分數: <span id="q1-val">3</span></div>
                     </div>
 
                     <div class="rating-group">
-                        <label>2. 整體而言，您覺得完成這些任務有多難或多容易？ (SEQ)</label>
-                        <div class="range-labels">
-                            <span>非常困難 (1)</span>
-                            <span>非常容易 (10)</span>
+                        <label>2. 我覺得這個產品過於複雜。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus2" value="1"> 1 (不複雜)</label>
+                            <label class="radio-label"><input type="radio" name="sus2" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus2" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus2" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus2" value="5"> 5 (非常複雜)</label>
                         </div>
-                        <input type="range" min="1" max="10" step="1" class="slider" id="q2">
-                        <div class="score-display">分數: <span id="q2-val">5</span></div>
                     </div>
 
                     <div class="rating-group">
-                        <label>3. 請問您有多大意願將這個 APP 推薦給您的農友？ (NPS)</label>
+                        <label>3. 我認為這個產品是簡單好用的。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus3" value="1"> 1 (不好用)</label>
+                            <label class="radio-label"><input type="radio" name="sus3" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus3" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus3" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus3" value="5"> 5 (非常好用)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>4. 我想我需要有人協助才能使用這個產品。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus4" value="1"> 1 (不需要協助)</label>
+                            <label class="radio-label"><input type="radio" name="sus4" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus4" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus4" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus4" value="5"> 5 (非常需要協助)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>5. 我覺得這個產品的功能整合的很好。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus5" value="1"> 1 (非常不好)</label>
+                            <label class="radio-label"><input type="radio" name="sus5" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus5" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus5" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus5" value="5"> 5 (非常好)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>6. 我覺得這個產品有很多不一致的地方。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus6" value="1"> 1 (非常一致)</label>
+                            <label class="radio-label"><input type="radio" name="sus6" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus6" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus6" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus6" value="5"> 5 (非常不一致)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>7. 我認為其他人能快速學習使用這個產品。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus7" value="1"> 1 (不容易學習)</label>
+                            <label class="radio-label"><input type="radio" name="sus7" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus7" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus7" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus7" value="5"> 5 (非常容易學習)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>8. 我覺得使用這個產品很麻煩。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus8" value="1"> 1 (不麻煩)</label>
+                            <label class="radio-label"><input type="radio" name="sus8" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus8" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus8" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus8" value="5"> 5 (非常麻煩)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>9. 我很有自信地使用這個產品。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus9" value="1"> 1 (沒有自信)</label>
+                            <label class="radio-label"><input type="radio" name="sus9" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus9" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus9" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus9" value="5"> 5 (非常有自信)</label>
+                        </div>
+                    </div>
+
+                    <div class="rating-group">
+                        <label>10. 我需要學會很多資訊才能使用這個產品。</label>
+                        <div class="radio-group" style="display:flex; justify-content:flex-start; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px; flex-wrap:wrap; gap:18px;">
+                            <label class="radio-label"><input type="radio" name="sus10" value="1"> 1 (非常不需要)</label>
+                            <label class="radio-label"><input type="radio" name="sus10" value="2"> 2</label>
+                            <label class="radio-label"><input type="radio" name="sus10" value="3"> 3</label>
+                            <label class="radio-label"><input type="radio" name="sus10" value="4"> 4</label>
+                            <label class="radio-label"><input type="radio" name="sus10" value="5"> 5 (非常需要)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NPS 推薦意願 -->
+                <div class="clay-card survey-card">
+                    <h2>NPS 淨推薦值</h2>
+                    <div class="rating-group">
+                        <label>請問您有多大意願將這個 APP 推薦給您的農友？</label>
                         <div class="range-labels">
                             <span>不推薦 (0)</span>
                             <span>非常推薦 (10)</span>
@@ -262,7 +357,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>2. 您覺得這個 APP 最需要改進的地方是什麼？</label>
+                        <label>2. 您覺得這個 APP 可以更好的地方是什麼？</label>
                         <textarea id="text-cons" placeholder="例如：註冊步驟太多、按鈕找不到..."></textarea>
                     </div>
 
@@ -305,27 +400,27 @@
                     <!-- Card 2 -->
                     <div class="big-task" id="card-2">
                         <span class="step-badge">任務 2</span>
-                        <h1>請開通農藥與<br>肥料「跨店購買」功能</h1>
+                        <h1>在 E 文件<br>「新增一筆土地資料」</h1>
                     </div>
                     <!-- Card 3 -->
                     <div class="big-task" id="card-3">
                         <span class="step-badge">任務 3</span>
-                        <h1>查詢自己的<br>「退休儲金」和<br>「農藥、肥料購買記錄」</h1>
+                        <h1>請進行<br>「在地青農入會申請」</h1>
                     </div>
                     <!-- Card 4 -->
                     <div class="big-task" id="card-4">
                         <span class="step-badge">任務 4</span>
-                        <h1>查看透過 APP 送申請的<br>案件「審查進度」</h1>
+                        <h1>查看已送申請案件的<br>「審查進度」</h1>
                     </div>
                     <!-- Card 5 -->
                     <div class="big-task" id="card-5">
                         <span class="step-badge">任務 5</span>
-                        <h1>查看自己的 E 文件<br>並「新增一筆土地資料」</h1>
+                        <h1>查詢自己的<br>「退休儲金」和「肥料購買記錄」</h1>
                     </div>
                     <!-- Card 6 (New) -->
                     <div class="big-task" id="card-6">
                         <span class="step-badge">任務 6</span>
-                        <h1>請進行<br>「在地青農入會申請」<br>需完成簽名與送出</h1>
+                        <h1>從會員專區開通<br>「農藥跨店購買」與「肥料跨店購買」</h1>
                     </div>
                 </div>
 
@@ -345,27 +440,29 @@
                 <p>目前共收集 <span id="total-users" style="font-weight:bold; color:var(--primary)">0</span> 位受測者數據</p>
                 
                 <div class="stats-grid">
-                    <!-- Q1 Confidene -->
+                    <!-- SUS 平均分數 -->
                     <div class="stat-box">
-                        <h4>Q1. 信心指數 (1-5)</h4>
-                        <div class="big-number" id="avg-q1">-</div>
+                        <h4>SUS 易用性分數</h4>
+                        <div class="big-number" id="avg-sus">-</div>
                         <div class="bar-container">
-                            <div class="bar-fill" id="bar-q1" style="width: 0%"></div>
+                            <div class="bar-fill" id="bar-sus" style="width: 0%"></div>
                         </div>
-                    </div>
-                    
-                    <!-- Q2 SEQ -->
-                    <div class="stat-box">
-                        <h4>Q2. 容易度 SEQ (1-10)</h4>
-                        <div class="big-number" id="avg-q2">-</div>
-                        <div class="bar-container">
-                            <div class="bar-fill" id="bar-q2" style="width: 0%"></div>
-                        </div>
+                        <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">滿分 100，68 分以上為及格</p>
                     </div>
 
-                    <!-- Q3 NPS -->
+                    <!-- NPS 淨推薦值 -->
                     <div class="stat-box">
-                        <h4>Q3. 推薦意願 NPS (0-10)</h4>
+                        <h4>NPS 淨推薦值</h4>
+                        <div class="big-number" id="avg-nps">-</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="bar-nps" style="width: 0%"></div>
+                        </div>
+                        <p style="font-size:0.75rem; color:#64748b; margin-top:4px;">範圍 -100 ~ 100</p>
+                    </div>
+
+                    <!-- NPS 推薦分數平均 -->
+                    <div class="stat-box">
+                        <h4>NPS 推薦分數平均 (0-10)</h4>
                         <div class="big-number" id="avg-q3">-</div>
                         <div class="bar-container">
                             <div class="bar-fill" id="bar-q3" style="width: 0%"></div>
