@@ -734,6 +734,84 @@ details[open] summary::after {
     transform: scale(1.1);
 }
 
+/* --- 刪除確認彈窗 --- */
+.delete-confirm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+.delete-confirm-overlay.visible {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+.delete-confirm-dialog {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 36px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    max-width: 360px;
+    width: 90%;
+    animation: scaleIn 0.25s ease;
+}
+.delete-confirm-icon {
+    font-size: 2.4rem;
+    margin-bottom: 8px;
+}
+.delete-confirm-dialog h3 {
+    margin: 0 0 8px;
+    font-size: 1.2rem;
+    color: #333;
+}
+.delete-confirm-dialog p {
+    margin: 0 0 24px;
+    font-size: 0.92rem;
+    color: #888;
+}
+.delete-confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+.delete-confirm-btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.15s;
+}
+.delete-confirm-btn:active {
+    transform: scale(0.96);
+}
+.delete-confirm-btn.cancel {
+    background: #f0f0f0;
+    color: #555;
+}
+.delete-confirm-btn.cancel:hover {
+    background: #e0e0e0;
+}
+.delete-confirm-btn.confirm {
+    background: #e74c3c;
+    color: #fff;
+}
+.delete-confirm-btn.confirm:hover {
+    background: #c0392b;
+}
+@keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
 /* 確保卡片本身相對定位，讓刪除按鈕可以對齊 */
 .record-card {
     position: relative; /* 加入這行 */

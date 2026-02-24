@@ -735,9 +735,35 @@ async function saveData() {
     }
 }
 
+// 刪除確認彈窗邏輯
+function showDeleteConfirm() {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('delete-confirm-overlay');
+        const okBtn = document.getElementById('delete-ok-btn');
+        const cancelBtn = document.getElementById('delete-cancel-btn');
+        overlay.classList.add('visible');
+
+        function cleanup(result) {
+            overlay.classList.remove('visible');
+            okBtn.removeEventListener('click', onOk);
+            cancelBtn.removeEventListener('click', onCancel);
+            overlay.removeEventListener('click', onOverlay);
+            resolve(result);
+        }
+        function onOk() { cleanup(true); }
+        function onCancel() { cleanup(false); }
+        function onOverlay(e) { if (e.target === overlay) cleanup(false); }
+
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+        overlay.addEventListener('click', onOverlay);
+    });
+}
+
 // 刪除資料函數
 async function deleteRecord(docId) {
-    if(!confirm("確定要刪除這筆資料嗎？")) return;
+    const confirmed = await showDeleteConfirm();
+    if (!confirmed) return;
     
     try {
         await deleteDoc(doc(db, DB_COLLECTION, docId));
