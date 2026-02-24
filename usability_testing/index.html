@@ -83,7 +83,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>主要種植作物</label>
-                            <input type="text" placeholder="例如：水稻、茶葉">
+                            <input type="text" id="crop-input" placeholder="例如：水稻、茶葉">
                         </div>
                         <div class="form-group">
                             <!-- 將原本單一輸入框，改為左右排列的兩個欄位 -->
@@ -136,9 +136,9 @@
                     <div class="clay-card task-card">
                         <div class="task-header">
                             <span class="task-num">02</span>
-                            <h3>農藥與肥料開通</h3>
+                            <h3>E 文件庫新增土地</h3>
                         </div>
-                        <p class="desc">路徑：會員 > 下滑到跨店購買 > 同意開通 > 補齊資料</p>
+                        <p class="desc">路徑：E 文件 > 新增 > 填寫資料 > 確定</p>
                         <div class="observation-area">
                             <div class="task-status-group">
                                 <label class="task-status-label success"><input type="radio" name="task2-status" value="success"> 任務成功</label>
@@ -153,9 +153,9 @@
                     <div class="clay-card task-card">
                         <div class="task-header">
                             <span class="task-num">03</span>
-                            <h3>查詢紀錄 (退休金/肥料)</h3>
+                            <h3>在地青農入會申請</h3>
                         </div>
-                        <p class="desc">路徑：首頁 > 查詢 > 選擇項目 > 觀看內容</p>
+                        <p class="desc">路徑：首頁 > 申請 > 在地青農入會申請 > 開始線上申請 > 填寫資料、上傳證件 > 線上簽名 > 暫存</p>
                         <div class="observation-area">
                             <div class="task-status-group">
                                 <label class="task-status-label success"><input type="radio" name="task3-status" value="success"> 任務成功</label>
@@ -172,7 +172,7 @@
                             <span class="task-num">04</span>
                             <h3>查看案件審查進度</h3>
                         </div>
-                        <p class="desc">路徑：會員 > 我的案件管理 > 點選案件編號</p>
+                        <p class="desc">路徑：會員 > 我的案件管理 > 點選案件編號 / 查詢 > 任一筆申請查詢 (兩種方式擇一)</p>
                         <div class="observation-area">
                             <div class="task-status-group">
                                 <label class="task-status-label success"><input type="radio" name="task4-status" value="success"> 任務成功</label>
@@ -187,9 +187,9 @@
                     <div class="clay-card task-card">
                         <div class="task-header">
                             <span class="task-num">05</span>
-                            <h3>E 文件庫新增土地</h3>
+                            <h3>查詢紀錄 (退休金/肥料)</h3>
                         </div>
-                        <p class="desc">路徑：E 文件 > 新增 > 填寫資料 > 確定 (需建立一塊地對應騰本)</p>
+                        <p class="desc">路徑：首頁 > 查詢 > 選擇項目 > 觀看內容</p>
                         <div class="observation-area">
                             <div class="task-status-group">
                                 <label class="task-status-label success"><input type="radio" name="task5-status" value="success"> 任務成功</label>
@@ -204,9 +204,9 @@
                     <div class="clay-card task-card">
                         <div class="task-header">
                             <span class="task-num">06</span>
-                            <h3>在地青農入會申請</h3>
+                            <h3>農藥跨店購買 QR-Code 開通</h3>
                         </div>
-                        <p class="desc">路徑：首頁 > 申請 > 開始線上申請 > 填寫資料/上傳證件 > 線上簽名 > 送出</p>
+                        <p class="desc">路徑：會員 > 下滑到跨店購買 > 同意開通 > 補齊資料 > 回到會員 > 跨店購買 > 開通</p>
                         <div class="observation-area">
                             <div class="task-status-group">
                                 <label class="task-status-label success"><input type="radio" name="task6-status" value="success"> 任務成功</label>
@@ -407,11 +407,13 @@
                     <div class="big-task" id="card-3">
                         <span class="step-badge">任務 3</span>
                         <h1>請進行<br>「在地青農入會申請」</h1>
+                        <div>暫存即可，不需送出</div>
                     </div>
                     <!-- Card 4 -->
                     <div class="big-task" id="card-4">
                         <span class="step-badge">任務 4</span>
                         <h1>查看已送申請案件的<br>「審查進度」</h1>
+                        <div>若無申請案件，找到功能即可</div>
                     </div>
                     <!-- Card 5 -->
                     <div class="big-task" id="card-5">
@@ -421,7 +423,7 @@
                     <!-- Card 6 (New) -->
                     <div class="big-task" id="card-6">
                         <span class="step-badge">任務 6</span>
-                        <h1>從會員專區開通<br>「農藥跨店購買」與「肥料跨店購買」</h1>
+                        <h1>從會員專區開通<br>「農藥跨店購買」條碼</h1>
                     </div>
                 </div>
 

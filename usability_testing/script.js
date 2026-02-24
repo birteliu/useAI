@@ -631,7 +631,8 @@ async function saveData() {
 
     // --- 修改結束 ---
 
-    const crop = form.querySelector('input[placeholder="例如: 水稻、茶葉"]')?.value || '-';
+    const cropInput = document.getElementById('crop-input');
+    const crop = cropInput ? cropInput.value.trim() || '-' : '-';
     
     // --- 修改開始：更新讀取手機型號邏輯 ---
     // 舊的寫法 (依賴順序，容易出錯)：
