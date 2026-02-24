@@ -6,6 +6,7 @@
     <title>Usability Test</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -472,7 +473,12 @@
             </div>
 
             <div class="clay-card result-card">
-                <h2 style="margin-bottom: 15px;">詳細訪談記錄總表</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="margin: 0;">詳細訪談記錄總表</h2>
+                    <button class="export-excel-btn" onclick="exportToExcel()">
+                        匯出 Excel
+                    </button>
+                </div>
                 
                 <div id="analysisGrid" class="record-grid">
                     <p style="text-align:center; grid-column: 1/-1; color:#666;">

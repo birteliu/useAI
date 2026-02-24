@@ -819,10 +819,105 @@ function calculateSUS() {
     return Math.round((totalScore / answeredCount) * 10 * 2.5 * 10) / 10;
 }
 
-// --- 6. Export to Window ---
+// --- 6. 匯出 Excel ---
+function exportToExcel() {
+    if (allTestRecords.length === 0) {
+        alert('目前沒有資料可匯出');
+        return;
+    }
+
+    const formatTime = (seconds) => {
+        if (seconds === undefined || seconds === null) return '--:--';
+        const n = parseInt(seconds, 10);
+        if (isNaN(n)) return '--:--';
+        return `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+    };
+
+    const statusLabel = (val) => {
+        if (val === 'success' || val === true) return '成功';
+        if (val === 'fail' || val === false) return '不成功';
+        if (val === 'skipped') return '未操作';
+        return '-';
+    };
+
+    const susLabels = [
+        '1.我想我會經常使用這個產品',
+        '2.我覺得這個產品過於複雜',
+        '3.我認為這個產品是簡單好用的',
+        '4.我想我需要有人協助才能使用',
+        '5.我覺得功能整合的很好',
+        '6.我覺得有很多不一致的地方',
+        '7.我認為其他人能快速學會',
+        '8.我覺得使用很麻煩',
+        '9.我很有自信地使用',
+        '10.我需要學很多才能使用'
+    ];
+
+    // 建構表頭 & 資料列
+    const rows = allTestRecords.map(r => {
+        let totalTime = 0;
+        if (r.taskTimes && Array.isArray(r.taskTimes)) {
+            totalTime = r.taskTimes.reduce((a, b) => a + (parseInt(b) || 0), 0);
+        }
+
+        const row = {
+            '受訪者編號': r.id || '-',
+            '年齡': r.age || '-',
+            '性別': r.gender || '-',
+            '作物': r.crop || '-',
+            '裝置': r.device || '-',
+            '成功任務數': r.successCount != null ? r.successCount : '-',
+            'SUS 分數': r.susScore != null ? r.susScore : '-',
+            'NPS 推薦分數': r.npsScore != null ? r.npsScore : '-',
+            '總耗時': formatTime(totalTime),
+        };
+
+        // 任務 1~6 狀態、耗時、筆記
+        for (let i = 0; i < 6; i++) {
+            const num = i + 1;
+            row[`任務${num} 狀態`] = (r.taskSuccess && r.taskSuccess[i] !== undefined) ? statusLabel(r.taskSuccess[i]) : '-';
+            row[`任務${num} 耗時`] = (r.taskTimes && r.taskTimes[i] !== undefined) ? formatTime(r.taskTimes[i]) : '--:--';
+            row[`任務${num} 觀察筆記`] = (r.taskNotes && r.taskNotes[i]) ? r.taskNotes[i] : '-';
+        }
+
+        // SUS 各題分數
+        for (let i = 0; i < 10; i++) {
+            row[`SUS ${susLabels[i]}`] = (r.susAnswers && r.susAnswers[i] != null) ? r.susAnswers[i] : '-';
+        }
+
+        // 質化回饋
+        row['優點'] = r.pros || '-';
+        row['改進建議'] = r.cons || '-';
+        row['想法'] = r.ideas || '-';
+        row['觀察'] = r.notes || '-';
+        row['紀錄時間'] = r.timestamp || '-';
+
+        return row;
+    });
+
+    // 使用 SheetJS 建立工作簿
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    // 設定欄寬
+    const colWidths = Object.keys(rows[0]).map(key => ({
+        wch: Math.max(key.length * 2, 12)
+    }));
+    ws['!cols'] = colWidths;
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '訪談記錄');
+
+    // 產生日期作為檔名
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+    XLSX.writeFile(wb, `易用性測試_訪談記錄_${dateStr}.xlsx`);
+}
+
+// --- 7. Export to Window ---
 window.toggleFullScreenMode = toggleFullScreenMode; 
 window.switchTab = switchTab;
 window.saveData = saveData;
 window.deleteRecord = deleteRecord;
 window.nextCard = nextCard;
 window.prevCard = prevCard;
+window.exportToExcel = exportToExcel;
