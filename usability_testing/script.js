@@ -6,6 +6,7 @@ import {
     addDoc, 
     onSnapshot, 
     deleteDoc, 
+    updateDoc,
     doc,
     query, 
     orderBy 
@@ -374,13 +375,15 @@ function renderAnalysisGrid() {
         const totalTimeStr = formatTime(totalTimeSecs);
 
         card.innerHTML = `
-            <div class="card-actions">
-                <button class="delete-btn" onclick="deleteRecord('${record.docId}')" title="刪除">✖</button>
-            </div>
-
             <div class="record-header">
                 <h4>${record.id}</h4>
-                <span class="badge ${badgeColor}" style="margin-right: 25px;">${record.successCount} / 6 成功</span> 
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="badge ${badgeColor}">${record.successCount} / 6 成功</span>
+                    <div class="card-actions">
+                        <button class="edit-btn" onclick="editRecord('${record.docId}')" title="編輯">✎</button>
+                        <button class="delete-btn" onclick="deleteRecord('${record.docId}')" title="刪除">✖</button>
+                    </div>
+                </div>
             </div>
             
             <div class="user-tags">
@@ -914,11 +917,183 @@ function exportToExcel() {
     XLSX.writeFile(wb, `易用性測試_訪談記錄_${dateStr}.xlsx`);
 }
 
-// --- 7. Export to Window ---
+// --- 7. Edit Record Logic ---
+
+// 目前正在編輯的記錄 docId
+let editingDocId = null;
+
+function editRecord(docId) {
+    const record = allTestRecords.find(r => r.docId === docId);
+    if (!record) { alert('找不到此記錄'); return; }
+    editingDocId = docId;
+
+    // 填入基本資料
+    document.getElementById('edit-user-id').value = record.id || '';
+    document.getElementById('edit-age').value = record.age || '20-40 歲';
+    document.getElementById('edit-crop').value = record.crop || '';
+    document.getElementById('edit-phone-brand').value = '';
+    document.getElementById('edit-phone-model').value = '';
+
+    // 嘗試拆分 device 為品牌+型號
+    if (record.device && record.device !== '-') {
+        const brands = ['Apple', 'Samsung', 'OPPO', 'Vivo', 'Xiaomi', 'ASUS', 'Sony', 'Pixel', 'Other'];
+        let matched = false;
+        for (const b of brands) {
+            if (record.device.startsWith(b)) {
+                document.getElementById('edit-phone-brand').value = b;
+                document.getElementById('edit-phone-model').value = record.device.substring(b.length).trim();
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            document.getElementById('edit-phone-model').value = record.device;
+        }
+    }
+
+    // 性別
+    const genderRadios = document.querySelectorAll('input[name="edit-gender"]');
+    genderRadios.forEach(r => r.checked = (r.value === record.gender));
+
+    // 任務狀態、筆記、時間
+    for (let i = 0; i < 6; i++) {
+        const statusVal = (record.taskSuccess && record.taskSuccess[i]) ? record.taskSuccess[i] : 'skipped';
+        const radios = document.querySelectorAll(`input[name="edit-task${i+1}-status"]`);
+        radios.forEach(r => r.checked = (r.value === statusVal));
+
+        const noteEl = document.getElementById(`edit-task${i+1}-note`);
+        if (noteEl) noteEl.value = (record.taskNotes && record.taskNotes[i] && record.taskNotes[i] !== '-') ? record.taskNotes[i] : '';
+
+        const timeEl = document.getElementById(`edit-task${i+1}-time`);
+        if (timeEl) timeEl.value = (record.taskTimes && record.taskTimes[i]) ? record.taskTimes[i] : 0;
+    }
+
+    // SUS 各題
+    for (let i = 1; i <= 10; i++) {
+        const val = (record.susAnswers && record.susAnswers[i-1] != null) ? record.susAnswers[i-1] : null;
+        const radios = document.querySelectorAll(`input[name="edit-sus${i}"]`);
+        radios.forEach(r => r.checked = (val !== null && parseInt(r.value) === val));
+    }
+
+    // NPS
+    const npsSlider = document.getElementById('edit-nps');
+    const npsVal = record.npsScore != null ? record.npsScore : 5;
+    if (npsSlider) { npsSlider.value = npsVal; }
+    const npsDisplay = document.getElementById('edit-nps-val');
+    if (npsDisplay) npsDisplay.textContent = npsVal;
+
+    // 質化回饋
+    document.getElementById('edit-pros').value = (record.pros && record.pros !== '-') ? record.pros : '';
+    document.getElementById('edit-cons').value = (record.cons && record.cons !== '-') ? record.cons : '';
+    document.getElementById('edit-ideas').value = (record.ideas && record.ideas !== '-') ? record.ideas : '';
+    document.getElementById('edit-notes').value = (record.notes && record.notes !== '-') ? record.notes : '';
+
+    // 顯示 modal
+    document.getElementById('edit-modal-overlay').classList.add('visible');
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal-overlay').classList.remove('visible');
+    editingDocId = null;
+}
+
+function calculateEditSUS() {
+    let totalScore = 0;
+    let answeredCount = 0;
+    for (let i = 1; i <= 10; i++) {
+        const radio = document.querySelector(`input[name="edit-sus${i}"]:checked`);
+        if (!radio) continue;
+        answeredCount++;
+        const val = parseInt(radio.value, 10);
+        if (i % 2 !== 0) {
+            totalScore += (val - 1);
+        } else {
+            totalScore += (5 - val);
+        }
+    }
+    if (answeredCount === 0) return null;
+    return Math.round((totalScore / answeredCount) * 10 * 2.5 * 10) / 10;
+}
+
+async function saveEditedRecord() {
+    if (!editingDocId) return;
+
+    const userName = document.getElementById('edit-user-id').value.trim();
+    if (!userName) { alert('請填寫受訪者編號'); return; }
+
+    const age = document.getElementById('edit-age').value;
+    const genderEl = document.querySelector('input[name="edit-gender"]:checked');
+    const gender = genderEl ? genderEl.value : '-';
+    const crop = document.getElementById('edit-crop').value.trim() || '-';
+
+    const brand = document.getElementById('edit-phone-brand').value;
+    const model = document.getElementById('edit-phone-model').value.trim();
+    const device = (brand && model) ? `${brand} ${model}` : (brand || model || '-');
+
+    let successCount = 0;
+    const taskSuccess = [];
+    const taskNotes = [];
+    const taskTimes = [];
+
+    for (let i = 1; i <= 6; i++) {
+        const statusRadio = document.querySelector(`input[name="edit-task${i}-status"]:checked`);
+        const status = statusRadio ? statusRadio.value : 'skipped';
+        if (status === 'success') successCount++;
+        taskSuccess.push(status);
+
+        const noteEl = document.getElementById(`edit-task${i}-note`);
+        taskNotes.push(noteEl ? (noteEl.value.trim() || '-') : '-');
+
+        const timeEl = document.getElementById(`edit-task${i}-time`);
+        taskTimes.push(timeEl ? parseInt(timeEl.value, 10) || 0 : 0);
+    }
+
+    const susScore = calculateEditSUS();
+    const susAnswers = [];
+    for (let i = 1; i <= 10; i++) {
+        const radio = document.querySelector(`input[name="edit-sus${i}"]:checked`);
+        susAnswers.push(radio ? parseInt(radio.value, 10) : null);
+    }
+
+    const npsSlider = document.getElementById('edit-nps');
+    const npsScore = npsSlider ? parseInt(npsSlider.value, 10) : null;
+
+    const pros = document.getElementById('edit-pros').value || '-';
+    const cons = document.getElementById('edit-cons').value || '-';
+    const ideas = document.getElementById('edit-ideas').value || '-';
+    const notes = document.getElementById('edit-notes').value || '-';
+
+    const updatedData = {
+        id: userName, age, gender, crop, device,
+        successCount, taskSuccess, taskNotes, taskTimes,
+        susScore, susAnswers, npsScore,
+        pros, cons, ideas, notes
+    };
+
+    try {
+        const saveBtn = document.getElementById('edit-save-btn');
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '儲存中...'; }
+
+        await updateDoc(doc(db, DB_COLLECTION, editingDocId), updatedData);
+        alert('記錄已更新！');
+        closeEditModal();
+    } catch (e) {
+        console.error('更新失敗:', e);
+        alert('更新失敗，請檢查網路連線');
+    } finally {
+        const saveBtn = document.getElementById('edit-save-btn');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '儲存修改'; }
+    }
+}
+
+// --- 8. Export to Window ---
 window.toggleFullScreenMode = toggleFullScreenMode; 
 window.switchTab = switchTab;
 window.saveData = saveData;
 window.deleteRecord = deleteRecord;
+window.editRecord = editRecord;
+window.closeEditModal = closeEditModal;
+window.saveEditedRecord = saveEditedRecord;
 window.nextCard = nextCard;
 window.prevCard = prevCard;
 window.exportToExcel = exportToExcel;
