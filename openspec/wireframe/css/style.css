@@ -1,0 +1,448 @@
+@charset "UTF-8";
+
+/* ===== 前台 Wireframe 樣式 ===== */
+
+:root {
+  --color-primary: #62adb3;
+  --color-primary-dark: #1a7279;
+  --color-primary-light: #e8f6f3;
+  --color-warm-bg: #faf8f0;
+  --color-text: #333;
+  --color-muted: #888;
+}
+
+body {
+  font-family: "Noto Sans TC", sans-serif;
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-primary);
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: 700;
+  color: var(--color-primary-dark) !important;
+  font-size: 1.3rem;
+}
+.navbar .nav-link {
+  color: #555;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--color-primary-dark);
+}
+
+/* Hero */
+.hero-section {
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, #fff 100%);
+  padding: 80px 0;
+}
+.hero-section h1 {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+.hero-section .lead {
+  color: #555;
+}
+
+/* Section */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  position: relative;
+  padding-bottom: 10px;
+  margin-bottom: 24px;
+}
+.section-title::after {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: var(--color-primary);
+  margin-top: 8px;
+}
+.section-more {
+  color: var(--color-primary-dark);
+  font-weight: 500;
+}
+.section-more:hover {
+  color: var(--color-primary);
+}
+
+/* 圖片佔位 */
+.placeholder-img {
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 0.85rem;
+  min-height: 180px;
+}
+.placeholder-img-sm {
+  min-height: 120px;
+}
+.placeholder-img-lg {
+  min-height: 300px;
+}
+
+/* 卡片 */
+.card-news {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.card-news:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.card-news .card-body {
+  padding: 16px;
+}
+.card-news .card-date {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.card-news .card-title {
+  font-weight: 600;
+  margin: 4px 0;
+  color: var(--color-text);
+}
+.card-news .card-summary {
+  font-size: 0.9rem;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 活動列表項目 */
+.event-item {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.2s;
+}
+.event-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.event-item .event-img {
+  width: 160px;
+  min-height: 120px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.event-meta {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+.event-meta i {
+  color: var(--color-primary);
+  margin-right: 4px;
+}
+
+/* 類別標籤 */
+.badge-category {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+.badge-ended {
+  background: #f8d7da;
+  color: #842029;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* 按鈕 */
+.btn-primary-custom {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-weight: 500;
+}
+.btn-primary-custom:hover {
+  background: var(--color-primary-dark);
+  color: #fff;
+}
+.btn-outline-custom {
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary-dark);
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-weight: 500;
+  background: transparent;
+}
+.btn-outline-custom:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Page Banner */
+.page-banner {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  color: #fff;
+  padding: 48px 0;
+  text-align: center;
+}
+.page-banner h1 {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.page-banner .subtitle {
+  opacity: 0.8;
+  font-size: 1rem;
+}
+
+/* 麵包屑 */
+.breadcrumb-custom {
+  font-size: 0.9rem;
+  padding: 12px 0;
+}
+.breadcrumb-custom a {
+  color: var(--color-primary-dark);
+}
+
+/* 募款區塊 (首頁) */
+.donation-section {
+  background: var(--color-primary-light);
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+}
+.donation-section .lead {
+  color: #555;
+  max-width: 600px;
+  margin: 0 auto 24px;
+}
+
+/* 募款方案卡片 */
+.plan-card {
+  border: 2px solid #eee;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 100%;
+}
+.plan-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.plan-card .plan-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+.plan-card .plan-name {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-primary-dark);
+}
+.plan-card .plan-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin: 12px 0;
+}
+.plan-card ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+.plan-card ul li {
+  padding: 4px 0;
+  font-size: 0.95rem;
+}
+.plan-card ul li::before {
+  content: "·";
+  margin-right: 8px;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* 匯款資訊 */
+.bank-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 24px;
+}
+.bank-info dt {
+  color: var(--color-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+.bank-info dd {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+/* 日記風格 */
+.diary-page-bg {
+  background: var(--color-warm-bg);
+}
+.diary-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e4da;
+  padding: 24px;
+  transition: box-shadow 0.2s;
+}
+.diary-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.diary-card .diary-img {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.diary-card .diary-date {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.diary-card .diary-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.diary-card .diary-summary {
+  font-size: 0.95rem;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.diary-pen-icon {
+  color: var(--color-primary);
+}
+
+/* 日記詳細頁 */
+.diary-detail-content {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e4da;
+  padding: 48px;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.9;
+  font-size: 1.05rem;
+}
+.diary-detail-content h1 {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+.diary-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+.diary-gallery .gallery-item {
+  background: #fff;
+  padding: 8px;
+  border: 1px solid #e0dcd4;
+  border-radius: 4px;
+}
+.diary-gallery .gallery-item .placeholder-img {
+  min-height: 150px;
+  border-radius: 2px;
+}
+
+/* Footer */
+.footer {
+  background: #2c2c2c;
+  color: #ccc;
+  padding: 48px 0 24px;
+}
+.footer h6 {
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.footer a {
+  color: #aaa;
+}
+.footer a:hover {
+  color: var(--color-primary);
+}
+.footer-bottom {
+  border-top: 1px solid #444;
+  padding-top: 16px;
+  margin-top: 32px;
+  font-size: 0.85rem;
+  color: #888;
+}
+.footer .social-links a {
+  font-size: 1.3rem;
+  margin-right: 12px;
+}
+
+/* 文章內容 */
+.article-content {
+  line-height: 1.9;
+  font-size: 1.05rem;
+}
+.article-content p {
+  margin-bottom: 1rem;
+}
+
+/* 篩選列 */
+.filter-bar {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* 分頁 */
+.pagination .page-link {
+  color: var(--color-primary-dark);
+}
+.pagination .page-item.active .page-link {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* 上下篇導航 */
+.prev-next-nav {
+  border-top: 1px solid #eee;
+  padding-top: 24px;
+  margin-top: 40px;
+}
+.prev-next-nav a {
+  color: var(--color-primary-dark);
+  font-weight: 500;
+}
+.prev-next-nav a:hover {
+  color: var(--color-primary);
+}
+
+/* RWD */
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 48px 0;
+    text-align: center;
+  }
+  .event-item .event-img {
+    width: 100%;
+    min-height: 160px;
+    margin-bottom: 12px;
+  }
+  .donation-section {
+    padding: 32px 16px;
+  }
+  .diary-detail-content {
+    padding: 24px;
+  }
+}
