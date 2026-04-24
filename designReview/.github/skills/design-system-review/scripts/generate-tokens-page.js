@@ -357,7 +357,7 @@ function renderSpecAudit(specs) {
       <p class="spec-summary">${esc(sp.summary)}</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/${encodeURIComponent(sp.file)}" alt="${esc(sp.file)}" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/${encodeURIComponent(sp.file)}" alt="${esc(sp.file)}" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings">`;
 

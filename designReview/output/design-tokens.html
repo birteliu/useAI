@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>農業數位 —  設計系統基礎規範與檢核</title>
+<title>農業數位整合服務平臺 — Design System Tokens — 設計系統基礎規範與檢核</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -46,6 +46,7 @@
 
   h1 { font-size: 2rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
   .meta { color: var(--c-text-secondary); margin-bottom: var(--section-gap); font-size: .875rem; }
+  .page-subtitle { font-size: 1.125rem; font-weight: 500; color: var(--c-primary); margin-bottom: .375rem; letter-spacing: -.01em; }
   h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1.5rem; padding-bottom: .75rem; border-bottom: 2px solid var(--c-primary-soft); letter-spacing: -.01em; }
   h3 { font-size: 1.125rem; font-weight: 600; margin: 1.5rem 0 1rem; text-transform: capitalize; }
   h4 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 .75rem; }
@@ -207,7 +208,8 @@
 </style>
 </head>
 <body>
-<h1>農業數位 —  設計系統基礎規範與檢核</h1>
+<h1>農業數位整合服務平臺 — Design System Tokens</h1>
+<p class="page-subtitle">設計系統基礎規範與檢核</p>
 <p class="meta">Version: 1.2.0 &middot; Generated: 2026-04-24</p>
 
 <div class="tab-bar">
@@ -265,7 +267,7 @@
       <p class="spec-summary">主色×2（teal green + orange）各 9 階 + 灰階 9 階 + 語意色 danger</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/Colors.png" alt="Colors.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/Colors.png" alt="Colors.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ 主色一 teal green 9 階漸層完整（900–100）</li><li class="finding-pass">✅ 主色二 orange 9 階漸層完整（900–100）</li><li class="finding-pass">✅ 中性灰 gray 9 階完整（900–100）</li><li class="finding-pass">✅ 語意色 danger（紅色）已定義</li><li class="finding-warn">⚠️ 色票無 HEX 色碼標示</li><li class="finding-fail">❌ 缺 success / warning / info 語意色</li><li class="finding-fail">❌ 缺背景（background）/ 前景（foreground）配對定義</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -284,7 +286,7 @@
       <p class="spec-summary">Noto Sans TC + Geologica，H1–H6 + Body 含行高與 mobile size</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/Typography.png" alt="Typography.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/Typography.png" alt="Typography.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ 中文字型 Noto Sans TC 已指定</li><li class="finding-pass">✅ 英文字型 Geologica 已指定</li><li class="finding-pass">✅ H1–H6 + Body 字級定義含行高</li><li class="finding-pass">✅ 含 Mobile size 響應式定義</li><li class="finding-warn">⚠️ 缺 Caption / Overline 層級</li><li class="finding-fail">❌ 無 fallback 字型指定（如系統字型後備）</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -303,7 +305,7 @@
       <p class="spec-summary">Primary / Secondary filled + outlined + Disabled + Text button</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/Button.png" alt="Button.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/Button.png" alt="Button.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ Primary filled + outlined 雙版本</li><li class="finding-pass">✅ Secondary filled + outlined 雙版本</li><li class="finding-pass">✅ Disabled 狀態已定義</li><li class="finding-pass">✅ Text button 類型已定義</li><li class="finding-warn">⚠️ 白字 on 綠色按鈕對比度 ≈ 3:1（AA 需 4.5:1）</li><li class="finding-fail">❌ 缺 Hover / Active / Focus ring 互動狀態</li><li class="finding-fail">❌ 缺 Loading 與 Danger 變體</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -322,7 +324,7 @@
       <p class="spec-summary">僅定義 Medium 1 級陰影</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/Shadow.png" alt="Shadow.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/Shadow.png" alt="Shadow.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ Medium 級別陰影已定義，含參數值</li><li class="finding-fail">❌ 僅 1 級，缺 low / high 層級系統</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -341,7 +343,7 @@
       <p class="spec-summary">完整首頁：Header / Hero / 公告輪播 / 補助卡片 / 活動 / 新聞 / Footer</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/WEB_%E9%A6%96%E9%A0%81%202.png" alt="WEB_首頁 2.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/WEB_%E9%A6%96%E9%A0%81%202.png" alt="WEB_首頁 2.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ 完整首頁結構含 Header、Hero、公告、補助、活動、新聞、Footer</li><li class="finding-pass">✅ 綠色品牌調性統一，色彩使用與 Colors.png 一致</li><li class="finding-pass">✅ 多種按鈕類型實際運用：Primary / Outlined / Tag / Ghost</li><li class="finding-pass">✅ 字級層級與 Typography.png 對應（標題/副標/內文/按鈕）</li><li class="finding-pass">✅ 觀察到一致的 8px 基準間距模式</li><li class="finding-warn">⚠️ 圖示以 Outline 為主但混用 Filled + Emoji 風格</li><li class="finding-warn">⚠️ 按鈕圓角不統一（查詢按鈕 8px vs Header 膠囊形）</li><li class="finding-fail">❌ 按鈕僅呈現 Default 狀態，缺 Hover / Active</li><li class="finding-fail">❌ Hero 區域白色文字在背景圖上對比不足</li><li class="finding-fail">❌ 無 Focus indicator（鍵盤導航不可見）</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -360,7 +362,7 @@
       <p class="spec-summary">登入頁面：帳號/密碼/驗證碼 + LINE 登入 + QR Code</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/WEB_%E6%9C%83%E5%93%A1%E7%99%BB%E5%85%A5.png" alt="WEB_會員登入.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/WEB_%E6%9C%83%E5%93%A1%E7%99%BB%E5%85%A5.png" alt="WEB_會員登入.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ 帳號 / 密碼 / 驗證碼輸入欄位完整</li><li class="finding-pass">✅ LINE 登入 + QR Code 登入流程</li><li class="finding-pass">✅ Header 含搜尋框元件</li><li class="finding-warn">⚠️ CAPTCHA 驗證碼圖片無替代方案（無障礙風險）</li><li class="finding-warn">⚠️ 連結文字僅靠顏色區分，無底線輔助</li><li class="finding-fail">❌ 🚨 白字 on 綠色按鈕對比度 ≈ 3:1（WCAG AA 需 4.5:1）</li><li class="finding-fail">❌ 表單僅 Default 狀態，缺 Focus / Error / Disabled</li><li class="finding-fail">❌ 無 Focus indicator</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -379,7 +381,7 @@
       <p class="spec-summary">Step 2 帳號設定：手機輸入 + Error 文字 + 步驟指示器</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/WEB_%E4%B8%80%E8%88%AC%E6%9C%83%E5%93%A102.png" alt="WEB_一般會員02.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/WEB_%E4%B8%80%E8%88%AC%E6%9C%83%E5%93%A102.png" alt="WEB_一般會員02.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ 步驟式表單 Step 2 帳號設定結構完整</li><li class="finding-pass">✅ 深綠側邊欄步驟指示器（Step 1–5）</li><li class="finding-pass">✅ 手機輸入框含錯誤訊息文字（首次見到 Error 狀態）</li><li class="finding-warn">⚠️ Error 狀態僅有文字提示，輸入框邊框未變紅色</li><li class="finding-fail">❌ 缺 Focus / Disabled / Success 表單狀態</li><li class="finding-fail">❌ 無 Focus indicator</li></ul></div></div>
     <div class="spec-card spec-card-has-fail">
@@ -398,7 +400,7 @@
       <p class="spec-summary">線上申請服務：搜尋篩選 + 服務卡片列表 + 分頁</p>
       <div class="spec-card-body">
       <div class="spec-img-wrap">
-        <img class="spec-img" src="../design-specs/WEB_%E7%B7%9A%E4%B8%8A%E7%94%B3%E8%AB%8B%E6%9C%8D%E5%8B%9901.png" alt="WEB_線上申請服務01.png" loading="lazy" onclick="openSpecImg(this)">
+        <img class="spec-img" src="../.github/skills/design-system-review/design-specs/WEB_%E7%B7%9A%E4%B8%8A%E7%94%B3%E8%AB%8B%E6%9C%8D%E5%8B%9901.png" alt="WEB_線上申請服務01.png" loading="lazy" onclick="openSpecImg(this)">
       </div>
       <ul class="spec-findings"><li class="finding-pass">✅ 搜尋篩選功能 + 服務卡片列表 + 分頁元件</li><li class="finding-pass">✅ 到期警告標籤使用 Warning 橘色（#F57C00）</li><li class="finding-pass">✅ 自訂 Radio 與 Tag 篩選元件</li><li class="finding-warn">⚠️ 卡片陰影極輕，整體扁平風格（與 Shadow.png 定義不一致）</li><li class="finding-fail">❌ 篩選元件僅 Default 狀態，缺互動回饋</li><li class="finding-fail">❌ 無 Focus indicator</li></ul></div></div></section>
 </div>
