@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System Tokens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c-primary: #2E7D5B;
+    --c-primary-light: #E8F5EE;
+    --c-primary-soft: #D4EDDA;
+    --c-accent: #D4853A;
+    --c-accent-light: #FFF4EB;
+    --c-bg: #FAFBF9;
+    --c-surface: #FFFFFF;
+    --c-text: #333333;
+    --c-text-secondary: #6B7280;
+    --c-border: #E8ECE6;
+    --c-danger: #DC3D5A;
+    --c-danger-light: #FEF2F4;
+    --c-warning: #E65100;
+    --c-warning-light: #FFF8E1;
+    --c-success: #2E7D32;
+    --c-success-light: #E8F5E9;
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 32px;
+    --radius-pill: 9999px;
+    --shadow-soft: 0 2px 16px rgba(0,0,0,.05);
+    --shadow-card: 0 4px 24px rgba(0,0,0,.06);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,.10);
+    --section-gap: 3.5rem;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', 'Inter', system-ui, sans-serif; color: var(--c-text); background: var(--c-bg); line-height: 1.7; padding: 2.5rem; max-width: 1200px; margin: 0 auto; }
+
+  /* decorative organic shapes */
+  body::before, body::after {
+    content: ''; position: fixed; border-radius: 50%; opacity: .06; pointer-events: none; z-index: -1;
+  }
+  body::before { width: 400px; height: 400px; background: var(--c-primary); top: -120px; right: -100px; }
+  body::after { width: 300px; height: 300px; background: var(--c-accent); bottom: -80px; left: -60px; }
+
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
+  .meta { color: var(--c-text-secondary); margin-bottom: var(--section-gap); font-size: .875rem; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: var(--section-gap) 0 1.5rem; padding-bottom: .75rem; border-bottom: 2px solid var(--c-primary-soft); letter-spacing: -.01em; }
+  h3 { font-size: 1.125rem; font-weight: 600; margin: 1.5rem 0 1rem; text-transform: capitalize; }
+  h4 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 .75rem; }
+
+  /* audit */
+  .audit-card { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem; border: none; box-shadow: var(--shadow-card); }
+  .audit-card p { margin-bottom: .625rem; font-size: .875rem; line-height: 1.7; }
+  .audit-notes { background: var(--c-warning-light); border-left: 4px solid #FFA000; padding: .75rem 1rem; border-radius: var(--radius-sm); font-size: .8125rem; color: var(--c-warning); }
+  .audit-table { margin-top: 1.5rem; }
+  .audit-table td:nth-child(3) { white-space: nowrap; }
+  .audit-table td:nth-child(4) { font-size: .8125rem; color: var(--c-text-secondary); }
+  .audit-table td ul { margin: .25rem 0; padding-left: 1.25rem; list-style: disc; }
+  .audit-table td li { padding: .15rem 0; line-height: 1.6; }
+
+  /* tabs */
+  .tab-bar { position: sticky; top: 0; background: var(--c-bg); z-index: 10; border-bottom: none; margin-bottom: 2rem; display: flex; gap: .5rem; padding: .5rem; background: var(--c-surface); border-radius: var(--radius-pill); box-shadow: var(--shadow-soft); }
+  .tab-btn { background: none; border: none; padding: .75rem 2rem; font-size: .9375rem; font-weight: 600; color: var(--c-text-secondary); cursor: pointer; border-radius: var(--radius-pill); transition: all .2s ease; display: flex; align-items: center; gap: .5rem; }
+  .tab-btn:hover { color: var(--c-text); background: var(--c-primary-light); }
+  .tab-btn.active { color: #FFF; background: var(--c-primary); box-shadow: 0 2px 8px rgba(46,125,91,.25); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* sub-nav inside tab */
+  .sub-nav { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: .5rem 0; }
+  .sub-nav a { color: var(--c-text-secondary); text-decoration: none; font-size: .8125rem; font-weight: 500; padding: .5rem 1.25rem; border-radius: var(--radius-pill); background: var(--c-surface); box-shadow: var(--shadow-soft); transition: all .2s; }
+  .sub-nav a:hover { background: var(--c-primary-light); color: var(--c-primary); transform: translateY(-1px); box-shadow: var(--shadow-card); }
+
+  /* colors */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+  .color-swatch { border-radius: var(--radius-md); padding: 1.25rem 1rem; min-height: 110px; display: flex; flex-direction: column; justify-content: flex-end; gap: .25rem; font-size: .75rem; transition: all .2s ease; box-shadow: var(--shadow-soft); }
+  .color-swatch:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .swatch-name { font-weight: 600; font-size: .8125rem; }
+  .swatch-contrast { opacity: .85; }
+
+  /* typography */
+  .type-scale { display: flex; flex-direction: column; gap: 1rem; }
+  .type-sample { padding: .75rem 0; border-bottom: 1px solid var(--c-border); }
+  .type-label { display: block; font-size: .75rem; color: var(--c-text-secondary); margin-bottom: .25rem; font-weight: 600; }
+
+  /* spacing */
+  .spacing-grid { display: flex; flex-direction: column; gap: .75rem; }
+  .spacing-item { display: flex; align-items: center; gap: 1rem; }
+  .spacing-bar { height: 28px; background: linear-gradient(90deg, var(--c-primary), var(--c-primary-soft)); border-radius: var(--radius-pill); opacity: .8; }
+  .spacing-label { font-size: .8125rem; white-space: nowrap; font-weight: 500; }
+
+  /* radius */
+  .radius-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .radius-item { text-align: center; font-size: .8125rem; font-weight: 500; }
+  .radius-box { width: 88px; height: 88px; background: linear-gradient(135deg, var(--c-primary-light), var(--c-primary-soft)); border: 2px solid var(--c-primary); opacity: .75; margin-bottom: .75rem; }
+
+  /* shadow */
+  .shadow-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .shadow-item { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem; width: 240px; display: flex; flex-direction: column; gap: .625rem; transition: transform .2s; }
+  .shadow-item:hover { transform: translateY(-2px); }
+  .shadow-item code { font-size: .6875rem; color: var(--c-text-secondary); word-break: break-all; }
+
+  /* tables */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 1rem 0; font-size: .875rem; background: var(--c-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-soft); }
+  th, td { text-align: left; padding: .75rem 1rem; border-bottom: 1px solid var(--c-border); }
+  th { font-weight: 600; background: var(--c-primary-light); color: var(--c-primary); }
+  tr:last-child td { border-bottom: none; }
+
+  .token-group { margin-bottom: 2.5rem; }
+  .group-desc { font-size: .8125rem; color: var(--c-text-secondary); margin: .25rem 0 1rem; line-height: 1.7; }
+
+  /* status badges */
+  .status-badge { font-size: .6875rem; font-weight: 600; padding: .2rem .625rem; border-radius: var(--radius-pill); margin-left: .5rem; vertical-align: middle; white-space: nowrap; }
+  .status-missing { background: var(--c-warning-light); color: var(--c-warning); }
+  .status-suggested { background: #EDE7F6; color: #5E35B1; font-size: .625rem; }
+  .status-from-design { background: var(--c-success-light); color: var(--c-success); font-size: .625rem; }
+
+  /* missing color swatch */
+  .color-missing { background: repeating-linear-gradient(45deg, #F8F8F8, #F8F8F8 10px, #F0F0F0 10px, #F0F0F0 20px); border: 2px dashed #D0D0D0; color: #9E9E9E; border-radius: var(--radius-md); }
+
+  /* spec audit */
+  .spec-stats { display: flex; gap: 1rem; margin-bottom: 2rem; }
+  .spec-stat { font-size: .875rem; display: flex; align-items: center; gap: .5rem; padding: .75rem 1.5rem; border-radius: var(--radius-pill); background: var(--c-surface); box-shadow: var(--shadow-soft); border: none; }
+  .spec-stat strong { font-size: 1.25rem; }
+  .spec-stat-pass strong { color: var(--c-success); }
+  .spec-stat-warn strong { color: var(--c-warning); }
+  .spec-stat-fail strong { color: var(--c-danger); }
+
+  .spec-card { background: var(--c-surface); border-radius: var(--radius-lg); margin-bottom: 1rem; border: none; box-shadow: var(--shadow-card); overflow: hidden; transition: transform .2s, box-shadow .2s; }
+  .spec-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+  .spec-card-has-fail { border-left: 5px solid var(--c-danger); }
+  .spec-card-has-warn { border-left: 5px solid var(--c-accent); }
+  .spec-card-all-pass { border-left: 5px solid #66BB6A; }
+  .spec-card-header { display: flex; align-items: center; gap: .75rem; padding: 1.25rem 1.5rem; cursor: pointer; user-select: none; }
+  .spec-card-header:hover { background: rgba(0,0,0,.015); }
+  .spec-collapse-icon { font-size: .6rem; color: #B0B0B0; transition: transform .2s; }
+  .spec-collapsed .spec-collapse-icon { transform: rotate(-90deg); }
+  .spec-collapsed .spec-summary,
+  .spec-collapsed .spec-card-body { display: none; }
+  .spec-card-title { flex: 1; }
+  .spec-card-title strong { font-size: .9375rem; }
+  .spec-type-badge { font-size: .625rem; font-weight: 600; padding: .15rem .625rem; border-radius: var(--radius-pill); background: #F3E5F5; color: #7B1FA2; margin-left: .5rem; vertical-align: middle; }
+  .spec-card-counts { display: flex; gap: .625rem; font-size: .75rem; white-space: nowrap; }
+  .sc-pass { color: var(--c-success); }
+  .sc-warn { color: var(--c-warning); }
+  .sc-fail { color: var(--c-danger); font-weight: 600; }
+  .spec-summary { font-size: .8125rem; color: var(--c-text-secondary); padding: 0 1.5rem .75rem; line-height: 1.7; }
+  .spec-card-body { display: flex; gap: 1.5rem; padding: 0 1.5rem 1.5rem; align-items: flex-start; }
+  .spec-img-wrap { flex-shrink: 0; width: 280px; }
+  .spec-img { width: 100%; border-radius: var(--radius-md); border: none; cursor: pointer; transition: all .25s ease; box-shadow: var(--shadow-soft); }
+  .spec-img:hover { box-shadow: var(--shadow-hover); transform: scale(1.02); }
+  .spec-img.spec-img-expanded { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: auto; max-width: 90vw; max-height: 90vh; object-fit: contain; z-index: 1000; box-shadow: 0 16px 64px rgba(0,0,0,.35); border-radius: var(--radius-md); }
+  .spec-img-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); z-index: 999; cursor: pointer; }
+  .spec-findings { list-style: none; padding: 0; flex: 1; min-width: 0; }
+  @media (max-width: 768px) {
+    .spec-card-body { flex-direction: column; }
+    .spec-img-wrap { width: 100%; }
+  }
+  .spec-findings li { padding: .4rem 0; font-size: .8125rem; border-bottom: 1px solid #F5F5F5; line-height: 1.6; }
+  .spec-findings li:last-child { border-bottom: none; }
+  .finding-pass { color: var(--c-success); }
+  .finding-warn { color: var(--c-warning); }
+  .finding-fail { color: var(--c-danger); }
+
+  /* checklist */
+  .checklist-progress { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; border: none; box-shadow: var(--shadow-card); }
+  .progress-stats { display: flex; gap: 2.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .progress-stat { display: flex; flex-direction: column; }
+  .progress-label { font-size: .75rem; color: var(--c-text-secondary); text-transform: uppercase; letter-spacing: .5px; font-weight: 500; }
+  .progress-value { font-size: 1.5rem; font-weight: 700; color: var(--c-text); }
+  .progress-bar-track { height: 10px; background: var(--c-border); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: 1rem; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--c-primary), #43A047); border-radius: var(--radius-pill); transition: width .4s ease; }
+  .btn-reset { background: none; border: 1px solid var(--c-border); border-radius: var(--radius-pill); padding: .5rem 1.25rem; font-size: .75rem; font-weight: 500; color: var(--c-text-secondary); cursor: pointer; transition: all .2s; }
+  .btn-reset:hover { background: var(--c-danger-light); color: var(--c-danger); border-color: var(--c-danger); }
+
+  .checklist-section { background: var(--c-surface); border-radius: var(--radius-lg); margin-bottom: 1.25rem; border: none; box-shadow: var(--shadow-card); overflow: hidden; }
+  .checklist-section-title { margin: 0; padding: 1.25rem 1.5rem; cursor: pointer; user-select: none; display: flex; align-items: center; gap: .5rem; font-size: 1.05rem; text-transform: none; }
+  .checklist-section-title:hover { background: rgba(0,0,0,.015); }
+  .collapse-icon { font-size: .65rem; transition: transform .2s; color: #B0B0B0; }
+  .checklist-section.collapsed .collapse-icon { transform: rotate(-90deg); }
+  .checklist-section.collapsed .checklist-section-body { display: none; }
+  .checklist-section-body { padding: 0 1.5rem 1.25rem; }
+  .section-badge { margin-left: auto; font-size: .75rem; font-weight: 600; padding: .2rem .75rem; border-radius: var(--radius-pill); background: var(--c-success-light); color: var(--c-success); }
+
+  .checklist-sub-title { font-size: .875rem; font-weight: 600; margin: 1.25rem 0 .625rem; color: #424242; padding-bottom: .375rem; border-bottom: 1px solid var(--c-border); text-transform: none; }
+  .checklist-items { list-style: none; padding: 0; }
+  .checklist-item { padding: .4rem 0; }
+  .checklist-item label { display: flex; align-items: flex-start; gap: .625rem; cursor: pointer; font-size: .875rem; line-height: 1.7; }
+  .checklist-indent { padding-left: 1.75rem; }
+  .checklist-item input[type="checkbox"] { display: none; }
+  .checkmark { flex-shrink: 0; width: 20px; height: 20px; border: 2px solid #D0D0D0; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-top: 3px; transition: all .2s; }
+  .checklist-item input:checked ~ .checkmark { background: var(--c-primary); border-color: var(--c-primary); }
+  .checklist-item input:checked ~ .checkmark::after { content: "✓"; color: #FFF; font-size: .7rem; font-weight: 700; }
+  .checklist-item input:checked ~ .item-text { color: #B0B0B0; text-decoration: line-through; }
+  .badge-required { font-size: .625rem; font-weight: 600; padding: .15rem .5rem; border-radius: var(--radius-pill); background: var(--c-warning-light); color: var(--c-warning); margin-left: .25rem; white-space: nowrap; }
+
+  @media (max-width: 640px) {
+    body { padding: 1.25rem; }
+    .color-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .progress-stats { gap: 1.25rem; }
+    .tab-bar { flex-direction: column; border-radius: var(--radius-md); }
+    .spec-stats { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<h1>農業數位 — Design System Tokens</h1>
+<p class="meta">Version: 1.2.0 &middot; Generated: 2026-04-24</p>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="audit" onclick="switchTab('audit')">審核結果</button>
+  <button class="tab-btn" data-tab="tokens" onclick="switchTab('tokens')">Design Tokens</button>
+  <button class="tab-btn" data-tab="checklist" onclick="switchTab('checklist')">審核清單</button>
+</div>
+
+<div id="tab-audit" class="tab-panel active">
+  <div class="sub-nav">
+    <a href="#audit-summary">摘要</a>
+    <a href="#spec-audit">逐稿審核</a>
+  </div>
+  <section id="audit-summary"><h2>審核摘要</h2>
+    <div class="audit-card">
+      <p><strong>審核日期：</strong>2026-04-24</p>
+      <p><strong>來源檔案：</strong></p>
+      <ul style="font-size:.8125rem; margin:.25rem 0 .75rem 1.25rem; color:#616161;"><li>design-specs/Colors.png</li><li>design-specs/Typography.png</li><li>design-specs/Button.png</li><li>design-specs/Shadow.png</li><li>design-specs/WEB_首頁 2.png</li><li>design-specs/WEB_會員登入.png</li><li>design-specs/WEB_一般會員02.png</li><li>design-specs/WEB_線上申請服務01.png</li></ul>
+      <p class="audit-notes">⚠️ 色碼為從設計稿圖檔目測估算值，正式使用前請與設計師確認精確色碼。新增 4 張 WEB 頁面設計稿，驗證了色彩/字體/按鈕/表單在實際頁面中的使用情況。</p>
+      <table class="audit-table">
+        <thead><tr><th>#</th><th>類別</th><th>狀態</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>色彩系統</td><td>⚠️ 部分缺漏</td><td><ul><li>主色×2（teal green + orange）9 階完整 + 灰階 9 階 ✅</li><li>背景/前景配對已從 WEB 頁面補充 ✅</li><li>缺 success/info 語意色</li><li>warning 僅從頁面觀察到橘色標籤</li><li>danger 無變體</li></ul></td></tr>
+          <tr><td>2</td><td>字體系統</td><td>⚠️ 部分缺漏</td><td><ul><li>Noto Sans TC + Geologica 已指定 ✅</li><li>H1–H6 + Body 含行高與 mobile size ✅</li><li>WEB 頁面驗證字級層級一致 ✅</li><li>缺 Caption/Overline</li><li>無 fallback 字型</li></ul></td></tr>
+          <tr><td>3</td><td>間距系統</td><td>⚠️ 部分缺漏</td><td><ul><li>設計稿未正式定義</li><li>WEB 頁面觀察到一致的 8px 基準間距模式</li><li>JSON 中為建議值</li></ul></td></tr>
+          <tr><td>4</td><td>圓角</td><td>⚠️ 部分缺漏</td><td><ul><li>WEB 頁面觀察到 4-5 種圓角值（4px/8px/12px/膠囊/圓形）</li><li>缺乏正式 token 定義</li><li>按鈕圓角語言不統一（查詢 8px vs Header 膠囊）</li></ul></td></tr>
+          <tr><td>5</td><td>陰影</td><td>⚠️ 部分缺漏</td><td><ul><li>設計稿僅定義 $medium 1 級</li><li>WEB 頁面整體走扁平設計風格，陰影極輕</li><li>low/high 為建議補充</li></ul></td></tr>
+          <tr><td>6</td><td>按鈕狀態</td><td>⚠️ 部分缺漏</td><td><ul><li>Button.png 有 Primary/Secondary filled+outlined + Disabled ✅</li><li>WEB 頁面確認實際使用 ✅</li><li>❌ 全部頁面皆僅見 Default 狀態</li><li>缺 Hover/Active/Focus ring/Loading/Danger</li></ul></td></tr>
+          <tr><td>7</td><td>表單狀態</td><td>⚠️ 部分缺漏</td><td><ul><li>WEB_會員登入有搜尋框 + 帳號/密碼/驗證碼欄位 ✅</li><li>WEB_一般會員02 有手機輸入框 + Error 文字 ✅</li><li>❌ 缺 Focus/Disabled/Success 狀態</li><li>Error 僅有文字無紅色邊框</li></ul></td></tr>
+          <tr><td>8</td><td>無障礙</td><td>❌ 嚴重缺漏</td><td><ul><li>白色文字 on 綠色按鈕對比度約 3:1 未達 AA 4.5:1</li><li>全部頁面無 Focus indicator</li><li>Hero 白字在圖片上對比不足</li><li>CAPTCHA 無替代方案</li><li>連結僅靠顏色無底線</li></ul></td></tr>
+          <tr><td>9</td><td>圖示系統</td><td>⚠️ 部分缺漏</td><td><ul><li>WEB 頁面大量使用 Outline 線性圖示 ✅</li><li>混用 Filled + Emoji 風格 ⚠️</li><li>約 16/20/24px 三種尺寸</li><li>缺正式規範</li></ul></td></tr>
+          <tr><td>10</td><td>風格一致性</td><td>⚠️ 部分缺漏</td><td><ul><li>整體綠色品牌調性統一 ✅</li><li>4 張 WEB 頁面視覺語言一致 ✅</li><li>圓角/圖示風格混用需統一 ⚠️</li></ul></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section><section id="spec-audit"><h2>逐稿審核結果</h2>
+    <div class="spec-stats">
+      <span class="spec-stat spec-stat-pass">✅ 通過 <strong>27</strong></span>
+      <span class="spec-stat spec-stat-warn">⚠️ 注意 <strong>9</strong></span>
+      <span class="spec-stat spec-stat-fail">❌ 缺漏 <strong>16</strong></span>
+    </div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>Colors.png</strong>
+          <span class="spec-type-badge">元件規格</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">4✅</span>
+          <span class="sc-warn">1⚠️</span>
+          <span class="sc-fail">2❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">主色×2（teal green + orange）各 9 階 + 灰階 9 階 + 語意色 danger</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/Colors.png" alt="Colors.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ 主色一 teal green 9 階漸層完整（900–100）</li><li class="finding-pass">✅ 主色二 orange 9 階漸層完整（900–100）</li><li class="finding-pass">✅ 中性灰 gray 9 階完整（900–100）</li><li class="finding-pass">✅ 語意色 danger（紅色）已定義</li><li class="finding-warn">⚠️ 色票無 HEX 色碼標示</li><li class="finding-fail">❌ 缺 success / warning / info 語意色</li><li class="finding-fail">❌ 缺背景（background）/ 前景（foreground）配對定義</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>Typography.png</strong>
+          <span class="spec-type-badge">元件規格</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">4✅</span>
+          <span class="sc-warn">1⚠️</span>
+          <span class="sc-fail">1❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">Noto Sans TC + Geologica，H1–H6 + Body 含行高與 mobile size</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/Typography.png" alt="Typography.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ 中文字型 Noto Sans TC 已指定</li><li class="finding-pass">✅ 英文字型 Geologica 已指定</li><li class="finding-pass">✅ H1–H6 + Body 字級定義含行高</li><li class="finding-pass">✅ 含 Mobile size 響應式定義</li><li class="finding-warn">⚠️ 缺 Caption / Overline 層級</li><li class="finding-fail">❌ 無 fallback 字型指定（如系統字型後備）</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>Button.png</strong>
+          <span class="spec-type-badge">元件規格</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">4✅</span>
+          <span class="sc-warn">1⚠️</span>
+          <span class="sc-fail">2❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">Primary / Secondary filled + outlined + Disabled + Text button</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/Button.png" alt="Button.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ Primary filled + outlined 雙版本</li><li class="finding-pass">✅ Secondary filled + outlined 雙版本</li><li class="finding-pass">✅ Disabled 狀態已定義</li><li class="finding-pass">✅ Text button 類型已定義</li><li class="finding-warn">⚠️ 白字 on 綠色按鈕對比度 ≈ 3:1（AA 需 4.5:1）</li><li class="finding-fail">❌ 缺 Hover / Active / Focus ring 互動狀態</li><li class="finding-fail">❌ 缺 Loading 與 Danger 變體</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>Shadow.png</strong>
+          <span class="spec-type-badge">元件規格</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">1✅</span>
+          
+          <span class="sc-fail">1❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">僅定義 Medium 1 級陰影</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/Shadow.png" alt="Shadow.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ Medium 級別陰影已定義，含參數值</li><li class="finding-fail">❌ 僅 1 級，缺 low / high 層級系統</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>WEB_首頁 2.png</strong>
+          <span class="spec-type-badge">頁面設計稿</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">5✅</span>
+          <span class="sc-warn">2⚠️</span>
+          <span class="sc-fail">3❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">完整首頁：Header / Hero / 公告輪播 / 補助卡片 / 活動 / 新聞 / Footer</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/WEB_%E9%A6%96%E9%A0%81%202.png" alt="WEB_首頁 2.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ 完整首頁結構含 Header、Hero、公告、補助、活動、新聞、Footer</li><li class="finding-pass">✅ 綠色品牌調性統一，色彩使用與 Colors.png 一致</li><li class="finding-pass">✅ 多種按鈕類型實際運用：Primary / Outlined / Tag / Ghost</li><li class="finding-pass">✅ 字級層級與 Typography.png 對應（標題/副標/內文/按鈕）</li><li class="finding-pass">✅ 觀察到一致的 8px 基準間距模式</li><li class="finding-warn">⚠️ 圖示以 Outline 為主但混用 Filled + Emoji 風格</li><li class="finding-warn">⚠️ 按鈕圓角不統一（查詢按鈕 8px vs Header 膠囊形）</li><li class="finding-fail">❌ 按鈕僅呈現 Default 狀態，缺 Hover / Active</li><li class="finding-fail">❌ Hero 區域白色文字在背景圖上對比不足</li><li class="finding-fail">❌ 無 Focus indicator（鍵盤導航不可見）</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>WEB_會員登入.png</strong>
+          <span class="spec-type-badge">頁面設計稿</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">3✅</span>
+          <span class="sc-warn">2⚠️</span>
+          <span class="sc-fail">3❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">登入頁面：帳號/密碼/驗證碼 + LINE 登入 + QR Code</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/WEB_%E6%9C%83%E5%93%A1%E7%99%BB%E5%85%A5.png" alt="WEB_會員登入.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ 帳號 / 密碼 / 驗證碼輸入欄位完整</li><li class="finding-pass">✅ LINE 登入 + QR Code 登入流程</li><li class="finding-pass">✅ Header 含搜尋框元件</li><li class="finding-warn">⚠️ CAPTCHA 驗證碼圖片無替代方案（無障礙風險）</li><li class="finding-warn">⚠️ 連結文字僅靠顏色區分，無底線輔助</li><li class="finding-fail">❌ 🚨 白字 on 綠色按鈕對比度 ≈ 3:1（WCAG AA 需 4.5:1）</li><li class="finding-fail">❌ 表單僅 Default 狀態，缺 Focus / Error / Disabled</li><li class="finding-fail">❌ 無 Focus indicator</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>WEB_一般會員02.png</strong>
+          <span class="spec-type-badge">頁面設計稿</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">3✅</span>
+          <span class="sc-warn">1⚠️</span>
+          <span class="sc-fail">2❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">Step 2 帳號設定：手機輸入 + Error 文字 + 步驟指示器</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/WEB_%E4%B8%80%E8%88%AC%E6%9C%83%E5%93%A102.png" alt="WEB_一般會員02.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ 步驟式表單 Step 2 帳號設定結構完整</li><li class="finding-pass">✅ 深綠側邊欄步驟指示器（Step 1–5）</li><li class="finding-pass">✅ 手機輸入框含錯誤訊息文字（首次見到 Error 狀態）</li><li class="finding-warn">⚠️ Error 狀態僅有文字提示，輸入框邊框未變紅色</li><li class="finding-fail">❌ 缺 Focus / Disabled / Success 表單狀態</li><li class="finding-fail">❌ 無 Focus indicator</li></ul></div></div>
+    <div class="spec-card spec-card-has-fail">
+      <div class="spec-card-header" onclick="this.parentElement.classList.toggle('spec-collapsed')">
+        <span class="spec-collapse-icon">▼</span>
+        <div class="spec-card-title">
+          <strong>WEB_線上申請服務01.png</strong>
+          <span class="spec-type-badge">頁面設計稿</span>
+        </div>
+        <div class="spec-card-counts">
+          <span class="sc-pass">3✅</span>
+          <span class="sc-warn">1⚠️</span>
+          <span class="sc-fail">2❌</span>
+        </div>
+      </div>
+      <p class="spec-summary">線上申請服務：搜尋篩選 + 服務卡片列表 + 分頁</p>
+      <div class="spec-card-body">
+      <div class="spec-img-wrap">
+        <img class="spec-img" src="../design-specs/WEB_%E7%B7%9A%E4%B8%8A%E7%94%B3%E8%AB%8B%E6%9C%8D%E5%8B%9901.png" alt="WEB_線上申請服務01.png" loading="lazy" onclick="openSpecImg(this)">
+      </div>
+      <ul class="spec-findings"><li class="finding-pass">✅ 搜尋篩選功能 + 服務卡片列表 + 分頁元件</li><li class="finding-pass">✅ 到期警告標籤使用 Warning 橘色（#F57C00）</li><li class="finding-pass">✅ 自訂 Radio 與 Tag 篩選元件</li><li class="finding-warn">⚠️ 卡片陰影極輕，整體扁平風格（與 Shadow.png 定義不一致）</li><li class="finding-fail">❌ 篩選元件僅 Default 狀態，缺互動回饋</li><li class="finding-fail">❌ 無 Focus indicator</li></ul></div></div></section>
+</div>
+
+<div id="tab-tokens" class="tab-panel">
+  <div class="sub-nav">
+    <a href="#colors">Colors</a>
+    <a href="#typography">Typography</a>
+    <a href="#spacing">Spacing</a>
+    <a href="#border-radius">Border Radius</a>
+    <a href="#shadows">Shadows</a>
+  </div>
+  <section id="colors"><h2>Color System</h2><div class="token-group"><h3>basic</h3><div class="color-grid">
+        <div class="color-swatch" style="background:#000000; color:#FFFFFF">
+          <span class="swatch-name">black</span>
+          <span class="swatch-value">#000000</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">21.00:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#FFFFFF; color:#000000">
+          <span class="swatch-name">white</span>
+          <span class="swatch-value">#FFFFFF</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.00:1 ⚠️</span>
+        </div></div></div><div class="token-group"><h3>primary</h3><p class="group-desc">color01 — 主色一（teal green）</p><div class="color-grid">
+        <div class="color-swatch" style="background:#E3F7EE; color:#000000">
+          <span class="swatch-name">100</span>
+          <span class="swatch-value">#E3F7EE</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.12:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#B8EDD8; color:#000000">
+          <span class="swatch-name">200</span>
+          <span class="swatch-value">#B8EDD8</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.30:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#84DBBD; color:#000000">
+          <span class="swatch-name">300</span>
+          <span class="swatch-value">#84DBBD</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.63:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#55C9A3; color:#000000">
+          <span class="swatch-name">400</span>
+          <span class="swatch-value">#55C9A3</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.04:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#27B287; color:#000000">
+          <span class="swatch-name">500</span>
+          <span class="swatch-value">#27B287</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.69:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#1F9970; color:#FFFFFF">
+          <span class="swatch-name">600</span>
+          <span class="swatch-value">#1F9970</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">3.59:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#187A5A; color:#FFFFFF">
+          <span class="swatch-name">700</span>
+          <span class="swatch-value">#187A5A</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">5.29:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#115943; color:#FFFFFF">
+          <span class="swatch-name">800</span>
+          <span class="swatch-value">#115943</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">8.29:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#0C3B30; color:#FFFFFF">
+          <span class="swatch-name">900</span>
+          <span class="swatch-value">#0C3B30</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">12.47:1 ✅</span>
+        </div></div></div><div class="token-group"><h3>secondary</h3><p class="group-desc">color02 — 主色二（orange）</p><div class="color-grid">
+        <div class="color-swatch" style="background:#FCEBD8; color:#000000">
+          <span class="swatch-name">100</span>
+          <span class="swatch-value">#FCEBD8</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.17:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#F5CCA0; color:#000000">
+          <span class="swatch-name">200</span>
+          <span class="swatch-value">#F5CCA0</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.50:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#EEB278; color:#000000">
+          <span class="swatch-name">300</span>
+          <span class="swatch-value">#EEB278</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.86:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#E49A58; color:#000000">
+          <span class="swatch-name">400</span>
+          <span class="swatch-value">#E49A58</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.32:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#D8823A; color:#000000">
+          <span class="swatch-name">500</span>
+          <span class="swatch-value">#D8823A</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.93:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#C66D2D; color:#FFFFFF">
+          <span class="swatch-name">600</span>
+          <span class="swatch-value">#C66D2D</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">3.73:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#A85720; color:#FFFFFF">
+          <span class="swatch-name">700</span>
+          <span class="swatch-value">#A85720</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">5.19:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#8B4215; color:#FFFFFF">
+          <span class="swatch-name">800</span>
+          <span class="swatch-value">#8B4215</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">7.27:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#6B3200; color:#FFFFFF">
+          <span class="swatch-name">900</span>
+          <span class="swatch-value">#6B3200</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">10.09:1 ✅</span>
+        </div></div></div><div class="token-group"><h3>semantic</h3><p class="group-desc">語意色 — danger 來自 Colors.png；warning 來自 WEB 頁面到期標籤；success/info 仍待定義</p><div class="color-grid">
+        <div class="color-swatch" style="background:#DC3D5A; color:#FFFFFF">
+          <span class="swatch-name">danger</span>
+          <span class="swatch-value">#DC3D5A</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">4.32:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#F57C00; color:#000000">
+          <span class="swatch-name">warning</span>
+          <span class="swatch-value">#F57C00</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.70:1 ⚠️</span>
+        </div>
+        <div class="color-swatch color-missing">
+          <span class="swatch-name">success</span>
+          <span class="swatch-value">⚠️ 未定義</span>
+        </div>
+        <div class="color-swatch color-missing">
+          <span class="swatch-name">info</span>
+          <span class="swatch-value">⚠️ 未定義</span>
+        </div></div></div><div class="token-group"><h3>neutral</h3><p class="group-desc">gray — 灰色 9 階</p><div class="color-grid">
+        <div class="color-swatch" style="background:#F0F0F0; color:#000000">
+          <span class="swatch-name">100</span>
+          <span class="swatch-value">#F0F0F0</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.14:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#D9D9D9; color:#000000">
+          <span class="swatch-name">200</span>
+          <span class="swatch-value">#D9D9D9</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.41:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#C2C2C2; color:#000000">
+          <span class="swatch-name">300</span>
+          <span class="swatch-value">#C2C2C2</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.78:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#A8A8A8; color:#000000">
+          <span class="swatch-name">400</span>
+          <span class="swatch-value">#A8A8A8</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.38:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#888888; color:#FFFFFF">
+          <span class="swatch-name">500</span>
+          <span class="swatch-value">#888888</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">3.54:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#686868; color:#FFFFFF">
+          <span class="swatch-name">600</span>
+          <span class="swatch-value">#686868</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">5.57:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#4D4D4D; color:#FFFFFF">
+          <span class="swatch-name">700</span>
+          <span class="swatch-value">#4D4D4D</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">8.45:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#333333; color:#FFFFFF">
+          <span class="swatch-name">800</span>
+          <span class="swatch-value">#333333</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">12.63:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#212121; color:#FFFFFF">
+          <span class="swatch-name">900</span>
+          <span class="swatch-value">#212121</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">16.10:1 ✅</span>
+        </div></div></div><div class="token-group"><h3>background</h3><p class="group-desc">背景色 — 從 WEB 頁面設計稿觀察到的背景色</p><div class="color-grid">
+        <div class="color-swatch" style="background:#F8F4EC; color:#000000">
+          <span class="swatch-name">page</span>
+          <span class="swatch-value">#F8F4EC</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.10:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#FFFFFF; color:#000000">
+          <span class="swatch-name">card</span>
+          <span class="swatch-value">#FFFFFF</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.00:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#263238; color:#FFFFFF">
+          <span class="swatch-name">footerDark</span>
+          <span class="swatch-value">#263238</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">13.16:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#1B4332; color:#FFFFFF">
+          <span class="swatch-name">sidebarDark</span>
+          <span class="swatch-value">#1B4332</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">11.08:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#F5F5F0; color:#000000">
+          <span class="swatch-name">sectionAlt</span>
+          <span class="swatch-value">#F5F5F0</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.09:1 ⚠️</span>
+        </div></div></div><div class="token-group"><h3>foreground</h3><p class="group-desc">文字色 — 從 WEB 頁面設計稿觀察到的文字色</p><div class="color-grid">
+        <div class="color-swatch" style="background:#212121; color:#FFFFFF">
+          <span class="swatch-name">primary</span>
+          <span class="swatch-value">#212121</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">16.10:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#666666; color:#FFFFFF">
+          <span class="swatch-name">secondary</span>
+          <span class="swatch-value">#666666</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">5.74:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#9E9E9E; color:#000000">
+          <span class="swatch-name">muted</span>
+          <span class="swatch-value">#9E9E9E</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.68:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#FFFFFF; color:#000000">
+          <span class="swatch-name">onDark</span>
+          <span class="swatch-value">#FFFFFF</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.00:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#0066CC; color:#FFFFFF">
+          <span class="swatch-name">link</span>
+          <span class="swatch-value">#0066CC</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">5.57:1 ✅</span>
+        </div></div></div></section><section id="typography"><h2>Typography</h2><div class="token-group"><h3>Typography</h3><h4>Font Family</h4><table><thead><tr><th>Token</th><th>Value</th><th>Description</th></tr></thead><tbody><tr><td>fontFamily.chinese</td><td style="font-family:'Noto Sans TC', sans-serif">'Noto Sans TC', sans-serif</td><td>中文字型</td></tr><tr><td>fontFamily.english</td><td style="font-family:'Geologica', sans-serif">'Geologica', sans-serif</td><td>英文字型</td></tr><tr><td>fontFamily.button</td><td style="font-family:'Noto Sans TC', sans-serif">'Noto Sans TC', sans-serif</td><td>按鈕字型</td></tr></tbody></table><h4>Font Size Scale</h4><p class="group-desc">Size 為桌面版 px，Mobile 為行動版 px</p><table><thead><tr><th>Token</th><th>Size</th><th>Mobile</th><th>Weight</th><th>Preview</th></tr></thead><tbody><tr><td>h1</td><td>40px</td><td>32px</td><td>—</td><td style="font-size:40px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h2</td><td>32px</td><td>28px</td><td>—</td><td style="font-size:32px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h3</td><td>28px</td><td>24px</td><td>—</td><td style="font-size:28px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h4</td><td>24px</td><td>20px</td><td>—</td><td style="font-size:24px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h5</td><td>20px</td><td>18px</td><td>—</td><td style="font-size:20px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h6</td><td>18px</td><td>16px</td><td>—</td><td style="font-size:18px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>body1</td><td>20px</td><td>20px</td><td>—</td><td style="font-size:20px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>body2</td><td>18px</td><td>18px</td><td>—</td><td style="font-size:18px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>body3Bold</td><td>16px</td><td>16px</td><td>700</td><td style="font-size:16px; font-weight:700; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>body3</td><td>16px</td><td>16px</td><td>—</td><td style="font-size:16px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>buttonMd</td><td>20px</td><td>18px</td><td>—</td><td style="font-size:20px; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr></tbody></table><h4>Font Weight</h4><div class="type-scale"><div class="type-sample" style="font-weight:400"><span class="type-label">regular — 400</span> The quick brown fox 敏捷的棕色狐狸</div><div class="type-sample" style="font-weight:700"><span class="type-label">bold — 700</span> The quick brown fox 敏捷的棕色狐狸</div></div><h4>Line Height</h4><p class="group-desc">每個字級對應的行高 (px)</p><table><thead><tr><th>Token</th><th>Value</th><th>Preview</th></tr></thead><tbody><tr><td>lineHeight.h1</td><td>58px</td><td style="font-size:40px; line-height:58px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.h2</td><td>48px</td><td style="font-size:32px; line-height:48px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.h3</td><td>36px</td><td style="font-size:28px; line-height:36px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.h4</td><td>30px</td><td style="font-size:24px; line-height:30px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.h5</td><td>22px</td><td style="font-size:20px; line-height:22px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.h6</td><td>20px</td><td style="font-size:18px; line-height:20px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.body1</td><td>24px</td><td style="font-size:20px; line-height:24px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.body2</td><td>20px</td><td style="font-size:18px; line-height:20px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.body3</td><td>20px</td><td style="font-size:16px; line-height:20px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.buttonMd</td><td>24px</td><td style="font-size:20px; line-height:24px; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr></tbody></table></div></section><section id="spacing"><h2>Spacing</h2><div class="token-group"><h3>Spacing <span class="status-badge status-missing">⚠️ 設計稿未定義 — 建議值</span></h3><p class="group-desc">⚠️ 設計稿未定義間距系統，以下為建議值</p><p>Base unit: <strong>4px</strong></p><div class="spacing-grid">
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:4px; min-width:4px;"></div>
+          <span class="spacing-label">1 — 4px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:8px; min-width:4px;"></div>
+          <span class="spacing-label">2 — 8px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:12px; min-width:4px;"></div>
+          <span class="spacing-label">3 — 12px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:16px; min-width:4px;"></div>
+          <span class="spacing-label">4 — 16px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:20px; min-width:4px;"></div>
+          <span class="spacing-label">5 — 20px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:24px; min-width:4px;"></div>
+          <span class="spacing-label">6 — 24px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:32px; min-width:4px;"></div>
+          <span class="spacing-label">8 — 32px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:40px; min-width:4px;"></div>
+          <span class="spacing-label">10 — 40px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:48px; min-width:4px;"></div>
+          <span class="spacing-label">12 — 48px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:64px; min-width:4px;"></div>
+          <span class="spacing-label">16 — 64px</span>
+        </div></div></div></section><section id="border-radius"><h2>Border Radius</h2><div class="token-group"><h3>Border Radius <span class="status-badge status-missing">⚠️ 設計稿未定義 — 建議值</span></h3><p class="group-desc">⚠️ 設計稿未定義圓角層級，以下為從按鈕觀察到的值 + 建議補充</p><div class="radius-grid">
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:0px"></div>
+          <span>none — 0px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:4px"></div>
+          <span>small — 4px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:8px"></div>
+          <span>medium — 8px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:16px"></div>
+          <span>large — 16px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:9999px"></div>
+          <span>full — 9999px</span>
+        </div></div></div></section><section id="shadows"><h2>Shadows</h2><div class="token-group"><h3>Shadows / Elevation</h3><p class="group-desc">⚠️ 設計稿僅定義 $medium，low/high 為建議補充</p><div class="shadow-grid">
+        <div class="shadow-item" style="box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.10)">
+          <strong>low</strong> <span class="status-badge status-suggested">建議補充</span>
+          <code>0px 1px 3px 0px rgba(0, 0, 0, 0.10)</code>
+        </div>
+        <div class="shadow-item" style="box-shadow:0px 4px 8px -1px rgba(0, 0, 0, 0.12), 0px 2px 4px -1px rgba(0, 0, 0, 0.08)">
+          <strong>medium</strong> <span class="status-badge status-from-design">來自設計稿</span>
+          <code>0px 4px 8px -1px rgba(0, 0, 0, 0.12), 0px 2px 4px -1px rgba(0, 0, 0, 0.08)</code>
+        </div>
+        <div class="shadow-item" style="box-shadow:0px 12px 24px -4px rgba(0, 0, 0, 0.15), 0px 4px 8px -2px rgba(0, 0, 0, 0.08)">
+          <strong>high</strong> <span class="status-badge status-suggested">建議補充</span>
+          <code>0px 12px 24px -4px rgba(0, 0, 0, 0.15), 0px 4px 8px -2px rgba(0, 0, 0, 0.08)</code>
+        </div></div></div></section>
+</div>
+
+<div id="tab-checklist" class="tab-panel">
+  
+  <section id="checklist">
+    <h2>設計系統審核清單</h2>
+    <p style="color:#757575; margin-bottom:1rem;">勾選已完成的項目以追蹤設計系統完整度。進度會自動儲存在瀏覽器中。</p>
+
+    <div class="checklist-progress">
+      <div class="progress-stats">
+        <div class="progress-stat">
+          <span class="progress-label">必要項目</span>
+          <span class="progress-value" id="progress-required">0 / 40</span>
+        </div>
+        <div class="progress-stat">
+          <span class="progress-label">建議項目</span>
+          <span class="progress-value" id="progress-optional">0 / 40</span>
+        </div>
+        <div class="progress-stat">
+          <span class="progress-label">總完成度</span>
+          <span class="progress-value" id="progress-total">0%</span>
+        </div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+      </div>
+      <button class="btn-reset" onclick="resetChecklist()">重置所有勾選</button>
+    </div>
+    <div class="checklist-section" id="sec-色彩系統--Color-System-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        色彩系統 (Color System)
+        <span class="section-badge" data-section="sec-色彩系統--Color-System-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="0" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>主色 (Primary)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="1" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">包含 light / base / dark 至少 3 個變體</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="2" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">已標示 HEX / RGB / HSL 色碼</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="3" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>輔助色 (Secondary)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="4" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">至少 1 組輔助色 + 變體</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="5" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>語意色 (Semantic Colors)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="6" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Success 成功色（綠色系）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="7" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Warning 警告色（黃/橙色系）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="8" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Error 錯誤色（紅色系）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="9" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Info 資訊色（藍色系）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="10" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每組語意色包含 light / base / dark 變體</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="11" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>灰階 (Neutral / Gray Scale)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="12" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">至少 5 階灰色</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="13" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">包含純白 (#FFFFFF 或近白) 與純黑 (#000000 或近黑)</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="14" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">灰階間有明顯的視覺區隔</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="15" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>背景色 / 前景色配對</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="16" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每組配對標示用途（如：卡片背景 + 標題文字）</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="17" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">色彩命名採用語意化命名（如 `color-primary-500` 而非 `blue-500`）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="18" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供深色模式 (Dark Mode) 色彩對照表</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="19" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">色板以階梯式展示（50, 100, 200 ... 900）</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-字體系統--Typography-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        字體系統 (Typography)
+        <span class="section-badge" data-section="sec-字體系統--Typography-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="20" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>字型家族 (Font Family)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="21" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">主要字型已指定</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="22" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">備用字型 (Fallback) 已指定</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="23" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">中文字型已指定（適用於中文介面）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="24" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">英文/數字字型已指定</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="25" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>字級階層 (Type Scale)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="26" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Display / H1（最大標題）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="27" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">H2（次標題）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="28" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">H3（段落標題）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="29" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">H4 / H5 / H6（小標題）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="30" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Body Large（大內文）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="31" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Body（標準內文）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="32" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Body Small / Caption（小字說明）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="33" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Overline / Label（標籤文字）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="34" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每個字級標示 px / rem 數值</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="35" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>字重 (Font Weight)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="36" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Regular (400)</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="37" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Medium (500)（建議）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="38" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Semi-Bold (600)（建議）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="39" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Bold (700)</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="40" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>行高 (Line Height)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="41" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每個字級有對應的行高數值</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="42" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">行高使用倍率標示（如 1.5）或 px 數值</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="43" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">字間距 (Letter Spacing) 已定義</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="44" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">段落間距 (Paragraph Spacing) 已定義</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="45" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供中英文混排的範例</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-間距系統--Spacing-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        間距系統 (Spacing)
+        <span class="section-badge" data-section="sec-間距系統--Spacing-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="46" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>基礎單位 (Base Unit)</strong> 已定義（建議 4px 或 8px）</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="47" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>間距比例尺 (Spacing Scale)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="48" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">至少 6 級間距</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="49" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">建議刻度：4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="50" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每級標示 px 數值與 token 名稱</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="51" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>內距 (Padding) 規範</strong> 已說明</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="52" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>外距 (Margin) 規範</strong> 已說明</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="53" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供元件間距的應用範例</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="54" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">區分 inline spacing 與 stack spacing</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-圓角--Border-Radius-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        圓角 (Border Radius)
+        <span class="section-badge" data-section="sec-圓角--Border-Radius-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="55" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>圓角層級</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="56" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`none` — 0px</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="57" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`small` — 如 2px 或 4px</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="58" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`medium` — 如 8px</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="59" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`large` — 如 12px 或 16px</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="60" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`full` — 9999px 或 50%（膠囊/圓形）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="61" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每級標示 px 數值</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="62" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">標示各圓角層級的適用元件（如按鈕用 medium、卡片用 large）</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-陰影--Shadows---Elevation-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        陰影 (Shadows / Elevation)
+        <span class="section-badge" data-section="sec-陰影--Shadows---Elevation-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="63" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>陰影層級</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="64" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`low` / Level 1（微浮起）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="65" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`medium` / Level 2（中等浮起）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="66" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`high` / Level 3（明顯浮起）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="67" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">每級包含完整 CSS box-shadow 參數</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="68" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`offset-x`</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="69" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`offset-y`</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="70" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`blur-radius`</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="71" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`spread-radius`</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="72" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">`color`（含透明度）</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="73" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供陰影的適用場景說明（如卡片、下拉選單、Modal）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="74" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">深色模式的陰影替代方案</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-按鈕狀態--Button-States-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        按鈕狀態 (Button States)
+        <span class="section-badge" data-section="sec-按鈕狀態--Button-States-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="75" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Default</strong> — 預設狀態樣式</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="76" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Hover</strong> — 滑鼠懸停樣式</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="77" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Active / Pressed</strong> — 點擊中樣式</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="78" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Focus</strong> — 鍵盤焦點樣式</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="79" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">有可見的 focus ring / outline</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="80" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">focus ring 與背景有足夠對比</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="81" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Disabled</strong> — 不可操作樣式</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="82" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">視覺上明顯降低對比度</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="83" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">使用 `cursor: not-allowed` 或等效提示</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">按鈕類型應涵蓋</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="84" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Primary Button</strong> — 主要行動按鈕</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="85" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Secondary Button</strong> — 次要行動按鈕</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="86" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Tertiary / Ghost Button</strong> — 低強調按鈕（建議）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="87" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Destructive / Danger Button</strong> — 破壞性操作按鈕（建議）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="88" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Icon Button</strong> — 純圖示按鈕（建議）</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="89" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Loading 載入中狀態</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="90" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">不同尺寸（Small / Medium / Large）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="91" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">按鈕內含圖示的樣式</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-表單狀態--Form-States-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        表單狀態 (Form States)
+        <span class="section-badge" data-section="sec-表單狀態--Form-States-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="92" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Default</strong> — 預設狀態</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="93" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Focus</strong> — 聚焦中</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="94" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">有可見的 focus indicator</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="95" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Filled</strong> — 已填寫內容</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="96" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Error</strong> — 錯誤狀態</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="97" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">邊框變色（通常為紅色系）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="98" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">錯誤訊息文字樣式已定義</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="99" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">錯誤圖示已定義（建議）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="100" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Disabled</strong> — 不可操作</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="101" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">背景灰化 / 文字淡化</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">表單元件應涵蓋</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="102" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Text Input（文字輸入框）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="103" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Password Input（密碼輸入框）（建議）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="104" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Textarea（多行文字區塊）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="105" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Select / Dropdown（下拉選單）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="106" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Checkbox（核取方塊）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="107" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Radio Button（單選按鈕）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="108" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Toggle / Switch（開關切換）（建議）</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="109" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Success 驗證通過狀態</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="110" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Helper text（輔助說明文字）樣式</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="111" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Required field（必填欄位）標示</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="112" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Placeholder 樣式</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="113" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">字數限制提示樣式</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-無障礙--Accessibility---WCAG-2-1-Level-A-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        無障礙 (Accessibility — WCAG 2.1 Level A)
+        <span class="section-badge" data-section="sec-無障礙--Accessibility---WCAG-2-1-Level-A-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="114" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>文字對比度</strong> 符合 WCAG 2.1 AA（Level A 不強制對比度，但建議至少達 AA）</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="115" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">一般文字（&lt; 18pt / &lt; 14pt bold）：對比度 ≥ 4.5:1</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="116" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">大型文字（≥ 18pt / ≥ 14pt bold）：對比度 ≥ 3:1</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="117" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>Focus indicator</strong> 可見</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="118" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">所有互動元件在鍵盤焦點時有可見的視覺指示</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="119" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>不僅靠顏色傳達資訊</strong></span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="120" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">錯誤狀態搭配圖示或文字，不僅用紅色表示</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="121" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">連結除了顏色外有底線或其他視覺區分</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="122" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>互動元素尺寸</strong></span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="123" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">觸控目標至少 44×44px（行動裝置）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="124" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">桌面互動目標至少 24×24px</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="125" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供每組色彩配對的對比度數值</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="126" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">通過 WCAG 2.1 AA 標準（對比度 ≥ 4.5:1）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="127" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供色盲友善檢查結果</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-圖示系統--Icon-System-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        圖示系統 (Icon System)
+        <span class="section-badge" data-section="sec-圖示系統--Icon-System-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="128" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>圖示風格</strong> 已定義且統一</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="129" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">Outline（線性）/ Filled（填充）/ Duotone（雙色）擇一</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="130" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">全系統使用同一風格</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="131" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>圖示尺寸</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="132" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">至少 2-3 種尺寸（如 16px, 24px, 32px）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="133" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">標示各尺寸的適用場景</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="134" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>筆畫粗細 (Stroke Width)</strong> 已統一</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="135" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">全系統使用一致的 stroke width（如 1.5px）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="136" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text"><strong>格線系統 (Grid)</strong> 已定義</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item checklist-indent item-required">
+            <label>
+              <input type="checkbox" data-id="137" data-required="1" data-depth="1" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">圖示繪製基準格線（如 24×24 grid with 2px padding）</span>
+              
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="138" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供圖示命名規範</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="139" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供常用圖示清單</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="140" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">圖示包含 Hover / Active 狀態變化說明</span>
+              
+            </label>
+          </li></ul></div></div>
+    <div class="checklist-section" id="sec-風格一致性--Visual-Consistency-">
+      <h3 class="checklist-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="collapse-icon">▼</span>
+        風格一致性 (Visual Consistency)
+        <span class="section-badge" data-section="sec-風格一致性--Visual-Consistency-"></span>
+      </h3>
+      <div class="checklist-section-body"><h4 class="checklist-sub-title">必要項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="141" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">所有元件使用同一套色彩 token，無色碼直接硬編碼</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="142" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">圓角使用定義好的層級，無隨意數值</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="143" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">陰影使用定義好的層級</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="144" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">間距使用定義好的比例尺</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li>
+          <li class="checklist-item item-required">
+            <label>
+              <input type="checkbox" data-id="145" data-required="1" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">字型使用統一，無隨意混用不同字型</span>
+              <span class="badge-required">必要</span>
+            </label>
+          </li></ul><h4 class="checklist-sub-title">建議項目</h4><ul class="checklist-items">
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="146" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供元件組合範例頁面（如表單頁面、列表頁面）</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="147" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供深色模式 / 淺色模式切換範例</span>
+              
+            </label>
+          </li>
+          <li class="checklist-item item-optional">
+            <label>
+              <input type="checkbox" data-id="148" data-required="0" data-depth="0" onchange="onCheckChange()">
+              <span class="checkmark"></span>
+              <span class="item-text">提供 RWD 響應式斷點定義</span>
+              
+            </label>
+          </li></ul></div></div></section>
+</div>
+
+<footer style="margin-top:5rem; padding:2rem; text-align:center; font-size:.8125rem; color:var(--c-text-secondary); background:var(--c-surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-soft);">
+  Generated by Design System Review Skill
+</footer>
+
+<div class="spec-img-overlay" id="spec-overlay" onclick="closeSpecImg()"></div>
+
+<script>
+// Lightbox for spec images
+var _expandedImg = null;
+function openSpecImg(img) {
+  if (_expandedImg) { closeSpecImg(); return; }
+  _expandedImg = img;
+  img.classList.add('spec-img-expanded');
+  document.getElementById('spec-overlay').style.display = 'block';
+}
+function closeSpecImg() {
+  if (_expandedImg) _expandedImg.classList.remove('spec-img-expanded');
+  _expandedImg = null;
+  document.getElementById('spec-overlay').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSpecImg(); });
+
+// Tab switching
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+  document.querySelector('[data-tab="' + tabName + '"]').classList.add('active');
+  history.replaceState(null, '', '#tab-' + tabName);
+}
+// Restore tab from hash
+(function() {
+  const h = location.hash;
+  if (h === '#tab-tokens') switchTab('tokens');
+  else if (h.startsWith('#') && !h.startsWith('#tab-')) {
+    // If hash targets an element inside tokens tab, switch to it
+    const el = document.querySelector(h);
+    if (el && document.getElementById('tab-tokens').contains(el)) switchTab('tokens');
+    else if (el && document.getElementById('tab-audit').contains(el)) switchTab('audit');
+  }
+})();
+
+(function() {
+  const STORAGE_KEY = "ds-review-checklist";
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+  }
+  function save(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // restore
+  const state = load();
+  document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+    const id = cb.dataset.id;
+    if (state[id]) cb.checked = true;
+  });
+  updateProgress();
+
+  window.onCheckChange = function() {
+    const s = {};
+    document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+      if (cb.checked) s[cb.dataset.id] = 1;
+    });
+    save(s);
+    updateProgress();
+  };
+
+  window.resetChecklist = function() {
+    if (!confirm("確定要重置所有勾選嗎？")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => cb.checked = false);
+    updateProgress();
+  };
+
+  function updateProgress() {
+    let reqChecked = 0, reqTotal = 0, optChecked = 0, optTotal = 0;
+    document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+      if (cb.dataset.depth !== "0") return; // only top-level items
+      const req = cb.dataset.required === "1";
+      if (req) { reqTotal++; if (cb.checked) reqChecked++; }
+      else { optTotal++; if (cb.checked) optChecked++; }
+    });
+
+    const total = reqTotal + optTotal;
+    const checked = reqChecked + optChecked;
+    const pct = total > 0 ? Math.round(checked / total * 100) : 0;
+
+    const elReq = document.getElementById("progress-required");
+    const elOpt = document.getElementById("progress-optional");
+    const elTotal = document.getElementById("progress-total");
+    const elBar = document.getElementById("progress-bar");
+    if (elReq) elReq.textContent = reqChecked + " / " + reqTotal;
+    if (elOpt) elOpt.textContent = optChecked + " / " + optTotal;
+    if (elTotal) elTotal.textContent = pct + "%";
+    if (elBar) elBar.style.width = pct + "%";
+
+    // section badges
+    document.querySelectorAll(".checklist-section").forEach(sec => {
+      const cbs = sec.querySelectorAll('input[type="checkbox"][data-depth="0"]');
+      let done = 0;
+      cbs.forEach(c => { if (c.checked) done++; });
+      const badge = sec.querySelector(".section-badge");
+      if (badge) {
+        badge.textContent = done + "/" + cbs.length;
+        badge.style.background = done === cbs.length ? "#E8F5E9" : "#FFF3E0";
+        badge.style.color = done === cbs.length ? "#2E7D32" : "#E65100";
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
