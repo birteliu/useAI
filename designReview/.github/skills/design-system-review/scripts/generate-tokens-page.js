@@ -415,27 +415,27 @@ if (tokens.$audit) {
 }
 
 if (tokens.color) {
-  tokenSections += `<section id="colors"><h2>Color System</h2>`;
+  tokenSections += `<section id="colors"><h2>Color System</h2><div class="section-card">`;
   for (const [groupName, group] of Object.entries(tokens.color)) {
     if (group && typeof group === "object") tokenSections += renderColorGroup(groupName, group);
   }
-  tokenSections += `</section>`;
+  tokenSections += `</div></section>`;
 }
 
 if (tokens.typography) {
-  tokenSections += `<section id="typography"><h2>Typography</h2>${renderTypography(tokens.typography)}</section>`;
+  tokenSections += `<section id="typography"><h2>Typography</h2><div class="section-card">${renderTypography(tokens.typography)}</div></section>`;
 }
 
 if (tokens.spacing) {
-  tokenSections += `<section id="spacing"><h2>Spacing</h2>${renderSpacing(tokens.spacing)}</section>`;
+  tokenSections += `<section id="spacing"><h2>Spacing</h2><div class="section-card">${renderSpacing(tokens.spacing)}</div></section>`;
 }
 
 if (tokens.borderRadius) {
-  tokenSections += `<section id="border-radius"><h2>Border Radius</h2>${renderBorderRadius(tokens.borderRadius)}</section>`;
+  tokenSections += `<section id="border-radius"><h2>Border Radius</h2><div class="section-card">${renderBorderRadius(tokens.borderRadius)}</div></section>`;
 }
 
 if (tokens.shadow) {
-  tokenSections += `<section id="shadows"><h2>Shadows</h2>${renderShadow(tokens.shadow)}</section>`;
+  tokenSections += `<section id="shadows"><h2>Shadows</h2><div class="section-card">${renderShadow(tokens.shadow)}</div></section>`;
 }
 
 const projectName = tokens.$name || "Design Tokens";
@@ -445,7 +445,7 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(projectName)}</title>
+<title>${esc(projectName)} — 設計系統基礎規範與檢核</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -488,7 +488,8 @@ const html = `<!DOCTYPE html>
 
   h1 { font-size: 2rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
   .meta { color: var(--c-text-secondary); margin-bottom: var(--section-gap); font-size: .875rem; }
-  h2 { font-size: 1.5rem; font-weight: 700; margin: var(--section-gap) 0 1.5rem; padding-bottom: .75rem; border-bottom: 2px solid var(--c-primary-soft); letter-spacing: -.01em; }
+  .page-subtitle { font-size: 1.125rem; font-weight: 500; color: var(--c-primary); margin-bottom: .375rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1.5rem; padding-bottom: .75rem; border-bottom: 2px solid var(--c-primary-soft); letter-spacing: -.01em; }
   h3 { font-size: 1.125rem; font-weight: 600; margin: 1.5rem 0 1rem; text-transform: capitalize; }
   h4 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 .75rem; }
 
@@ -550,6 +551,7 @@ const html = `<!DOCTYPE html>
   th { font-weight: 600; background: var(--c-primary-light); color: var(--c-primary); }
   tr:last-child td { border-bottom: none; }
 
+  .section-card { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem 2.5rem; box-shadow: var(--shadow-card); margin-bottom: 1rem; }
   .token-group { margin-bottom: 2.5rem; }
   .group-desc { font-size: .8125rem; color: var(--c-text-secondary); margin: .25rem 0 1rem; line-height: 1.7; }
 
@@ -649,6 +651,7 @@ const html = `<!DOCTYPE html>
 </head>
 <body>
 <h1>${esc(projectName)}</h1>
+<p class="page-subtitle">設計系統基礎規範與檢核</p>
 <p class="meta">Version: ${esc(tokens.$version || "—")} &middot; Generated: ${new Date().toISOString().slice(0, 10)}</p>
 
 <div class="tab-bar">
