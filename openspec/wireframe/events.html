@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>活動消息｜○○○ 個人網站</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">○○○</a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">首頁</a></li>
+          <li class="nav-item"><a class="nav-link" href="news.html">最新消息</a></li>
+          <li class="nav-item"><a class="nav-link active" href="events.html">活動消息</a></li>
+          <li class="nav-item"><a class="nav-link" href="diary.html">照片回顧</a></li>
+          <li class="nav-item"><a class="nav-link" href="donation.html">募款資訊</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="container">
+      <h1>活動消息</h1>
+      <div class="subtitle">Events</div>
+    </div>
+  </div>
+
+  <!-- 篩選 + 列表 -->
+  <section class="py-5">
+    <div class="container">
+      <!-- 篩選列 -->
+      <div class="filter-bar mb-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label fw-bold">類別</label>
+            <select class="form-select">
+              <option selected>全部</option>
+              <option>社區活動</option>
+              <option>講座</option>
+              <option>文化節慶</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">開始日期</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">結束日期</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary-custom me-2">搜尋</button>
+            <button class="btn btn-outline-custom">清除</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 活動 1 -->
+      <div class="event-item mb-3">
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="event-img placeholder-img placeholder-img-sm">活動封面圖</div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">社區春季清掃日</h5>
+              <span class="badge badge-category">社區活動</span>
+            </div>
+            <div class="event-meta mb-1">
+              <i class="bi bi-calendar3"></i> 2026-04-10 &nbsp;
+              <i class="bi bi-geo-alt"></i> 台北市中山區中山公園
+            </div>
+            <p class="mb-2 text-muted">一起動手讓我們的社區更乾淨！歡迎攜帶家人一同參加，清掃工具由主辦方提供。</p>
+            <a href="#" target="_blank" class="btn btn-primary-custom btn-sm">前往活動頁面 <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 活動 2 -->
+      <div class="event-item mb-3">
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="event-img placeholder-img placeholder-img-sm">活動封面圖</div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">在地文化講座：傳統工藝之美</h5>
+              <span class="badge badge-category">講座</span>
+            </div>
+            <div class="event-meta mb-1">
+              <i class="bi bi-calendar3"></i> 2026-04-15 &nbsp;
+              <i class="bi bi-geo-alt"></i> 新北市板橋區社區活動中心
+            </div>
+            <p class="mb-2 text-muted">邀請在地工藝師分享傳統技藝的美好與傳承，適合親子一同參加。</p>
+            <a href="#" target="_blank" class="btn btn-primary-custom btn-sm">前往活動頁面 <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 活動 3 -->
+      <div class="event-item mb-3">
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="event-img placeholder-img placeholder-img-sm">活動封面圖</div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">桃園花季文化節</h5>
+              <span class="badge badge-category">文化節慶</span>
+            </div>
+            <div class="event-meta mb-1">
+              <i class="bi bi-calendar3"></i> 2026-04-20 ~ 04-22 &nbsp;
+              <i class="bi bi-geo-alt"></i> 桃園市中壢區老街溪
+            </div>
+            <p class="mb-2 text-muted">三天的文化盛會，結合花藝展覽、音樂表演、手作市集與在地美食。</p>
+            <a href="#" target="_blank" class="btn btn-primary-custom btn-sm">前往活動頁面 <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 活動 4 -->
+      <div class="event-item mb-3">
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="event-img placeholder-img placeholder-img-sm">活動封面圖</div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">環保志工培訓工作坊</h5>
+              <span class="badge badge-category">社區活動</span>
+            </div>
+            <div class="event-meta mb-1">
+              <i class="bi bi-calendar3"></i> 2026-04-25 &nbsp;
+              <i class="bi bi-geo-alt"></i> 台北市大安區環保局
+            </div>
+            <p class="mb-2 text-muted">學習垃圾分類與資源回收的正確方式，完成培訓可取得志工證書。</p>
+            <a href="#" target="_blank" class="btn btn-primary-custom btn-sm">前往活動頁面 <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 活動 5 (已結束) -->
+      <div class="event-item mb-3" style="opacity: 0.7;">
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="event-img placeholder-img placeholder-img-sm">活動封面圖</div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">社區長者關懷座談會</h5>
+              <span class="badge badge-category">社區活動</span>
+              <span class="badge badge-ended">已結束</span>
+            </div>
+            <div class="event-meta mb-1">
+              <i class="bi bi-calendar3"></i> 2026-03-20 &nbsp;
+              <i class="bi bi-geo-alt"></i> 台北市中山區服務站
+            </div>
+            <p class="mb-2 text-muted">與社區長者面對面交流，了解需求，共同打造更友善的生活環境。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 活動 6 (已結束) -->
+      <div class="event-item mb-3" style="opacity: 0.7;">
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="event-img placeholder-img placeholder-img-sm">活動封面圖</div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">元宵節慶祝活動</h5>
+              <span class="badge badge-category">文化節慶</span>
+              <span class="badge badge-ended">已結束</span>
+            </div>
+            <div class="event-meta mb-1">
+              <i class="bi bi-calendar3"></i> 2026-02-12 &nbsp;
+              <i class="bi bi-geo-alt"></i> 新北市三重區
+            </div>
+            <p class="mb-2 text-muted">猜燈謎、吃湯圓、看花燈，一起歡度元宵佳節。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分頁 -->
+      <nav class="mt-4 d-flex justify-content-center">
+        <ul class="pagination">
+          <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h6>○○○</h6>
+          <p class="mb-3">用行動改變社區，用溫度連結每一個人</p>
+          <div class="social-links">
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-line"></i></a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h6>快速連結</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="news.html">最新消息</a></li>
+            <li class="mb-2"><a href="events.html">活動消息</a></li>
+            <li class="mb-2"><a href="diary.html">照片回顧</a></li>
+            <li class="mb-2"><a href="donation.html">募款資訊</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h6>聯絡資訊</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><i class="bi bi-envelope me-2"></i>email@example.com</li>
+            <li class="mb-2"><i class="bi bi-telephone me-2"></i>0912-345-678</li>
+            <li class="mb-2"><i class="bi bi-geo-alt me-2"></i>○○市○○區○○路 XX 號</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom text-center">
+        &copy; 2026 ○○○. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

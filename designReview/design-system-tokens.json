@@ -1,0 +1,275 @@
+{
+  "$name": "農業數位整合服務平臺 — Design System Tokens",
+  "$version": "1.2.0",
+  "$audit": {
+    "date": "2026-04-24",
+    "sources": [
+      "design-specs/Colors.png",
+      "design-specs/Typography.png",
+      "design-specs/Button.png",
+      "design-specs/Shadow.png",
+      "design-specs/WEB_首頁 2.png",
+      "design-specs/WEB_會員登入.png",
+      "design-specs/WEB_一般會員02.png",
+      "design-specs/WEB_線上申請服務01.png"
+    ],
+    "notes": "色碼為從設計稿圖檔目測估算值，正式使用前請與設計師確認精確色碼。新增 4 張 WEB 頁面設計稿，驗證了色彩/字體/按鈕/表單在實際頁面中的使用情況。",
+    "specs": [
+      {
+        "file": "Colors.png",
+        "type": "component-spec",
+        "summary": "主色×2（teal green + orange）各 9 階 + 灰階 9 階 + 語意色 danger",
+        "findings": [
+          { "s": "pass", "t": "主色一 teal green 9 階漸層完整（900–100）" },
+          { "s": "pass", "t": "主色二 orange 9 階漸層完整（900–100）" },
+          { "s": "pass", "t": "中性灰 gray 9 階完整（900–100）" },
+          { "s": "pass", "t": "語意色 danger（紅色）已定義" },
+          { "s": "warn", "t": "色票無 HEX 色碼標示" },
+          { "s": "fail", "t": "缺 success / warning / info 語意色" },
+          { "s": "fail", "t": "缺背景（background）/ 前景（foreground）配對定義" }
+        ]
+      },
+      {
+        "file": "Typography.png",
+        "type": "component-spec",
+        "summary": "Noto Sans TC + Geologica，H1–H6 + Body 含行高與 mobile size",
+        "findings": [
+          { "s": "pass", "t": "中文字型 Noto Sans TC 已指定" },
+          { "s": "pass", "t": "英文字型 Geologica 已指定" },
+          { "s": "pass", "t": "H1–H6 + Body 字級定義含行高" },
+          { "s": "pass", "t": "含 Mobile size 響應式定義" },
+          { "s": "warn", "t": "缺 Caption / Overline 層級" },
+          { "s": "fail", "t": "無 fallback 字型指定（如系統字型後備）" }
+        ]
+      },
+      {
+        "file": "Button.png",
+        "type": "component-spec",
+        "summary": "Primary / Secondary filled + outlined + Disabled + Text button",
+        "findings": [
+          { "s": "pass", "t": "Primary filled + outlined 雙版本" },
+          { "s": "pass", "t": "Secondary filled + outlined 雙版本" },
+          { "s": "pass", "t": "Disabled 狀態已定義" },
+          { "s": "pass", "t": "Text button 類型已定義" },
+          { "s": "warn", "t": "白字 on 綠色按鈕對比度 ≈ 3:1（AA 需 4.5:1）" },
+          { "s": "fail", "t": "缺 Hover / Active / Focus ring 互動狀態" },
+          { "s": "fail", "t": "缺 Loading 與 Danger 變體" }
+        ]
+      },
+      {
+        "file": "Shadow.png",
+        "type": "component-spec",
+        "summary": "僅定義 Medium 1 級陰影",
+        "findings": [
+          { "s": "pass", "t": "Medium 級別陰影已定義，含參數值" },
+          { "s": "fail", "t": "僅 1 級，缺 low / high 層級系統" }
+        ]
+      },
+      {
+        "file": "WEB_首頁 2.png",
+        "type": "page-mockup",
+        "summary": "完整首頁：Header / Hero / 公告輪播 / 補助卡片 / 活動 / 新聞 / Footer",
+        "findings": [
+          { "s": "pass", "t": "完整首頁結構含 Header、Hero、公告、補助、活動、新聞、Footer" },
+          { "s": "pass", "t": "綠色品牌調性統一，色彩使用與 Colors.png 一致" },
+          { "s": "pass", "t": "多種按鈕類型實際運用：Primary / Outlined / Tag / Ghost" },
+          { "s": "pass", "t": "字級層級與 Typography.png 對應（標題/副標/內文/按鈕）" },
+          { "s": "pass", "t": "觀察到一致的 8px 基準間距模式" },
+          { "s": "warn", "t": "圖示以 Outline 為主但混用 Filled + Emoji 風格" },
+          { "s": "warn", "t": "按鈕圓角不統一（查詢按鈕 8px vs Header 膠囊形）" },
+          { "s": "fail", "t": "按鈕僅呈現 Default 狀態，缺 Hover / Active" },
+          { "s": "fail", "t": "Hero 區域白色文字在背景圖上對比不足" },
+          { "s": "fail", "t": "無 Focus indicator（鍵盤導航不可見）" }
+        ]
+      },
+      {
+        "file": "WEB_會員登入.png",
+        "type": "page-mockup",
+        "summary": "登入頁面：帳號/密碼/驗證碼 + LINE 登入 + QR Code",
+        "findings": [
+          { "s": "pass", "t": "帳號 / 密碼 / 驗證碼輸入欄位完整" },
+          { "s": "pass", "t": "LINE 登入 + QR Code 登入流程" },
+          { "s": "pass", "t": "Header 含搜尋框元件" },
+          { "s": "warn", "t": "CAPTCHA 驗證碼圖片無替代方案（無障礙風險）" },
+          { "s": "warn", "t": "連結文字僅靠顏色區分，無底線輔助" },
+          { "s": "fail", "t": "🚨 白字 on 綠色按鈕對比度 ≈ 3:1（WCAG AA 需 4.5:1）" },
+          { "s": "fail", "t": "表單僅 Default 狀態，缺 Focus / Error / Disabled" },
+          { "s": "fail", "t": "無 Focus indicator" }
+        ]
+      },
+      {
+        "file": "WEB_一般會員02.png",
+        "type": "page-mockup",
+        "summary": "Step 2 帳號設定：手機輸入 + Error 文字 + 步驟指示器",
+        "findings": [
+          { "s": "pass", "t": "步驟式表單 Step 2 帳號設定結構完整" },
+          { "s": "pass", "t": "深綠側邊欄步驟指示器（Step 1–5）" },
+          { "s": "pass", "t": "手機輸入框含錯誤訊息文字（首次見到 Error 狀態）" },
+          { "s": "warn", "t": "Error 狀態僅有文字提示，輸入框邊框未變紅色" },
+          { "s": "fail", "t": "缺 Focus / Disabled / Success 表單狀態" },
+          { "s": "fail", "t": "無 Focus indicator" }
+        ]
+      },
+      {
+        "file": "WEB_線上申請服務01.png",
+        "type": "page-mockup",
+        "summary": "線上申請服務：搜尋篩選 + 服務卡片列表 + 分頁",
+        "findings": [
+          { "s": "pass", "t": "搜尋篩選功能 + 服務卡片列表 + 分頁元件" },
+          { "s": "pass", "t": "到期警告標籤使用 Warning 橘色（#F57C00）" },
+          { "s": "pass", "t": "自訂 Radio 與 Tag 篩選元件" },
+          { "s": "warn", "t": "卡片陰影極輕，整體扁平風格（與 Shadow.png 定義不一致）" },
+          { "s": "fail", "t": "篩選元件僅 Default 狀態，缺互動回饋" },
+          { "s": "fail", "t": "無 Focus indicator" }
+        ]
+      }
+    ]
+  },
+  "color": {
+    "basic": {
+      "black": { "$value": "#000000", "$type": "color" },
+      "white": { "$value": "#FFFFFF", "$type": "color" }
+    },
+    "primary": {
+      "$description": "color01 — 主色一（teal green）",
+      "900": { "$value": "#0C3B30", "$type": "color" },
+      "800": { "$value": "#115943", "$type": "color" },
+      "700": { "$value": "#187A5A", "$type": "color" },
+      "600": { "$value": "#1F9970", "$type": "color" },
+      "500": { "$value": "#27B287", "$type": "color" },
+      "400": { "$value": "#55C9A3", "$type": "color" },
+      "300": { "$value": "#84DBBD", "$type": "color" },
+      "200": { "$value": "#B8EDD8", "$type": "color" },
+      "100": { "$value": "#E3F7EE", "$type": "color" }
+    },
+    "secondary": {
+      "$description": "color02 — 主色二（orange）",
+      "900": { "$value": "#6B3200", "$type": "color" },
+      "800": { "$value": "#8B4215", "$type": "color" },
+      "700": { "$value": "#A85720", "$type": "color" },
+      "600": { "$value": "#C66D2D", "$type": "color" },
+      "500": { "$value": "#D8823A", "$type": "color" },
+      "400": { "$value": "#E49A58", "$type": "color" },
+      "300": { "$value": "#EEB278", "$type": "color" },
+      "200": { "$value": "#F5CCA0", "$type": "color" },
+      "100": { "$value": "#FCEBD8", "$type": "color" }
+    },
+    "semantic": {
+      "$description": "語意色 — danger 來自 Colors.png；warning 來自 WEB 頁面到期標籤；success/info 仍待定義",
+      "danger": { "$value": "#DC3D5A", "$type": "color" },
+      "warning": { "$value": "#F57C00", "$type": "color", "$description": "WEB 頁面到期警告標籤觀察到的橙色" },
+      "success": { "$value": "⚠️ 未定義", "$type": "color", "$status": "missing" },
+      "info": { "$value": "⚠️ 未定義", "$type": "color", "$status": "missing" }
+    },
+    "neutral": {
+      "$description": "gray — 灰色 9 階",
+      "900": { "$value": "#212121", "$type": "color" },
+      "800": { "$value": "#333333", "$type": "color" },
+      "700": { "$value": "#4D4D4D", "$type": "color" },
+      "600": { "$value": "#686868", "$type": "color" },
+      "500": { "$value": "#888888", "$type": "color" },
+      "400": { "$value": "#A8A8A8", "$type": "color" },
+      "300": { "$value": "#C2C2C2", "$type": "color" },
+      "200": { "$value": "#D9D9D9", "$type": "color" },
+      "100": { "$value": "#F0F0F0", "$type": "color" }
+    },
+    "background": {
+      "$description": "背景色 — 從 WEB 頁面設計稿觀察到的背景色",
+      "page": { "$value": "#F8F4EC", "$type": "color", "$description": "頁面主背景（米色/奶油色）" },
+      "card": { "$value": "#FFFFFF", "$type": "color", "$description": "卡片/表單區域白色背景" },
+      "footerDark": { "$value": "#263238", "$type": "color", "$description": "深色 Footer 背景" },
+      "sidebarDark": { "$value": "#1B4332", "$type": "color", "$description": "會員頁側邊欄深綠背景" },
+      "sectionAlt": { "$value": "#F5F5F0", "$type": "color", "$description": "交替區塊淺灰/淺米色背景" }
+    },
+    "foreground": {
+      "$description": "文字色 — 從 WEB 頁面設計稿觀察到的文字色",
+      "primary": { "$value": "#212121", "$type": "color", "$description": "主要標題/正文文字" },
+      "secondary": { "$value": "#666666", "$type": "color", "$description": "次要說明文字" },
+      "muted": { "$value": "#9E9E9E", "$type": "color", "$description": "Placeholder/標籤輔助文字" },
+      "onDark": { "$value": "#FFFFFF", "$type": "color", "$description": "深色背景上的白色文字" },
+      "link": { "$value": "#0066CC", "$type": "color", "$description": "Footer 連結藍色（WEB_一般會員02 觀察）" }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "chinese": { "$value": "'Noto Sans TC', sans-serif", "$type": "fontFamily", "$description": "中文字型" },
+      "english": { "$value": "'Geologica', sans-serif", "$type": "fontFamily", "$description": "英文字型" },
+      "button": { "$value": "'Noto Sans TC', sans-serif", "$type": "fontFamily", "$description": "按鈕字型" }
+    },
+    "fontSize": {
+      "$description": "Size 為桌面版 px，Mobile 為行動版 px",
+      "h1": { "$value": "40px", "$type": "dimension", "$mobile": "32px" },
+      "h2": { "$value": "32px", "$type": "dimension", "$mobile": "28px" },
+      "h3": { "$value": "28px", "$type": "dimension", "$mobile": "24px" },
+      "h4": { "$value": "24px", "$type": "dimension", "$mobile": "20px" },
+      "h5": { "$value": "20px", "$type": "dimension", "$mobile": "18px" },
+      "h6": { "$value": "18px", "$type": "dimension", "$mobile": "16px" },
+      "body1": { "$value": "20px", "$type": "dimension", "$mobile": "20px" },
+      "body2": { "$value": "18px", "$type": "dimension", "$mobile": "18px" },
+      "body3Bold": { "$value": "16px", "$type": "dimension", "$mobile": "16px", "$weight": 700 },
+      "body3": { "$value": "16px", "$type": "dimension", "$mobile": "16px" },
+      "buttonMd": { "$value": "20px", "$type": "dimension", "$mobile": "18px", "$description": "按鈕文字-中" }
+    },
+    "fontWeight": {
+      "regular": { "$value": 400, "$type": "fontWeight" },
+      "bold": { "$value": 700, "$type": "fontWeight" }
+    },
+    "lineHeight": {
+      "$description": "每個字級對應的行高 (px)",
+      "h1": { "$value": "58px", "$type": "dimension" },
+      "h2": { "$value": "48px", "$type": "dimension" },
+      "h3": { "$value": "36px", "$type": "dimension" },
+      "h4": { "$value": "30px", "$type": "dimension" },
+      "h5": { "$value": "22px", "$type": "dimension" },
+      "h6": { "$value": "20px", "$type": "dimension" },
+      "body1": { "$value": "24px", "$type": "dimension" },
+      "body2": { "$value": "20px", "$type": "dimension" },
+      "body3": { "$value": "20px", "$type": "dimension" },
+      "buttonMd": { "$value": "24px", "$type": "dimension" }
+    }
+  },
+  "spacing": {
+    "$status": "missing",
+    "$description": "⚠️ 設計稿未定義間距系統，以下為建議值",
+    "unit": { "$value": "4px", "$type": "dimension", "$description": "Base unit (suggested)" },
+    "scale": {
+      "1": { "$value": "4px", "$type": "dimension" },
+      "2": { "$value": "8px", "$type": "dimension" },
+      "3": { "$value": "12px", "$type": "dimension" },
+      "4": { "$value": "16px", "$type": "dimension" },
+      "5": { "$value": "20px", "$type": "dimension" },
+      "6": { "$value": "24px", "$type": "dimension" },
+      "8": { "$value": "32px", "$type": "dimension" },
+      "10": { "$value": "40px", "$type": "dimension" },
+      "12": { "$value": "48px", "$type": "dimension" },
+      "16": { "$value": "64px", "$type": "dimension" }
+    }
+  },
+  "borderRadius": {
+    "$status": "missing",
+    "$description": "⚠️ 設計稿未定義圓角層級，以下為從按鈕觀察到的值 + 建議補充",
+    "none": { "$value": "0px", "$type": "dimension" },
+    "small": { "$value": "4px", "$type": "dimension" },
+    "medium": { "$value": "8px", "$type": "dimension" },
+    "large": { "$value": "16px", "$type": "dimension" },
+    "full": { "$value": "9999px", "$type": "dimension", "$description": "按鈕使用膠囊圓角" }
+  },
+  "shadow": {
+    "$description": "⚠️ 設計稿僅定義 $medium，low/high 為建議補充",
+    "low": {
+      "$value": "0px 1px 3px 0px rgba(0, 0, 0, 0.10)",
+      "$type": "shadow",
+      "$status": "suggested"
+    },
+    "medium": {
+      "$value": "0px 4px 8px -1px rgba(0, 0, 0, 0.12), 0px 2px 4px -1px rgba(0, 0, 0, 0.08)",
+      "$type": "shadow",
+      "$status": "from-design"
+    },
+    "high": {
+      "$value": "0px 12px 24px -4px rgba(0, 0, 0, 0.15), 0px 4px 8px -2px rgba(0, 0, 0, 0.08)",
+      "$type": "shadow",
+      "$status": "suggested"
+    }
+  }
+}

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Project Design Tokens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c-primary: #2E7D5B;
+    --c-primary-light: #E8F5EE;
+    --c-primary-soft: #D4EDDA;
+    --c-accent: #D4853A;
+    --c-accent-light: #FFF4EB;
+    --c-bg: #FAFBF9;
+    --c-surface: #FFFFFF;
+    --c-text: #333333;
+    --c-text-secondary: #6B7280;
+    --c-border: #E8ECE6;
+    --c-danger: #DC3D5A;
+    --c-danger-light: #FEF2F4;
+    --c-warning: #E65100;
+    --c-warning-light: #FFF8E1;
+    --c-success: #2E7D32;
+    --c-success-light: #E8F5E9;
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 32px;
+    --radius-pill: 9999px;
+    --shadow-soft: 0 2px 16px rgba(0,0,0,.05);
+    --shadow-card: 0 4px 24px rgba(0,0,0,.06);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,.10);
+    --section-gap: 3.5rem;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', 'Inter', system-ui, sans-serif; color: var(--c-text); background: var(--c-bg); line-height: 1.7; padding: 2.5rem; max-width: 1200px; margin: 0 auto; }
+
+  /* decorative organic shapes */
+  body::before, body::after {
+    content: ''; position: fixed; border-radius: 50%; opacity: .06; pointer-events: none; z-index: -1;
+  }
+  body::before { width: 400px; height: 400px; background: var(--c-primary); top: -120px; right: -100px; }
+  body::after { width: 300px; height: 300px; background: var(--c-accent); bottom: -80px; left: -60px; }
+
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
+  .meta { color: var(--c-text-secondary); margin-bottom: var(--section-gap); font-size: .875rem; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1.5rem; padding-bottom: .75rem; border-bottom: 2px solid var(--c-primary-soft); letter-spacing: -.01em; }
+  h3 { font-size: 1.125rem; font-weight: 600; margin: 1.5rem 0 1rem; text-transform: capitalize; }
+  h4 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 .75rem; }
+
+  /* audit */
+  .audit-card { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem; border: none; box-shadow: var(--shadow-card); }
+  .audit-card p { margin-bottom: .625rem; font-size: .875rem; line-height: 1.7; }
+  .audit-notes { background: var(--c-warning-light); border-left: 4px solid #FFA000; padding: .75rem 1rem; border-radius: var(--radius-sm); font-size: .8125rem; color: var(--c-warning); }
+  .audit-table { margin-top: 1.5rem; }
+  .audit-table td:nth-child(3) { white-space: nowrap; }
+  .audit-table td:nth-child(4) { font-size: .8125rem; color: var(--c-text-secondary); }
+  .audit-table td ul { margin: .25rem 0; padding-left: 1.25rem; list-style: disc; }
+  .audit-table td li { padding: .15rem 0; line-height: 1.6; }
+
+  /* tabs */
+  .tab-bar { position: sticky; top: 0; background: var(--c-bg); z-index: 10; border-bottom: none; margin-bottom: 2rem; display: flex; gap: .5rem; padding: .5rem; background: var(--c-surface); border-radius: var(--radius-pill); box-shadow: var(--shadow-soft); }
+  .tab-btn { background: none; border: none; padding: .75rem 2rem; font-size: .9375rem; font-weight: 600; color: var(--c-text-secondary); cursor: pointer; border-radius: var(--radius-pill); transition: all .2s ease; display: flex; align-items: center; gap: .5rem; }
+  .tab-btn:hover { color: var(--c-text); background: var(--c-primary-light); }
+  .tab-btn.active { color: #FFF; background: var(--c-primary); box-shadow: 0 2px 8px rgba(46,125,91,.25); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* sub-nav inside tab */
+  .sub-nav { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: .5rem 0; }
+  .sub-nav a { color: var(--c-text-secondary); text-decoration: none; font-size: .8125rem; font-weight: 500; padding: .5rem 1.25rem; border-radius: var(--radius-pill); background: var(--c-surface); box-shadow: var(--shadow-soft); transition: all .2s; }
+  .sub-nav a:hover { background: var(--c-primary-light); color: var(--c-primary); transform: translateY(-1px); box-shadow: var(--shadow-card); }
+
+  /* colors */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+  .color-swatch { border-radius: var(--radius-md); padding: 1.25rem 1rem; min-height: 110px; display: flex; flex-direction: column; justify-content: flex-end; gap: .25rem; font-size: .75rem; transition: all .2s ease; box-shadow: var(--shadow-soft); }
+  .color-swatch:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .swatch-name { font-weight: 600; font-size: .8125rem; }
+  .swatch-contrast { opacity: .85; }
+
+  /* typography */
+  .type-scale { display: flex; flex-direction: column; gap: 1rem; }
+  .type-sample { padding: .75rem 0; border-bottom: 1px solid var(--c-border); }
+  .type-label { display: block; font-size: .75rem; color: var(--c-text-secondary); margin-bottom: .25rem; font-weight: 600; }
+
+  /* spacing */
+  .spacing-grid { display: flex; flex-direction: column; gap: .75rem; }
+  .spacing-item { display: flex; align-items: center; gap: 1rem; }
+  .spacing-bar { height: 28px; background: linear-gradient(90deg, var(--c-primary), var(--c-primary-soft)); border-radius: var(--radius-pill); opacity: .8; }
+  .spacing-label { font-size: .8125rem; white-space: nowrap; font-weight: 500; }
+
+  /* radius */
+  .radius-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .radius-item { text-align: center; font-size: .8125rem; font-weight: 500; }
+  .radius-box { width: 88px; height: 88px; background: linear-gradient(135deg, var(--c-primary-light), var(--c-primary-soft)); border: 2px solid var(--c-primary); opacity: .75; margin-bottom: .75rem; }
+
+  /* shadow */
+  .shadow-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .shadow-item { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem; width: 240px; display: flex; flex-direction: column; gap: .625rem; transition: transform .2s; }
+  .shadow-item:hover { transform: translateY(-2px); }
+  .shadow-item code { font-size: .6875rem; color: var(--c-text-secondary); word-break: break-all; }
+
+  /* tables */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 1rem 0; font-size: .875rem; background: var(--c-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-soft); }
+  th, td { text-align: left; padding: .75rem 1rem; border-bottom: 1px solid var(--c-border); }
+  th { font-weight: 600; background: var(--c-primary-light); color: var(--c-primary); }
+  tr:last-child td { border-bottom: none; }
+
+  .section-card { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem 2.5rem; box-shadow: var(--shadow-card); margin-bottom: 1rem; }
+  .token-group { margin-bottom: 2.5rem; }
+  .group-desc { font-size: .8125rem; color: var(--c-text-secondary); margin: .25rem 0 1rem; line-height: 1.7; }
+
+  /* status badges */
+  .status-badge { font-size: .6875rem; font-weight: 600; padding: .2rem .625rem; border-radius: var(--radius-pill); margin-left: .5rem; vertical-align: middle; white-space: nowrap; }
+  .status-missing { background: var(--c-warning-light); color: var(--c-warning); }
+  .status-suggested { background: #EDE7F6; color: #5E35B1; font-size: .625rem; }
+  .status-from-design { background: var(--c-success-light); color: var(--c-success); font-size: .625rem; }
+
+  /* missing color swatch */
+  .color-missing { background: repeating-linear-gradient(45deg, #F8F8F8, #F8F8F8 10px, #F0F0F0 10px, #F0F0F0 20px); border: 2px dashed #D0D0D0; color: #9E9E9E; border-radius: var(--radius-md); }
+
+  /* spec audit */
+  .spec-stats { display: flex; gap: 1rem; margin-bottom: 2rem; }
+  .spec-stat { font-size: .875rem; display: flex; align-items: center; gap: .5rem; padding: .75rem 1.5rem; border-radius: var(--radius-pill); background: var(--c-surface); box-shadow: var(--shadow-soft); border: none; }
+  .spec-stat strong { font-size: 1.25rem; }
+  .spec-stat-pass strong { color: var(--c-success); }
+  .spec-stat-warn strong { color: var(--c-warning); }
+  .spec-stat-fail strong { color: var(--c-danger); }
+
+  .spec-card { background: var(--c-surface); border-radius: var(--radius-lg); margin-bottom: 1rem; border: none; box-shadow: var(--shadow-card); overflow: hidden; transition: transform .2s, box-shadow .2s; }
+  .spec-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+  .spec-card-has-fail { border-left: 5px solid var(--c-danger); }
+  .spec-card-has-warn { border-left: 5px solid var(--c-accent); }
+  .spec-card-all-pass { border-left: 5px solid #66BB6A; }
+  .spec-card-header { display: flex; align-items: center; gap: .75rem; padding: 1.25rem 1.5rem; cursor: pointer; user-select: none; }
+  .spec-card-header:hover { background: rgba(0,0,0,.015); }
+  .spec-collapse-icon { font-size: .6rem; color: #B0B0B0; transition: transform .2s; }
+  .spec-collapsed .spec-collapse-icon { transform: rotate(-90deg); }
+  .spec-collapsed .spec-summary,
+  .spec-collapsed .spec-card-body { display: none; }
+  .spec-card-title { flex: 1; }
+  .spec-card-title strong { font-size: .9375rem; }
+  .spec-type-badge { font-size: .625rem; font-weight: 600; padding: .15rem .625rem; border-radius: var(--radius-pill); background: #F3E5F5; color: #7B1FA2; margin-left: .5rem; vertical-align: middle; }
+  .spec-card-counts { display: flex; gap: .625rem; font-size: .75rem; white-space: nowrap; }
+  .sc-pass { color: var(--c-success); }
+  .sc-warn { color: var(--c-warning); }
+  .sc-fail { color: var(--c-danger); font-weight: 600; }
+  .spec-summary { font-size: .8125rem; color: var(--c-text-secondary); padding: 0 1.5rem .75rem; line-height: 1.7; }
+  .spec-card-body { display: flex; gap: 1.5rem; padding: 0 1.5rem 1.5rem; align-items: flex-start; }
+  .spec-img-wrap { flex-shrink: 0; width: 280px; }
+  .spec-img { width: 100%; border-radius: var(--radius-md); border: none; cursor: pointer; transition: all .25s ease; box-shadow: var(--shadow-soft); }
+  .spec-img:hover { box-shadow: var(--shadow-hover); transform: scale(1.02); }
+  .spec-img.spec-img-expanded { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: auto; max-width: 90vw; max-height: 90vh; object-fit: contain; z-index: 1000; box-shadow: 0 16px 64px rgba(0,0,0,.35); border-radius: var(--radius-md); }
+  .spec-img-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); z-index: 999; cursor: pointer; }
+  .spec-findings { list-style: none; padding: 0; flex: 1; min-width: 0; }
+  @media (max-width: 768px) {
+    .spec-card-body { flex-direction: column; }
+    .spec-img-wrap { width: 100%; }
+  }
+  .spec-findings li { padding: .4rem 0; font-size: .8125rem; border-bottom: 1px solid #F5F5F5; line-height: 1.6; }
+  .spec-findings li:last-child { border-bottom: none; }
+  .finding-pass { color: var(--c-success); }
+  .finding-warn { color: var(--c-warning); }
+  .finding-fail { color: var(--c-danger); }
+
+  /* checklist */
+  .checklist-progress { background: var(--c-surface); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; border: none; box-shadow: var(--shadow-card); }
+  .progress-stats { display: flex; gap: 2.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .progress-stat { display: flex; flex-direction: column; }
+  .progress-label { font-size: .75rem; color: var(--c-text-secondary); text-transform: uppercase; letter-spacing: .5px; font-weight: 500; }
+  .progress-value { font-size: 1.5rem; font-weight: 700; color: var(--c-text); }
+  .progress-bar-track { height: 10px; background: var(--c-border); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: 1rem; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--c-primary), #43A047); border-radius: var(--radius-pill); transition: width .4s ease; }
+  .btn-reset { background: none; border: 1px solid var(--c-border); border-radius: var(--radius-pill); padding: .5rem 1.25rem; font-size: .75rem; font-weight: 500; color: var(--c-text-secondary); cursor: pointer; transition: all .2s; }
+  .btn-reset:hover { background: var(--c-danger-light); color: var(--c-danger); border-color: var(--c-danger); }
+
+  .checklist-section { background: var(--c-surface); border-radius: var(--radius-lg); margin-bottom: 1.25rem; border: none; box-shadow: var(--shadow-card); overflow: hidden; }
+  .checklist-section-title { margin: 0; padding: 1.25rem 1.5rem; cursor: pointer; user-select: none; display: flex; align-items: center; gap: .5rem; font-size: 1.05rem; text-transform: none; }
+  .checklist-section-title:hover { background: rgba(0,0,0,.015); }
+  .collapse-icon { font-size: .65rem; transition: transform .2s; color: #B0B0B0; }
+  .checklist-section.collapsed .collapse-icon { transform: rotate(-90deg); }
+  .checklist-section.collapsed .checklist-section-body { display: none; }
+  .checklist-section-body { padding: 0 1.5rem 1.25rem; }
+  .section-badge { margin-left: auto; font-size: .75rem; font-weight: 600; padding: .2rem .75rem; border-radius: var(--radius-pill); background: var(--c-success-light); color: var(--c-success); }
+
+  .checklist-sub-title { font-size: .875rem; font-weight: 600; margin: 1.25rem 0 .625rem; color: #424242; padding-bottom: .375rem; border-bottom: 1px solid var(--c-border); text-transform: none; }
+  .checklist-items { list-style: none; padding: 0; }
+  .checklist-item { padding: .4rem 0; }
+  .checklist-item label { display: flex; align-items: flex-start; gap: .625rem; cursor: pointer; font-size: .875rem; line-height: 1.7; }
+  .checklist-indent { padding-left: 1.75rem; }
+  .checklist-item input[type="checkbox"] { display: none; }
+  .checkmark { flex-shrink: 0; width: 20px; height: 20px; border: 2px solid #D0D0D0; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-top: 3px; transition: all .2s; }
+  .checklist-item input:checked ~ .checkmark { background: var(--c-primary); border-color: var(--c-primary); }
+  .checklist-item input:checked ~ .checkmark::after { content: "✓"; color: #FFF; font-size: .7rem; font-weight: 700; }
+  .checklist-item input:checked ~ .item-text { color: #B0B0B0; text-decoration: line-through; }
+  .badge-required { font-size: .625rem; font-weight: 600; padding: .15rem .5rem; border-radius: var(--radius-pill); background: var(--c-warning-light); color: var(--c-warning); margin-left: .25rem; white-space: nowrap; }
+
+  @media (max-width: 640px) {
+    body { padding: 1.25rem; }
+    .color-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .progress-stats { gap: 1.25rem; }
+    .tab-bar { flex-direction: column; border-radius: var(--radius-md); }
+    .spec-stats { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<h1>Sample Project Design Tokens</h1>
+<p class="meta">Version: 1.0.0 &middot; Generated: 2026-04-24</p>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="audit" onclick="switchTab('audit')">審核結果</button>
+  <button class="tab-btn" data-tab="tokens" onclick="switchTab('tokens')">Design Tokens</button>
+  <button class="tab-btn" data-tab="checklist" onclick="switchTab('checklist')">審核清單</button>
+</div>
+
+<div id="tab-audit" class="tab-panel active">
+  <div class="sub-nav">
+    
+    
+  </div>
+  
+</div>
+
+<div id="tab-tokens" class="tab-panel">
+  <div class="sub-nav">
+    <a href="#colors">Colors</a>
+    <a href="#typography">Typography</a>
+    <a href="#spacing">Spacing</a>
+    <a href="#border-radius">Border Radius</a>
+    <a href="#shadows">Shadows</a>
+  </div>
+  <section id="colors"><h2>Color System</h2><div class="section-card"><div class="token-group"><h3>primary</h3><div class="color-grid">
+        <div class="color-swatch" style="background:#E3F2FD; color:#000000">
+          <span class="swatch-name">light</span>
+          <span class="swatch-value">#E3F2FD</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.14:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#1976D2; color:#FFFFFF">
+          <span class="swatch-name">base</span>
+          <span class="swatch-value">#1976D2</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">4.60:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#0D47A1; color:#FFFFFF">
+          <span class="swatch-name">dark</span>
+          <span class="swatch-value">#0D47A1</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">8.63:1 ✅</span>
+        </div></div></div><div class="token-group"><h3>secondary</h3><div class="color-grid">
+        <div class="color-swatch" style="background:#F3E5F5; color:#000000">
+          <span class="swatch-name">light</span>
+          <span class="swatch-value">#F3E5F5</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.21:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#7B1FA2; color:#FFFFFF">
+          <span class="swatch-name">base</span>
+          <span class="swatch-value">#7B1FA2</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">8.20:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#4A148C; color:#FFFFFF">
+          <span class="swatch-name">dark</span>
+          <span class="swatch-value">#4A148C</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">11.86:1 ✅</span>
+        </div></div></div><div class="token-group"><h3>semantic</h3><div class="color-grid">
+        <div class="color-swatch" style="background:#2E7D32; color:#FFFFFF">
+          <span class="swatch-name">success</span>
+          <span class="swatch-value">#2E7D32</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">5.13:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#ED6C02; color:#FFFFFF">
+          <span class="swatch-name">warning</span>
+          <span class="swatch-value">#ED6C02</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">3.11:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#D32F2F; color:#FFFFFF">
+          <span class="swatch-name">error</span>
+          <span class="swatch-value">#D32F2F</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">4.98:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#0288D1; color:#FFFFFF">
+          <span class="swatch-name">info</span>
+          <span class="swatch-value">#0288D1</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">3.86:1 ⚠️</span>
+        </div></div></div><div class="token-group"><h3>neutral</h3><div class="color-grid">
+        <div class="color-swatch" style="background:#FFFFFF; color:#000000">
+          <span class="swatch-name">0</span>
+          <span class="swatch-value">#FFFFFF</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.00:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#F5F5F5; color:#000000">
+          <span class="swatch-name">100</span>
+          <span class="swatch-value">#F5F5F5</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.09:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#EEEEEE; color:#000000">
+          <span class="swatch-name">200</span>
+          <span class="swatch-value">#EEEEEE</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.16:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#E0E0E0; color:#000000">
+          <span class="swatch-name">300</span>
+          <span class="swatch-value">#E0E0E0</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.32:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#BDBDBD; color:#000000">
+          <span class="swatch-name">400</span>
+          <span class="swatch-value">#BDBDBD</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">1.88:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#9E9E9E; color:#000000">
+          <span class="swatch-name">500</span>
+          <span class="swatch-value">#9E9E9E</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">2.68:1 ⚠️</span>
+        </div>
+        <div class="color-swatch" style="background:#757575; color:#FFFFFF">
+          <span class="swatch-name">600</span>
+          <span class="swatch-value">#757575</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">4.61:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#616161; color:#FFFFFF">
+          <span class="swatch-name">700</span>
+          <span class="swatch-value">#616161</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">6.19:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#424242; color:#FFFFFF">
+          <span class="swatch-name">800</span>
+          <span class="swatch-value">#424242</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">10.05:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#212121; color:#FFFFFF">
+          <span class="swatch-name">900</span>
+          <span class="swatch-value">#212121</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">16.10:1 ✅</span>
+        </div>
+        <div class="color-swatch" style="background:#000000; color:#FFFFFF">
+          <span class="swatch-name">1000</span>
+          <span class="swatch-value">#000000</span>
+          <span class="swatch-contrast" title="Contrast vs #FFF">21.00:1 ✅</span>
+        </div></div></div></div></section><section id="typography"><h2>Typography</h2><div class="section-card"><div class="token-group"><h3>Typography</h3><h4>Font Family</h4><table><thead><tr><th>Token</th><th>Value</th><th>Description</th></tr></thead><tbody><tr><td>fontFamily.primary</td><td style="font-family:'Inter', 'Noto Sans TC', sans-serif">'Inter', 'Noto Sans TC', sans-serif</td><td></td></tr><tr><td>fontFamily.mono</td><td style="font-family:'Fira Code', 'Noto Sans Mono CJK TC', monospace">'Fira Code', 'Noto Sans Mono CJK TC', monospace</td><td></td></tr></tbody></table><h4>Font Size Scale</h4><table><thead><tr><th>Token</th><th>Size</th><th>Mobile</th><th>Weight</th><th>Preview</th></tr></thead><tbody><tr><td>display</td><td>3rem</td><td>—</td><td>—</td><td style="font-size:3rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h1</td><td>2.25rem</td><td>—</td><td>—</td><td style="font-size:2.25rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h2</td><td>1.875rem</td><td>—</td><td>—</td><td style="font-size:1.875rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h3</td><td>1.5rem</td><td>—</td><td>—</td><td style="font-size:1.5rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h4</td><td>1.25rem</td><td>—</td><td>—</td><td style="font-size:1.25rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h5</td><td>1.125rem</td><td>—</td><td>—</td><td style="font-size:1.125rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>h6</td><td>1rem</td><td>—</td><td>—</td><td style="font-size:1rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>bodyLarge</td><td>1.125rem</td><td>—</td><td>—</td><td style="font-size:1.125rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>body</td><td>1rem</td><td>—</td><td>—</td><td style="font-size:1rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>bodySmall</td><td>0.875rem</td><td>—</td><td>—</td><td style="font-size:0.875rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>caption</td><td>0.75rem</td><td>—</td><td>—</td><td style="font-size:0.75rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr><tr><td>overline</td><td>0.625rem</td><td>—</td><td>—</td><td style="font-size:0.625rem; font-weight:400; line-height:1.4; max-width:350px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">The quick brown fox 敏捷的棕色狐狸</td></tr></tbody></table><h4>Font Weight</h4><div class="type-scale"><div class="type-sample" style="font-weight:400"><span class="type-label">regular — 400</span> The quick brown fox 敏捷的棕色狐狸</div><div class="type-sample" style="font-weight:500"><span class="type-label">medium — 500</span> The quick brown fox 敏捷的棕色狐狸</div><div class="type-sample" style="font-weight:600"><span class="type-label">semibold — 600</span> The quick brown fox 敏捷的棕色狐狸</div><div class="type-sample" style="font-weight:700"><span class="type-label">bold — 700</span> The quick brown fox 敏捷的棕色狐狸</div></div><h4>Line Height</h4><table><thead><tr><th>Token</th><th>Value</th><th>Preview</th></tr></thead><tbody><tr><td>lineHeight.tight</td><td>1.25</td><td style="font-size:16px; line-height:1.25; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.normal</td><td>1.5</td><td style="font-size:16px; line-height:1.5; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr><tr><td>lineHeight.relaxed</td><td>1.75</td><td style="font-size:16px; line-height:1.75; border-left:3px solid var(--c-primary); padding-left:8px;">Line 1<br>Line 2</td></tr></tbody></table></div></div></section><section id="spacing"><h2>Spacing</h2><div class="section-card"><div class="token-group"><h3>Spacing </h3><p>Base unit: <strong>4px</strong></p><div class="spacing-grid">
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:4px; min-width:4px;"></div>
+          <span class="spacing-label">1 — 4px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:8px; min-width:4px;"></div>
+          <span class="spacing-label">2 — 8px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:12px; min-width:4px;"></div>
+          <span class="spacing-label">3 — 12px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:16px; min-width:4px;"></div>
+          <span class="spacing-label">4 — 16px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:20px; min-width:4px;"></div>
+          <span class="spacing-label">5 — 20px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:24px; min-width:4px;"></div>
+          <span class="spacing-label">6 — 24px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:32px; min-width:4px;"></div>
+          <span class="spacing-label">8 — 32px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:40px; min-width:4px;"></div>
+          <span class="spacing-label">10 — 40px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:48px; min-width:4px;"></div>
+          <span class="spacing-label">12 — 48px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:64px; min-width:4px;"></div>
+          <span class="spacing-label">16 — 64px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:80px; min-width:4px;"></div>
+          <span class="spacing-label">20 — 80px</span>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-bar" style="width:96px; min-width:4px;"></div>
+          <span class="spacing-label">24 — 96px</span>
+        </div></div></div></div></section><section id="border-radius"><h2>Border Radius</h2><div class="section-card"><div class="token-group"><h3>Border Radius </h3><div class="radius-grid">
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:0px"></div>
+          <span>none — 0px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:4px"></div>
+          <span>small — 4px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:8px"></div>
+          <span>medium — 8px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:16px"></div>
+          <span>large — 16px</span>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:9999px"></div>
+          <span>full — 9999px</span>
+        </div></div></div></div></section><section id="shadows"><h2>Shadows</h2><div class="section-card"><div class="token-group"><h3>Shadows / Elevation</h3><div class="shadow-grid">
+        <div class="shadow-item" style="box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.12), 0px 1px 2px 0px rgba(0, 0, 0, 0.08)">
+          <strong>low</strong> 
+          <code>0px 1px 3px 0px rgba(0, 0, 0, 0.12), 0px 1px 2px 0px rgba(0, 0, 0, 0.08)</code>
+        </div>
+        <div class="shadow-item" style="box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.12), 0px 2px 4px -1px rgba(0, 0, 0, 0.08)">
+          <strong>medium</strong> 
+          <code>0px 4px 6px -1px rgba(0, 0, 0, 0.12), 0px 2px 4px -1px rgba(0, 0, 0, 0.08)</code>
+        </div>
+        <div class="shadow-item" style="box-shadow:0px 10px 15px -3px rgba(0, 0, 0, 0.12), 0px 4px 6px -2px rgba(0, 0, 0, 0.06)">
+          <strong>high</strong> 
+          <code>0px 10px 15px -3px rgba(0, 0, 0, 0.12), 0px 4px 6px -2px rgba(0, 0, 0, 0.06)</code>
+        </div></div></div></div></section>
+</div>
+
+<div id="tab-checklist" class="tab-panel">
+  
+</div>
+
+<footer style="margin-top:5rem; padding:2rem; text-align:center; font-size:.8125rem; color:var(--c-text-secondary); background:var(--c-surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-soft);">
+  Generated by Design System Review Skill
+</footer>
+
+<div class="spec-img-overlay" id="spec-overlay" onclick="closeSpecImg()"></div>
+
+<script>
+// Lightbox for spec images
+var _expandedImg = null;
+function openSpecImg(img) {
+  if (_expandedImg) { closeSpecImg(); return; }
+  _expandedImg = img;
+  img.classList.add('spec-img-expanded');
+  document.getElementById('spec-overlay').style.display = 'block';
+}
+function closeSpecImg() {
+  if (_expandedImg) _expandedImg.classList.remove('spec-img-expanded');
+  _expandedImg = null;
+  document.getElementById('spec-overlay').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSpecImg(); });
+
+// Tab switching
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+  document.querySelector('[data-tab="' + tabName + '"]').classList.add('active');
+  history.replaceState(null, '', '#tab-' + tabName);
+}
+// Restore tab from hash
+(function() {
+  const h = location.hash;
+  if (h === '#tab-tokens') switchTab('tokens');
+  else if (h.startsWith('#') && !h.startsWith('#tab-')) {
+    // If hash targets an element inside tokens tab, switch to it
+    const el = document.querySelector(h);
+    if (el && document.getElementById('tab-tokens').contains(el)) switchTab('tokens');
+    else if (el && document.getElementById('tab-audit').contains(el)) switchTab('audit');
+  }
+})();
+
+(function() {
+  const STORAGE_KEY = "ds-review-checklist";
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+  }
+  function save(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // restore
+  const state = load();
+  document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+    const id = cb.dataset.id;
+    if (state[id]) cb.checked = true;
+  });
+  updateProgress();
+
+  window.onCheckChange = function() {
+    const s = {};
+    document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+      if (cb.checked) s[cb.dataset.id] = 1;
+    });
+    save(s);
+    updateProgress();
+  };
+
+  window.resetChecklist = function() {
+    if (!confirm("確定要重置所有勾選嗎？")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => cb.checked = false);
+    updateProgress();
+  };
+
+  function updateProgress() {
+    let reqChecked = 0, reqTotal = 0, optChecked = 0, optTotal = 0;
+    document.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+      if (cb.dataset.depth !== "0") return; // only top-level items
+      const req = cb.dataset.required === "1";
+      if (req) { reqTotal++; if (cb.checked) reqChecked++; }
+      else { optTotal++; if (cb.checked) optChecked++; }
+    });
+
+    const total = reqTotal + optTotal;
+    const checked = reqChecked + optChecked;
+    const pct = total > 0 ? Math.round(checked / total * 100) : 0;
+
+    const elReq = document.getElementById("progress-required");
+    const elOpt = document.getElementById("progress-optional");
+    const elTotal = document.getElementById("progress-total");
+    const elBar = document.getElementById("progress-bar");
+    if (elReq) elReq.textContent = reqChecked + " / " + reqTotal;
+    if (elOpt) elOpt.textContent = optChecked + " / " + optTotal;
+    if (elTotal) elTotal.textContent = pct + "%";
+    if (elBar) elBar.style.width = pct + "%";
+
+    // section badges
+    document.querySelectorAll(".checklist-section").forEach(sec => {
+      const cbs = sec.querySelectorAll('input[type="checkbox"][data-depth="0"]');
+      let done = 0;
+      cbs.forEach(c => { if (c.checked) done++; });
+      const badge = sec.querySelector(".section-badge");
+      if (badge) {
+        badge.textContent = done + "/" + cbs.length;
+        badge.style.background = done === cbs.length ? "#E8F5E9" : "#FFF3E0";
+        badge.style.color = done === cbs.length ? "#2E7D32" : "#E65100";
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
