@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Living Specimen — Sandbox (My Version)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- 沿用你原網站的粒子生命引擎(需與這支 html 放在同一個資料夾) -->
+<script src="particle-life-seeds.js"></script>
+<script src="particle-life-rules.js"></script>
+<script src="particle-life.js"></script>
+<script src="particle-life-gpu.js"></script>
+<style>
+  :root{
+    --bg: #050506;
+    --bg-2: #0A0D14;
+    --glow: #71C1F0;
+    --glow-dim: #3E7DA8;
+    --amber: #EFE6D2;
+    --ink: #EFE6D2;
+    --ink-dim: #A79C86;
+    --line: rgba(113,193,240,0.18);
+    --panel: rgba(8,10,14,0.92);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:100%; height:100%; overflow:hidden;
+    background: radial-gradient(ellipse at 50% 40%, var(--bg-2), var(--bg) 70%);
+    font-family: 'Inria Serif', 'Noto Serif TC', serif;
+    color: var(--ink);
+  }
+  canvas{position:fixed; inset:0; width:100vw; height:100vh; display:block; cursor:crosshair; z-index:1;}
+  #tagGlow{ pointer-events:none; z-index:2; cursor:default; }
+
+  /* ── 邊框裝飾:讓畫面有「圖卡發文」的裝裱感 ── */
+  .frame{
+    display:none;
+    position:fixed; inset: clamp(14px, 3vw, 30px);
+    z-index:3; pointer-events:none;
+    border: 1px solid rgba(113,193,240,0.28);
+    border-radius: 20px;
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.35);
+  }
+  .frame::after{
+    content:'';
+    position:absolute; inset:8px;
+    border: 1px solid rgba(239,230,210,0.08);
+    border-radius: 14px;
+  }
+  .frame .corner{
+    position:absolute; width:22px; height:22px;
+    pointer-events:none;
+  }
+  .frame .corner-tl{ top:-1px; left:-1px; border-top:2px solid var(--glow); border-left:2px solid var(--glow); border-top-left-radius:10px; }
+  .frame .corner-tr{ top:-1px; right:-1px; border-top:2px solid var(--glow); border-right:2px solid var(--glow); border-top-right-radius:10px; }
+  .frame .corner-bl{ bottom:-1px; left:-1px; border-bottom:2px solid var(--glow); border-left:2px solid var(--glow); border-bottom-left-radius:10px; }
+  .frame .corner-br{ bottom:-1px; right:-1px; border-bottom:2px solid var(--glow); border-right:2px solid var(--glow); border-bottom-right-radius:10px; }
+
+  @media (max-width:560px){
+    .frame{ inset:12px; border-radius:16px; }
+    .frame .corner{ width:16px; height:16px; }
+  }
+
+  /* ── 頂部標籤列 ── */
+  .lab-tag{
+    position:fixed; top:42px; left:44px; z-index:5;
+    font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--ink-dim);
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .lab-tag b{ color:var(--glow); font-weight:600; }
+  .lab-tag .pulse{
+    display:inline-block; width:6px; height:6px; border-radius:50%;
+    background:var(--glow); margin-right:6px;
+    box-shadow:0 0 8px var(--glow);
+    animation:blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink{ 50%{opacity:0.25;} }
+
+  .hint{
+    position:fixed; top:42px; right:44px; z-index:5;
+    font-size:11px; letter-spacing:0.06em; color:var(--ink-dim);
+    text-align:right; max-width:220px; line-height:1.6;
+  }
+
+  /* ── 正中央舞台區:依主題切換內容 ── */
+  .stage{
+    position:fixed; inset:0; z-index:4;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+    padding: 100px 24px 140px;
+  }
+  .stage-view{
+    display:none;
+    flex-direction:column; align-items:center; gap:18px;
+    text-align:center; max-width:min(880px, 90vw);
+  }
+  .stage-view.is-active{ display:flex; }
+
+  /* 一般公告 */
+  #titleOut{
+    font-family:'Inria Serif', 'Noto Serif TC', serif;
+    font-optical-sizing:auto;
+    font-weight:400; font-style:italic;
+    font-size: clamp(30px, 5.6vw, 68px);
+    line-height:1.08; letter-spacing:-0.01em;
+    color: var(--ink);
+    text-shadow: 0 0 24px rgba(113,193,240,0.35), 0 0 60px rgba(113,193,240,0.12);
+    transition: text-shadow 0.4s ease;
+    word-break: break-word;
+  }
+  #subtitleOut{
+    font-size: clamp(12px, 1.6vw, 16px);
+    letter-spacing:0.24em; text-transform:uppercase;
+    color: var(--glow-dim);
+    word-break: break-word;
+  }
+
+  /* 講者公告 — 依講者開箱視覺重排，四周保留 40px 安全距離 */
+  #stageSpeaker.is-active{
+    display:flex; position:fixed; inset:40px;
+    flex-direction:column; align-items:stretch;
+    text-align:left; max-width:none; width:auto; height:auto; gap:0;
+  }
+
+  body.is-speaker .lab-tag,
+  body.is-speaker .hint{ display:none; }
+
+  .sp-header{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding:0 10px 18px; margin-bottom:0;
+    border-bottom:1px solid rgba(239,230,210,0.42);
+    flex-wrap:wrap; gap:8px;
+  }
+  .sp-title{
+    font-family:'Inria Serif','Noto Serif TC',serif;
+    font-style:italic; font-weight:400;
+    font-size: clamp(46px, 7vw, 88px);
+    color: var(--ink);
+  }
+  .sp-kicker{
+    font-size:clamp(16px,2vw,28px); letter-spacing:0.28em; text-transform:uppercase;
+    color: var(--glow);
+  }
+
+  .sp-canvas-area{ position:relative; flex:1; min-height:0; overflow:visible; }
+  .sp-card{ position:absolute; }
+
+  /* 講者名稱卡 + 頭像 */
+  .sp-card-name{ top:7%; right:0; width:min(62vw, 760px); min-height:190px; }
+  .sp-name-box{
+    background: rgba(5,5,6,0.9);
+    border:1px solid rgba(239,230,210,0.42); border-radius:0;
+    min-height:150px; margin-right:24%;
+    padding:34px 28px 26px;
+  }
+  #speakerNameOut{
+    font-family:'Inria Serif','Noto Serif TC',serif;
+    font-style:italic; font-weight:400;
+    font-size: clamp(42px, 5vw, 70px);
+    color: var(--ink); line-height:1.1;
+    word-break: break-word;
+  }
+  #speakerRoleOut{
+    margin-top:8px;
+    font-size: clamp(18px, 2vw, 28px);
+    color: var(--ink-dim);
+    word-break: break-word;
+  }
+  .sp-photo{
+    position:absolute; top:0; right:0;
+    width: clamp(150px, 17vw, 230px);
+    height: clamp(190px, 21vw, 280px);
+    border:1px solid rgba(239,230,210,0.55);
+    overflow:hidden; background: rgba(255,255,255,0.06);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .sp-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .sp-photo .avatar-fallback{
+    font-size:10px; letter-spacing:0.1em; color:var(--ink-dim); text-transform:uppercase;
+  }
+
+  /* 講題引言卡 + 標籤列 */
+  .sp-card-quote{ left:0; bottom:8%; width:min(46vw, 590px); }
+  .sp-quote-box{
+    background: var(--ink);
+    color:#141008;
+    padding:34px 38px;
+    font-size: clamp(20px, 2.4vw, 34px);
+    line-height:1.55;
+    word-break: break-word;
+  }
+  .sp-tags-box{
+    background: rgba(5,5,6,0.94);
+    border:1px solid rgba(239,230,210,0.42); border-top:none;
+    padding:20px 38px;
+    font-size:clamp(14px,1.4vw,20px); letter-spacing:0.12em; color:var(--ink);
+    word-break: break-word;
+  }
+
+  /* 小型觀察視窗(透出背景粒子場) */
+  .sp-card-zoom{
+    right:0; bottom:7%;
+    width: clamp(100px, 12vw, 170px);
+    height: clamp(100px, 12vw, 170px);
+    border:1px solid rgba(239,230,210,0.72);
+    background: rgba(5,5,6,0.12);
+    backdrop-filter:blur(1px) saturate(1.8);
+  }
+  .sp-card-zoom::before{
+    content:''; position:absolute; width:22px; height:22px; border-radius:50%;
+    border:1px solid rgba(239,230,210,0.85); left:-88px; top:-150px;
+  }
+  .sp-card-zoom::after{
+    content:''; position:absolute; width:180px; height:1px;
+    background:rgba(239,230,210,0.8); left:-78px; top:-132px;
+    transform:rotate(61deg); transform-origin:left center;
+  }
+  .sp-connectors{
+    position:absolute; inset:0; width:100%; height:100%;
+    overflow:visible; pointer-events:none;
+  }
+  .sp-connectors line,
+  .sp-connectors circle{
+    fill:none; stroke:rgba(239,230,210,0.82); stroke-width:1.2;
+    vector-effect:non-scaling-stroke;
+  }
+
+  .sp-footer{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 10px 0; margin-top:0; gap:12px; flex-wrap:wrap;
+    border-top:1px solid rgba(239,230,210,0.42);
+  }
+  .sp-footer-left{ display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; }
+  .sp-event{
+    font-family:'Inria Serif','Noto Serif TC',serif; font-style:italic;
+    font-size: clamp(13px, 1.3vw, 17px); color: var(--ink);
+  }
+  .sp-footkicker{
+    font-size:clamp(12px,1.05vw,16px); letter-spacing:0.22em; color:var(--ink-dim);
+  }
+  .sp-wordmark{
+    font-family:'Inria Serif','Noto Serif TC',serif; font-style:italic; font-weight:400;
+    font-size: clamp(40px, 6vw, 74px); color:var(--ink);
+  }
+
+  @media (max-width: 720px){
+    #stageSpeaker.is-active{ inset:40px; }
+    #stageSpeaker.is-active .sp-canvas-area{
+      position:static; display:flex; flex-direction:column; gap:16px;
+    }
+    .sp-header{ padding-left:0; padding-right:0; }
+    .sp-title{ font-size:clamp(36px,11vw,58px); }
+    .sp-kicker{ font-size:12px; }
+    .sp-card{ position:static; width:100% !important; min-height:0; }
+    .sp-card-name{ display:flex; flex-direction:column-reverse; }
+    .sp-name-box{ margin-right:0; min-height:0; padding:18px; }
+    .sp-photo{ position:static; width:120px; height:145px; margin:0 0 10px auto; }
+    .sp-card-zoom,.sp-connectors{ display:none; }
+    .sp-footer{ flex-direction:column; align-items:flex-start; gap:10px; }
+  }
+
+  /* ── 開關按鈕 (FAB) ── */
+  .fab{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+    z-index:11; pointer-events:auto;
+    display:flex; align-items:center; gap:8px;
+    background: var(--glow); color:#0A2233;
+    border:none; border-radius:999px; cursor:pointer;
+    font-family:inherit; font-weight:700; font-size:13px; letter-spacing:0.04em;
+    padding:13px 22px;
+    box-shadow: 0 6px 26px rgba(113,193,240,0.28);
+    transition: transform 0.2s ease, background 0.15s ease, opacity 0.2s ease;
+  }
+  .fab:hover{ background:#a3ffce; transform:translateX(-50%) translateY(-2px); }
+  .fab:active{ transform:translateX(-50%) scale(0.97); }
+  /* 抽屜開啟時,FAB 會擋住面板內的按鈕,所以先淡出並停用點擊 */
+  .fab.is-hidden{
+    opacity:0; pointer-events:none; transform:translateX(-50%) translateY(12px);
+  }
+
+  /* ── 抽屜面板 ── */
+  .backdrop{
+    position:fixed; inset:0; z-index:9;
+    background: rgba(2,5,3,0.5);
+    opacity:0; pointer-events:none;
+    transition: opacity 0.25s ease;
+  }
+  .backdrop.is-open{ opacity:1; pointer-events:auto; }
+
+  .drawer{
+    position:fixed; z-index:10;
+    left:50%; bottom:0; transform:translate(-50%, 16px);
+    width:min(460px, 100vw);
+    max-height: min(82vh, 720px);
+    background: var(--panel);
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:22px 22px 0 0;
+    backdrop-filter: blur(14px);
+    padding: 20px 22px calc(20px + env(safe-area-inset-bottom, 0px));
+    overflow-y:auto;
+    opacity:0; pointer-events:none;
+    transition: transform 0.28s cubic-bezier(.2,.8,.2,1), opacity 0.22s ease;
+  }
+  .drawer.is-open{ opacity:1; pointer-events:auto; transform:translate(-50%, 0); }
+
+  .drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .drawer-head h2{
+    font-family:'Inria Serif', 'Noto Serif TC', serif;
+    font-size:12px; letter-spacing:0.2em; text-transform:uppercase;
+    color: var(--ink-dim); font-weight:600;
+  }
+  #closeDrawer{
+    background:none; border:1px solid var(--line); color:var(--ink-dim);
+    width:28px; height:28px; border-radius:50%; cursor:pointer;
+    font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center;
+  }
+  #closeDrawer:hover{ color:var(--glow); border-color:var(--glow); }
+
+  /* 主題分頁 */
+  .tabs{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    margin-bottom:18px;
+  }
+  .tab-btn{
+    border:1px solid var(--line); background:rgba(255,255,255,0.02);
+    color:var(--ink-dim); font-family:inherit; font-size:12px; font-weight:600;
+    letter-spacing:0.04em; padding:10px 8px; border-radius:11px; cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .tab-btn.is-active{
+    background: rgba(113,193,240,0.12); border-color:var(--glow); color:var(--glow);
+  }
+
+  .field-group{ display:none; flex-direction:column; gap:14px; }
+  .field-group.is-active{ display:flex; }
+
+  .field{ display:flex; flex-direction:column; gap:6px; width:100%; }
+  .field span{
+    font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim);
+  }
+  .field input[type="text"]{
+    width:100%; background: rgba(255,255,255,0.03); border:1px solid var(--line);
+    border-radius:10px; padding:11px 13px; color:var(--ink); font-family:inherit;
+    font-size:14px; outline:none; transition:border-color 0.15s ease;
+  }
+  .field input[type="text"]:focus{ border-color:var(--glow); }
+  .field input::placeholder{ color: rgba(239,230,210,0.3); }
+
+  .avatar-field{ flex-direction:row; align-items:center; gap:14px; }
+
+  /* ── 主題標籤複選 ── */
+  .tag-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;
+  }
+  .tag-chip{
+    display:flex; align-items:center; gap:9px; cursor:pointer;
+    font-size:13px; color:var(--ink-dim); user-select:none;
+    transition: color 0.15s ease;
+  }
+  .tag-chip input{ position:absolute; opacity:0; width:0; height:0; }
+  .tag-box{
+    width:17px; height:17px; flex-shrink:0; border-radius:3px;
+    border:2px solid var(--glow); background:transparent;
+    position:relative; transition: background 0.15s ease;
+  }
+  .tag-chip input:checked ~ .tag-box{ background: var(--glow); }
+  .tag-chip input:checked ~ .tag-box::after{
+    content:''; position:absolute; inset:3px; border-radius:1px;
+    background:#0A0D14;
+  }
+  .tag-chip input:checked ~ .tag-box{ box-shadow: 0 0 10px rgba(113,193,240,0.5); }
+  .tag-chip:has(input:checked){ color:var(--ink); }
+  .tag-chip:hover{ color:var(--ink); }
+  @media (max-width:380px){
+    .tag-grid{ grid-template-columns:1fr; }
+  }
+  .avatar-upload{
+    width:64px; height:64px; border-radius:50%; flex-shrink:0;
+    border:1.5px dashed var(--line); background:rgba(255,255,255,0.03);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    overflow:hidden; transition:border-color 0.15s ease;
+  }
+  .avatar-upload:hover{ border-color:var(--glow); }
+  .avatar-upload img{ width:100%; height:100%; object-fit:cover; }
+  .avatar-upload span{ font-size:20px; color:var(--ink-dim); }
+  .avatar-meta{ display:flex; flex-direction:column; gap:2px; }
+  .avatar-meta b{ font-size:12px; color:var(--ink); font-weight:600; }
+  .avatar-meta small{ font-size:10px; color:var(--ink-dim); letter-spacing:0.04em; }
+
+  .apply-btn{
+    margin-top:18px; width:100%;
+    border:none; cursor:pointer; background:var(--glow); color:#0A2233;
+    font-family:inherit; font-weight:700; font-size:13px; letter-spacing:0.06em;
+    text-transform:uppercase; padding:12px; border-radius:11px;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .apply-btn:hover{ background:#a3ffce; transform:translateY(-1px); }
+  .apply-btn:active{ transform:translateY(0) scale(0.98); }
+
+  .divider{ height:1px; background:var(--line); margin:20px 0 16px; }
+
+  .export-section .label{
+    font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-dim);
+    margin-bottom:10px; display:block;
+  }
+  .export-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .export-btn{
+    border:1px solid var(--line); background: rgba(255,255,255,0.02);
+    color:var(--ink); font-family:inherit; font-size:11px; font-weight:600;
+    padding:11px 6px; border-radius:10px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+  .export-btn .ratio-icon{ display:block; border:1.4px solid var(--ink-dim); border-radius:2px; }
+  .export-btn:hover{ border-color:var(--glow); background: rgba(113,193,240,0.08); }
+  .export-btn.is-busy{ opacity:0.55; pointer-events:none; }
+  .export-btn.is-done{ border-color:var(--glow); color:var(--glow); }
+  body.is-speaker .export-btn[data-ratio="16:9"]{ display:none; }
+  body.is-speaker .export-row{ grid-template-columns:1fr 1fr; }
+
+  #resetBtn{
+    margin-top:16px; width:100%; background:none; border:none; cursor:pointer;
+    color:var(--ink-dim); font-family:inherit; font-size:11px; letter-spacing:0.06em;
+    text-decoration:underline; text-underline-offset:3px; padding:4px;
+  }
+  #resetBtn:hover{ color:var(--glow); }
+
+  @media (max-width:560px){
+    .hint{ display:none; }
+    .stage{ padding: 90px 18px 120px; }
+    .drawer{ width:100%; border-radius:20px 20px 0 0; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="field"></canvas>
+<canvas id="tagGlow"></canvas>
+
+<div class="frame" aria-hidden="true">
+  <span class="corner corner-tl"></span>
+  <span class="corner corner-tr"></span>
+  <span class="corner corner-bl"></span>
+  <span class="corner corner-br"></span>
+</div>
+
+<div class="lab-tag"><span><span class="pulse"></span><b>WebConf · 2026</b></span><span>取素材實驗場 · 啟動中…</span></div>
+<div class="hint">點擊 / 拖曳畫面 → 噴出粒子<br>下方「編輯公告」→ 切換主題與內容</div>
+
+<div class="stage">
+  <!-- 一般公告 -->
+  <div class="stage-view is-active" id="stageGeneral">
+    <div id="titleOut">Living Specimen<br>— Sandbox</div>
+    <div id="subtitleOut">取素材實驗場 · SANDBOX MODE</div>
+  </div>
+
+  <!-- 講者公告 -->
+  <div class="stage-view" id="stageSpeaker">
+    <div class="sp-header">
+      <div class="sp-title">Speakers</div>
+      <div class="sp-kicker">講者開箱</div>
+    </div>
+
+    <div class="sp-canvas-area">
+      <div class="sp-card sp-card-name">
+        <div class="sp-name-box">
+          <div id="speakerNameOut">講者姓名</div>
+          <div id="speakerRoleOut">職稱 / 單位</div>
+        </div>
+        <div class="sp-photo" id="avatarOut"><span class="avatar-fallback">頭像</span></div>
+      </div>
+
+      <div class="sp-card sp-card-quote">
+        <div class="sp-quote-box" id="speakerTopicOut">講題 / 講者主題描述文字</div>
+        <div class="sp-tags-box" id="speakerTagsOut">尚未選擇標籤</div>
+      </div>
+
+      <div class="sp-card sp-card-zoom" aria-hidden="true"></div>
+
+      <svg class="sp-connectors" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="930" y1="185" x2="712.3" y2="303.3"></line>
+        <circle cx="700" cy="310" r="14"></circle>
+        <line x1="390" y1="500" x2="351" y2="417.7"></line>
+        <circle cx="345" cy="405" r="14"></circle>
+      </svg>
+    </div>
+
+    <div class="sp-footer">
+      <div class="sp-footer-left">
+        <div class="sp-event">Taipei Popop · Dec. 11-12, 2026</div>
+        <div class="sp-footkicker">AGENT · CONNECTIONS · CODE</div>
+      </div>
+      <div class="sp-wordmark">WebConf</div>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fabToggle">✎ 編輯公告</button>
+<div class="backdrop" id="backdrop"></div>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h2>公告設定</h2>
+    <button id="closeDrawer">×</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn is-active" data-theme="general">一般公告</button>
+    <button class="tab-btn" data-theme="speaker">公告講者</button>
+  </div>
+
+  <!-- 一般公告欄位 -->
+  <div class="field-group is-active" id="generalFields">
+    <label class="field">
+      <span>主標題</span>
+      <input type="text" id="titleInput" placeholder="輸入主標題…" maxlength="40">
+    </label>
+    <label class="field">
+      <span>副標題</span>
+      <input type="text" id="subtitleInput" placeholder="輸入副標題…" maxlength="60">
+    </label>
+  </div>
+
+  <!-- 講者公告欄位 -->
+  <div class="field-group" id="speakerFields">
+    <div class="field avatar-field">
+      <label class="avatar-upload" id="avatarUploadBtn">
+        <span id="avatarUploadIcon">＋</span>
+        <input type="file" id="avatarInput" accept="image/*" hidden>
+      </label>
+      <div class="avatar-meta">
+        <b>講者頭像</b>
+        <small>建議上傳正方形圖片</small>
+      </div>
+    </div>
+    <label class="field">
+      <span>講者名稱</span>
+      <input type="text" id="speakerNameInput" placeholder="輸入講者名稱…" maxlength="30">
+    </label>
+    <label class="field">
+      <span>講者職稱 / 單位</span>
+      <input type="text" id="speakerRoleInput" placeholder="例如:商業思維學院・院長" maxlength="40">
+    </label>
+    <label class="field">
+      <span>講者主題</span>
+      <input type="text" id="speakerTopicInput" placeholder="輸入講題 / 主題描述…" maxlength="80">
+    </label>
+    <div class="field">
+      <span>主題標籤(可複選,會疊加對應背景樣式)</span>
+      <div class="tag-grid" id="tagGrid">
+        <label class="tag-chip"><input type="checkbox" value="frontend" data-color="#71C1F0"><span class="tag-box"></span>Frontend</label>
+        <label class="tag-chip"><input type="checkbox" value="backend" data-color="#8E7CC3"><span class="tag-box"></span>Backend</label>
+        <label class="tag-chip"><input type="checkbox" value="devops" data-color="#6FCF97"><span class="tag-box"></span>DevOps</label>
+        <label class="tag-chip"><input type="checkbox" value="security" data-color="#EB5757"><span class="tag-box"></span>Security</label>
+        <label class="tag-chip"><input type="checkbox" value="agile" data-color="#F2C94C"><span class="tag-box"></span>Agile</label>
+        <label class="tag-chip"><input type="checkbox" value="ai" data-color="#BB6BD9"><span class="tag-box"></span>AI</label>
+        <label class="tag-chip"><input type="checkbox" value="product" data-color="#56CCF2"><span class="tag-box"></span>產品思維</label>
+        <label class="tag-chip"><input type="checkbox" value="industry" data-color="#F2994A"><span class="tag-box"></span>產業應用</label>
+        <label class="tag-chip"><input type="checkbox" value="teamwork" data-color="#27AE60"><span class="tag-box"></span>團隊管理</label>
+        <label class="tag-chip"><input type="checkbox" value="swdesign" data-color="#9B51E0"><span class="tag-box"></span>軟體設計</label>
+        <label class="tag-chip"><input type="checkbox" value="uxdesign" data-color="#EFE6D2"><span class="tag-box"></span>設計實務</label>
+      </div>
+    </div>
+  </div>
+
+  <button class="apply-btn" id="applyBtn">套用變更</button>
+
+  <div class="divider"></div>
+
+  <div class="export-section">
+    <span class="label">下載社群圖</span>
+    <div class="export-row">
+      <button class="export-btn" data-ratio="16:9"><span class="ratio-icon" style="width:22px;height:12px;"></span>16:9</button>
+      <button class="export-btn" data-ratio="1:1"><span class="ratio-icon" style="width:16px;height:16px;"></span>1:1</button>
+      <button class="export-btn" data-ratio="3:4"><span class="ratio-icon" style="width:13px;height:17px;"></span>3:4</button>
+    </div>
+  </div>
+
+  <button id="resetBtn">還原目前主題的預設內容</button>
+</div>
+
+<script>
+(() => {
+  // ───────────────────── 狀態 ─────────────────────
+  let theme = 'general'; // 'general' | 'speaker'
+  let avatarImage = null; // HTMLImageElement,供匯出圖片使用
+
+  const DEFAULTS = {
+    general: { title: 'Living Specimen<br>— Sandbox', subtitle: '取素材實驗場 · SANDBOX MODE' },
+    speaker: { name: '講者姓名', role: '職稱 / 單位', topic: '講題 / 講者主題描述文字', tags: '尚未選擇標籤' }
+  };
+
+  // ───────────────────── DOM 參照 ─────────────────────
+  const stageGeneral = document.getElementById('stageGeneral');
+  const stageSpeaker = document.getElementById('stageSpeaker');
+  const titleOut = document.getElementById('titleOut');
+  const subtitleOut = document.getElementById('subtitleOut');
+  const avatarOut = document.getElementById('avatarOut');
+  const speakerNameOut = document.getElementById('speakerNameOut');
+  const speakerRoleOut = document.getElementById('speakerRoleOut');
+  const speakerTopicOut = document.getElementById('speakerTopicOut');
+  const speakerTagsOut = document.getElementById('speakerTagsOut');
+
+  const fabToggle = document.getElementById('fabToggle');
+  const backdrop = document.getElementById('backdrop');
+  const drawer = document.getElementById('drawer');
+  const closeDrawer = document.getElementById('closeDrawer');
+
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const generalFields = document.getElementById('generalFields');
+  const speakerFields = document.getElementById('speakerFields');
+
+  const titleInput = document.getElementById('titleInput');
+  const subtitleInput = document.getElementById('subtitleInput');
+  const avatarUploadBtn = document.getElementById('avatarUploadBtn');
+  const avatarUploadIcon = document.getElementById('avatarUploadIcon');
+  const avatarInput = document.getElementById('avatarInput');
+  const speakerNameInput = document.getElementById('speakerNameInput');
+  const speakerRoleInput = document.getElementById('speakerRoleInput');
+  const speakerTopicInput = document.getElementById('speakerTopicInput');
+
+  const applyBtn = document.getElementById('applyBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // ───────────────────── 抽屜開關 ─────────────────────
+  function openDrawer(){
+    drawer.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    fabToggle.classList.add('is-hidden');
+  }
+  function closeDrawerFn(){
+    drawer.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    fabToggle.classList.remove('is-hidden');
+  }
+  fabToggle.addEventListener('click', openDrawer);
+  closeDrawer.addEventListener('click', closeDrawerFn);
+  backdrop.addEventListener('click', closeDrawerFn);
+
+  // ───────────────────── 主題切換 ─────────────────────
+  function setTheme(next){
+    theme = next;
+    document.body.classList.toggle('is-speaker', next === 'speaker');
+    tabBtns.forEach(b => b.classList.toggle('is-active', b.dataset.theme === next));
+    generalFields.classList.toggle('is-active', next === 'general');
+    speakerFields.classList.toggle('is-active', next === 'speaker');
+    stageGeneral.classList.toggle('is-active', next === 'general');
+    stageSpeaker.classList.toggle('is-active', next === 'speaker');
+  }
+  tabBtns.forEach(btn => btn.addEventListener('click', () => setTheme(btn.dataset.theme)));
+
+  // ───────────────────── 頭像上傳 ─────────────────────
+  avatarUploadBtn.addEventListener('click', () => avatarInput.click());
+  avatarInput.addEventListener('change', () => {
+    const file = avatarInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      avatarUploadIcon.style.display = 'none';
+      avatarUploadBtn.querySelectorAll('img').forEach(el => el.remove());
+      const previewImg = document.createElement('img');
+      previewImg.src = dataUrl;
+      avatarUploadBtn.appendChild(previewImg);
+
+      const img = new Image();
+      img.onload = () => { avatarImage = img; };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ───────────────────── 套用變更 ─────────────────────
+  function flashGlow(el){
+    el.style.textShadow = '0 0 34px rgba(113,193,240,0.7), 0 0 90px rgba(113,193,240,0.25)';
+    setTimeout(() => { el.style.textShadow = '0 0 24px rgba(113,193,240,0.35), 0 0 60px rgba(113,193,240,0.12)'; }, 400);
+  }
+
+  applyBtn.addEventListener('click', () => {
+    if(theme === 'general'){
+      const t = titleInput.value.trim();
+      const s = subtitleInput.value.trim();
+      if(t) titleOut.innerHTML = t.replace(/\n/g,'<br>');
+      if(s) subtitleOut.textContent = s;
+      flashGlow(titleOut);
+    } else {
+      const n = speakerNameInput.value.trim();
+      const rl = speakerRoleInput.value.trim();
+      const tp = speakerTopicInput.value.trim();
+      if(n) speakerNameOut.textContent = n;
+      if(rl) speakerRoleOut.textContent = rl;
+      if(tp) speakerTopicOut.textContent = tp;
+      if(avatarImage){
+        avatarOut.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = avatarImage.src;
+        avatarOut.appendChild(img);
+      }
+      flashGlow(speakerNameOut);
+    }
+    closeDrawerFn();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if(theme === 'general'){
+      titleOut.innerHTML = DEFAULTS.general.title;
+      subtitleOut.textContent = DEFAULTS.general.subtitle;
+      titleInput.value = ''; subtitleInput.value = '';
+    } else {
+      speakerNameOut.textContent = DEFAULTS.speaker.name;
+      speakerRoleOut.textContent = DEFAULTS.speaker.role;
+      speakerTopicOut.textContent = DEFAULTS.speaker.topic;
+      speakerNameInput.value = ''; speakerRoleInput.value = ''; speakerTopicInput.value = '';
+      avatarImage = null;
+      avatarOut.innerHTML = '<span class="avatar-fallback">頭像</span>';
+      avatarUploadBtn.querySelectorAll('img').forEach(el => el.remove());
+      avatarUploadIcon.style.display = '';
+      avatarInput.value = '';
+      // 清空已選標籤,並還原對應背景疊加與標籤文字顯示
+      tagCheckboxes.forEach(cb => cb.checked = false);
+      selectedTags.clear();
+      tagOrder.length = 0;
+      speakerTagsOut.textContent = DEFAULTS.speaker.tags;
+    }
+  });
+
+  // ───────────────────── 主題標籤 → 粒子生命引擎樣式 ─────────────────────
+  // 每個標籤除了對應一個顏色,也對應一種 particle-life 的互動規則(preset)。
+  // 不同規則會演化出完全不同的「生物形態」(蜂群/鏈狀/軌道/共生對…),
+  // 比單純換色更貼近你原本引擎的呈現方式。
+  const TAGS = [
+    { key: 'frontend', x: 0.18, y: 0.22, r: 0.42, color: '#71C1F0', preset: 'cellular', label: 'Frontend' },
+    { key: 'backend',  x: 0.82, y: 0.20, r: 0.40, color: '#8E7CC3', preset: 'hub-spokes', label: 'Backend' },
+    { key: 'devops',   x: 0.78, y: 0.80, r: 0.44, color: '#6FCF97', preset: 'spiral-conveyor', label: 'DevOps' },
+    { key: 'security', x: 0.18, y: 0.82, r: 0.40, color: '#EB5757', preset: 'shells', label: 'Security' },
+    { key: 'agile',    x: 0.50, y: 0.10, r: 0.36, color: '#F2C94C', preset: 'orbital', label: 'Agile' },
+    { key: 'ai',       x: 0.50, y: 0.90, r: 0.42, color: '#BB6BD9', preset: 'vortex', label: 'AI' },
+    { key: 'product',  x: 0.06, y: 0.52, r: 0.36, color: '#56CCF2', preset: 'tri-spiral', label: '產品思維' },
+    { key: 'industry', x: 0.94, y: 0.52, r: 0.36, color: '#F2994A', preset: 'ring-road', label: '產業應用' },
+    { key: 'teamwork', x: 0.36, y: 0.38, r: 0.30, color: '#27AE60', preset: 'triad-flocks', label: '團隊管理' },
+    { key: 'swdesign', x: 0.64, y: 0.62, r: 0.30, color: '#9B51E0', preset: 'helical', label: '軟體設計' },
+    { key: 'uxdesign', x: 0.50, y: 0.50, r: 0.46, color: '#EFE6D2', preset: 'symbiosis', label: '設計實務' },
+  ];
+  const TAG_BY_KEY = Object.fromEntries(TAGS.map(t => [t.key, t]));
+  const BASE_PALETTE = ['#71C1F0', '#3E7DA8', '#EFE6D2', '#A9D8F5'];
+
+  const selectedTags = new Map();   // key -> color(hex),用於背景光暈疊加
+  const tagOrder = [];              // 記錄勾選順序,決定目前生效的 preset
+  const tagGrid = document.getElementById('tagGrid');
+  const tagCheckboxes = tagGrid.querySelectorAll('input[type="checkbox"]');
+
+  tagCheckboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      if(cb.checked){
+        selectedTags.set(cb.value, cb.dataset.color);
+        tagOrder.push(cb.value);
+      } else {
+        selectedTags.delete(cb.value);
+        const idx = tagOrder.lastIndexOf(cb.value);
+        if(idx >= 0) tagOrder.splice(idx, 1);
+      }
+      applyTagsToEngine();
+      updateTagsText();
+    });
+  });
+
+  // 把目前選取的標籤名稱顯示在講者卡片的標籤欄位上(依勾選順序,用「・」分隔)
+  function updateTagsText(){
+    if(!speakerTagsOut) return;
+    if(tagOrder.length === 0){
+      speakerTagsOut.textContent = DEFAULTS.speaker.tags;
+      return;
+    }
+    speakerTagsOut.textContent = tagOrder.map(k => TAG_BY_KEY[k]?.label || k).join('　·　');
+  }
+
+  // 把目前選取的標籤同步到粒子引擎:調色盤混入已選顏色,
+  // 並套用「最後勾選的標籤」對應的互動規則(preset)。
+  function applyTagsToEngine(){
+    if(!engine) return; // 引擎尚未啟動完成,等 boot 完再套一次
+    const palette = selectedTags.size
+      ? BASE_PALETTE.concat(Array.from(selectedTags.values()))
+      : BASE_PALETTE;
+    engine.setPalette(palette);
+
+    const lastKey = tagOrder[tagOrder.length - 1];
+    const tag = lastKey ? TAG_BY_KEY[lastKey] : null;
+    engine.setPreset(tag ? tag.preset : 'cellular');
+  }
+
+  function hexToRgba(hex, alpha){
+    const h = hex.replace('#','');
+    const r = parseInt(h.substring(0,2),16);
+    const g = parseInt(h.substring(2,4),16);
+    const b = parseInt(h.substring(4,6),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // 依目前選取的標籤,把對應的光暈疊加畫到任意畫布上(主畫面 tagGlow 層或匯出畫布共用)
+  function drawTagOverlay(targetCtx, w, h){
+    if(selectedTags.size === 0) return;
+    targetCtx.save();
+    targetCtx.globalCompositeOperation = 'lighter';
+    selectedTags.forEach((color, key) => {
+      const t = TAG_BY_KEY[key];
+      if(!t) return;
+      const cx = t.x * w, cy = t.y * h;
+      const r = t.r * Math.max(w, h);
+      const grad = targetCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      grad.addColorStop(0, hexToRgba(color, 0.4));
+      grad.addColorStop(1, hexToRgba(color, 0));
+      targetCtx.fillStyle = grad;
+      targetCtx.beginPath();
+      targetCtx.arc(cx, cy, r, 0, Math.PI*2);
+      targetCtx.fill();
+    });
+    targetCtx.restore();
+  }
+
+  // ───────────────────── 粒子生命引擎(沿用你原網站的 particle-life 系統)─────────────────────
+  const canvas = document.getElementById('field');
+  const HAS_GPU = !!(window.ParticleLifeGPU && window.ParticleLifeGPU.isSupported && window.ParticleLifeGPU.isSupported());
+  let engine = null;
+
+  const ENGINE_OPTS = {
+    species: 5,
+    count: HAS_GPU ? 8000 : 1600,
+    preset: 'cellular',
+    seedPattern: 'centeredCloud',
+    palette: BASE_PALETTE,
+    bgFade: 'rgba(5,5,6,0.16)',
+    pointSize: 1.1,
+    glow: 0.02,
+    forceFactor: 1.2,
+    friction: HAS_GPU ? 0.31 : 0.92,
+    rMax: 55,
+    simSpeed: 0.35,
+    mouseRepel: 2.2,
+    showFps: false,
+    gpuCompute: false,
+  };
+
+  (async function bootEngine(){
+    try{
+      engine = await window.makeEngine(canvas, ENGINE_OPTS);
+    }catch(err){
+      console.error('[sandbox] 粒子引擎啟動失敗', err);
+      return;
+    }
+    window.livingSpecimenEngine = engine; // 方便在 console 手動調參
+    engine.setMouseRadius?.(260);
+    applyTagsToEngine(); // 若使用者在引擎就緒前已經勾選標籤,啟動後立刻補套用
+
+    // 輕量「呼吸感」擾動:每隔幾秒在畫面隨機位置輕輕擾動一下粒子場,
+    // 讓畫面在沒有人操作時也不會完全靜止(仿照原網站 Hero 的 metabolism 效果)。
+    setInterval(() => {
+      if(!engine) return;
+      const { W, H } = engine.size;
+      engine.disturb(W * (0.35 + Math.random()*0.3), H * (0.30 + Math.random()*0.4), 90 + Math.random()*80, 3 + Math.random()*3);
+    }, 2600);
+  })();
+
+  let pointerDown = false;
+  function pointerPos(e){
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX, y: t.clientY };
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    pointerDown = true;
+    const p = pointerPos(e);
+    engine?.disturb(p.x, p.y, 220, 16);
+  });
+  window.addEventListener('pointerup', () => pointerDown = false);
+  canvas.addEventListener('pointermove', (e) => {
+    if(pointerDown){ const p = pointerPos(e); engine?.disturb(p.x, p.y, 140, 8); }
+  });
+
+  // ───────────────────── 標籤光暈疊加畫布(獨立於引擎的畫布之上)─────────────────────
+  const glowCanvas = document.getElementById('tagGlow');
+  const glowCtx = glowCanvas.getContext('2d');
+  function resizeGlow(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth, h = window.innerHeight;
+    glowCanvas.width = w * dpr; glowCanvas.height = h * dpr;
+    glowCanvas.style.width = w + 'px'; glowCanvas.style.height = h + 'px';
+    glowCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resizeGlow);
+  resizeGlow();
+  function glowLoop(){
+    glowCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    drawTagOverlay(glowCtx, window.innerWidth, window.innerHeight);
+    requestAnimationFrame(glowLoop);
+  }
+  glowLoop();
+
+  // ───────────────────── 下載社群圖 ─────────────────────
+  const exportBtns = document.querySelectorAll('.export-btn');
+  const RATIO_MAP = {
+    '16:9': { w: 1600, h: 900  },
+    '1:1':  { w: 1200, h: 1200 },
+    '3:4':  { w: 1200, h: 1600 }
+  };
+
+  function wrapText(octx, text, maxWidth){
+    const words = text.split('');
+    const lines = [];
+    let line = '';
+    for(const ch of words){
+      const test = line + ch;
+      if(octx.measureText(test).width > maxWidth && line){
+        lines.push(line);
+        line = ch;
+      } else {
+        line = test;
+      }
+    }
+    if(line) lines.push(line);
+    return lines;
+  }
+
+  function drawImageCover(targetCtx, source, x, y, w, h){
+    if(!source || !source.width || !source.height) return;
+    const scale = Math.max(w / source.width, h / source.height);
+    const sw = w / scale, sh = h / scale;
+    const sx = (source.width - sw) / 2;
+    const sy = (source.height - sh) / 2;
+    targetCtx.drawImage(source, sx, sy, sw, sh, x, y, w, h);
+  }
+
+  // 依畫面上的邊框裝飾樣式,在匯出圖片上也畫出對應的圖卡邊框與四角標記
+  function drawFrame(targetCtx, w, h){
+    const margin = Math.round(Math.min(w, h) * 0.045);
+    const radius = Math.round(Math.min(w, h) * 0.028);
+    const cornerLen = Math.round(Math.min(w, h) * 0.05);
+    const lineW = Math.max(1.5, Math.round(Math.min(w, h) * 0.003));
+
+    targetCtx.save();
+
+    // 內層細線,呼應畫面上的雙層邊框
+    targetCtx.strokeStyle = 'rgba(239,230,210,0.08)';
+    targetCtx.lineWidth = Math.max(1, lineW * 0.6);
+    strokeFrameRect(targetCtx, margin + 8, margin + 8, w - (margin+8)*2, h - (margin+8)*2, radius*0.7);
+
+    // 外層主邊框
+    targetCtx.strokeStyle = 'rgba(113,193,240,0.28)';
+    targetCtx.lineWidth = lineW;
+    strokeFrameRect(targetCtx, margin, margin, w - margin*2, h - margin*2, radius);
+
+    // 四角標記(如相機觀景窗的裝飾角)
+    targetCtx.strokeStyle = '#71C1F0';
+    targetCtx.lineWidth = lineW * 1.8;
+    targetCtx.lineCap = 'round';
+    const corners = [
+      [margin, margin, 1, 1],
+      [w - margin, margin, -1, 1],
+      [margin, h - margin, 1, -1],
+      [w - margin, h - margin, -1, -1],
+    ];
+    corners.forEach(([cx, cy, dx, dy]) => {
+      targetCtx.beginPath();
+      targetCtx.moveTo(cx + dx*cornerLen, cy);
+      targetCtx.lineTo(cx, cy);
+      targetCtx.lineTo(cx, cy + dy*cornerLen);
+      targetCtx.stroke();
+    });
+
+    targetCtx.restore();
+    return margin; // 回傳邊界值,方便文字對齊邊框內側
+  }
+
+  function strokeFrameRect(targetCtx, x, y, w, h, r){
+    targetCtx.beginPath();
+    if(targetCtx.roundRect){
+      targetCtx.roundRect(x, y, w, h, r);
+    } else {
+      targetCtx.moveTo(x + r, y);
+      targetCtx.arcTo(x + w, y, x + w, y + h, r);
+      targetCtx.arcTo(x + w, y + h, x, y + h, r);
+      targetCtx.arcTo(x, y + h, x, y, r);
+      targetCtx.arcTo(x, y, x + w, y, r);
+      targetCtx.closePath();
+    }
+    targetCtx.stroke();
+  }
+
+  async function exportImage(ratioKey){
+    const { w: tw, h: th } = RATIO_MAP[ratioKey];
+    const off = document.createElement('canvas');
+    off.width = tw; off.height = th;
+    const octx = off.getContext('2d');
+
+    const grad = octx.createRadialGradient(tw/2, th*0.4, 0, tw/2, th*0.4, Math.max(tw,th)*0.75);
+    grad.addColorStop(0, '#0A0D14');
+    grad.addColorStop(0.7, '#050506');
+    grad.addColorStop(1, '#050704');
+    octx.fillStyle = grad;
+    octx.fillRect(0,0,tw,th);
+
+    // WebGPU 的顯示紋理在畫面呈現後可能已被瀏覽器回收，直接 drawImage(canvas)
+    // 在部分瀏覽器會得到全黑圖。匯出時改讀回粒子座標並重新繪製，CPU / GPU
+    // 兩種引擎都使用同一條可靠的輸出路徑。
+    let exportParticles = [];
+    if(engine){
+      if(typeof engine.readParticles === 'function'){
+        exportParticles = await engine.readParticles();
+      }else if(engine.particles && engine.particles.length){
+        exportParticles = engine.particles;
+      }
+    }
+
+    if(engine && exportParticles.length){
+      const { W, H } = engine.size;
+      const scale = Math.max(tw / W, th / H);
+      const offX = (tw - W*scale) / 2;
+      const offY = (th - H*scale) / 2;
+      const palette = engine.config.palette || BASE_PALETTE;
+      const pSize = Math.max(1.2, (engine.config.pointSize || 1.4) * scale);
+      octx.save();
+      octx.globalCompositeOperation = 'lighter';
+      exportParticles.forEach(p => {
+        const x = p.x*scale + offX;
+        const y = p.y*scale + offY;
+        if(x < -30 || x > tw+30 || y < -30 || y > th+30) return;
+        const color = palette[p.s % palette.length];
+        // 柔光外圈
+        octx.globalAlpha = 0.14;
+        octx.fillStyle = color;
+        octx.beginPath();
+        octx.arc(x, y, pSize * 4.2, 0, Math.PI*2);
+        octx.fill();
+        // 清晰粒子核心
+        octx.globalAlpha = 0.9;
+        octx.fillStyle = color;
+        octx.beginPath();
+        octx.arc(x, y, pSize, 0, Math.PI*2);
+        octx.fill();
+      });
+      octx.restore();
+    }else{
+      // 最後備援：若引擎尚未完成初始化，才嘗試擷取 2D 畫布。
+      try{ drawImageCover(octx, canvas, 0, 0, tw, th); }catch(e){}
+    }
+    drawTagOverlay(octx, tw, th);
+    octx.globalAlpha = 1;
+
+    // 字型載入設定逾時保護,避免因字型讀取失敗導致下載卡住沒反應
+    try{
+      await Promise.race([
+        document.fonts.ready,
+        new Promise(resolve => setTimeout(resolve, 1500))
+      ]);
+    }catch(e){ /* 忽略字型載入錯誤,改用後備字型繼續輸出 */ }
+
+    octx.textAlign = 'center';
+    octx.textBaseline = 'middle';
+
+    if(theme === 'general'){
+      const lines = titleOut.innerHTML.split(/<br\s*\/?>/i).map(s => {
+        const tmp = document.createElement('div'); tmp.innerHTML = s; return tmp.textContent;
+      });
+      const fontSize = Math.round(tw * 0.072);
+      octx.font = `italic 400 ${fontSize}px 'Inria Serif', 'Noto Serif TC', serif`;
+      const lineHeight = fontSize * 1.12;
+      const totalH = lineHeight * lines.length;
+      const startY = th/2 - totalH/2 + lineHeight/2;
+      lines.forEach((line, i) => {
+        const y = startY + i*lineHeight;
+        octx.shadowColor = 'rgba(113,193,240,0.55)';
+        octx.shadowBlur = fontSize*0.5;
+        octx.fillStyle = '#EFE6D2';
+        octx.fillText(line, tw/2, y);
+        octx.shadowBlur = 0;
+      });
+      octx.font = `400 ${Math.round(tw*0.02)}px 'Inria Serif', 'Noto Serif TC', serif`;
+      octx.fillStyle = '#3E7DA8';
+      octx.fillText(subtitleOut.textContent, tw/2, startY + lines.length*lineHeight + fontSize*0.42);
+    } else {
+      // 講者匯出：使用和畫面一致的海報式構圖，所有主要物件距邊緣 40px。
+      const safe = 40;
+      const line = 'rgba(239,230,210,0.55)';
+      const headerH = Math.max(92, th * 0.12);
+      const footerH = Math.max(92, th * 0.12);
+
+      octx.textBaseline = 'middle';
+      octx.textAlign = 'left';
+      octx.strokeStyle = line;
+      octx.lineWidth = 1.5;
+      octx.beginPath(); octx.moveTo(safe, safe + headerH); octx.lineTo(tw-safe, safe+headerH); octx.stroke();
+      octx.beginPath(); octx.moveTo(safe, th-safe-footerH); octx.lineTo(tw-safe, th-safe-footerH); octx.stroke();
+
+      octx.fillStyle = '#EFE6D2';
+      octx.font = `italic 400 ${Math.round(Math.min(tw*.075, headerH*.72))}px 'Inria Serif','Noto Serif TC',serif`;
+      octx.fillText('Speakers', safe, safe + headerH*.44);
+      octx.textAlign = 'right';
+      octx.fillStyle = '#71C1F0';
+      octx.font = `400 ${Math.round(Math.min(tw*.027, headerH*.30))}px 'Noto Serif TC',serif`;
+      octx.fillText('講 者 開 箱', tw-safe, safe + headerH*.45);
+
+      const photoW = Math.min(tw*.22, (th-headerH-footerH-safe*2)*.28);
+      const photoH = photoW*1.22;
+      const photoX = tw-safe-photoW;
+      const photoY = safe+headerH+Math.max(40, th*.055);
+      const nameX = Math.max(safe, photoX-Math.min(tw*.46, 570));
+      const nameW = photoX-nameX;
+      const nameH = photoH*.64;
+      octx.fillStyle = 'rgba(5,5,6,.9)'; octx.fillRect(nameX,photoY,nameW,nameH);
+      octx.strokeStyle = line; octx.strokeRect(nameX,photoY,nameW,nameH);
+      if(avatarImage) drawImageCover(octx, avatarImage, photoX, photoY, photoW, photoH);
+      else { octx.fillStyle='rgba(239,230,210,.08)'; octx.fillRect(photoX,photoY,photoW,photoH); }
+      octx.strokeRect(photoX,photoY,photoW,photoH);
+
+      octx.textAlign='left'; octx.fillStyle='#EFE6D2';
+      const nameFs=Math.max(34,Math.round(tw*.05));
+      octx.font=`italic 400 ${nameFs}px 'Inria Serif','Noto Serif TC',serif`;
+      octx.fillText(speakerNameOut.textContent,nameX+30,photoY+nameH*.40);
+      octx.font=`400 ${Math.max(18,Math.round(tw*.022))}px 'Noto Serif TC',serif`;
+      octx.fillText(speakerRoleOut.textContent,nameX+30,photoY+nameH*.75);
+
+      const contentBottom=th-safe-footerH-40;
+      const quoteW=Math.min(tw*.46,650), quoteX=safe;
+      const topicFs=Math.max(22,Math.round(tw*.026));
+      octx.font=`400 ${topicFs}px 'Noto Serif TC',serif`;
+      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64).slice(0,4);
+      const quoteH=Math.max(150,topicLines.length*topicFs*1.55+58);
+      const tagsH=Math.max(52,th*.045);
+      // 講題＋標籤整組固定靠齊內容區左下，不再跟著頭像高度浮動。
+      const quoteY=contentBottom-tagsH-quoteH;
+      octx.fillStyle='#EFE6D2'; octx.fillRect(quoteX,quoteY,quoteW,quoteH);
+      octx.fillStyle='#141008';
+      topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32,quoteY+38+topicFs*.78+i*topicFs*1.55));
+      octx.fillStyle='rgba(5,5,6,.92)'; octx.fillRect(quoteX,quoteY+quoteH,quoteW,tagsH);
+      octx.strokeStyle=line; octx.strokeRect(quoteX,quoteY+quoteH,quoteW,tagsH);
+      octx.fillStyle='#EFE6D2'; octx.font=`400 ${Math.max(18,Math.round(tw*.017))}px 'Noto Serif TC',serif`;
+      octx.fillText(speakerTagsOut.textContent,quoteX+32,quoteY+quoteH+tagsH/2);
+
+      // 顯微鏡觀察指示：分別從講者卡與講題卡連到粒子標記點。
+      octx.save();
+      octx.strokeStyle='rgba(239,230,210,.85)';
+      octx.lineWidth=Math.max(1.5,tw*.0011);
+      const speakerMarkX=photoX-photoW*.72;
+      const speakerMarkY=photoY+photoH*1.38;
+      const markerR=Math.max(12,tw*.011);
+      const speakerStartX=photoX+photoW*.55;
+      const speakerStartY=photoY+photoH;
+      const speakerD=Math.hypot(speakerStartX-speakerMarkX,speakerStartY-speakerMarkY)||1;
+      const speakerEndX=speakerMarkX+(speakerStartX-speakerMarkX)/speakerD*markerR;
+      const speakerEndY=speakerMarkY+(speakerStartY-speakerMarkY)/speakerD*markerR;
+      octx.beginPath();
+      octx.moveTo(speakerStartX,speakerStartY);
+      octx.lineTo(speakerEndX,speakerEndY);
+      octx.stroke();
+      octx.beginPath(); octx.arc(speakerMarkX,speakerMarkY,markerR,0,Math.PI*2); octx.stroke();
+
+      const topicMarkX=quoteX+quoteW*.70;
+      const topicMarkY=quoteY-Math.max(44,th*.055);
+      const topicStartX=quoteX+quoteW*.56;
+      const topicStartY=quoteY;
+      const topicD=Math.hypot(topicStartX-topicMarkX,topicStartY-topicMarkY)||1;
+      const topicEndX=topicMarkX+(topicStartX-topicMarkX)/topicD*markerR;
+      const topicEndY=topicMarkY+(topicStartY-topicMarkY)/topicD*markerR;
+      octx.beginPath();
+      octx.moveTo(topicStartX,topicStartY);
+      octx.lineTo(topicEndX,topicEndY);
+      octx.stroke();
+      octx.beginPath(); octx.arc(topicMarkX,topicMarkY,markerR,0,Math.PI*2); octx.stroke();
+      octx.restore();
+
+      // 右下顯微鏡標本：截取目前粒子畫布的一小塊並以連接線標示。
+      const zoomSize=Math.min(tw*.13,180), zoomX=tw-safe-zoomSize, zoomY=contentBottom-zoomSize;
+      octx.save();
+      octx.beginPath(); octx.rect(zoomX,zoomY,zoomSize,zoomSize); octx.clip();
+      octx.fillStyle='#050506'; octx.fillRect(zoomX,zoomY,zoomSize,zoomSize);
+      // 使用已讀回的粒子資料繪製放大標本，避免 WebGPU 畫布擷取後變黑。
+      if(engine && exportParticles.length){
+        const {W,H}=engine.size;
+        const palette=engine.config.palette||BASE_PALETTE;
+        const cropCX=W*.62, cropCY=H*.62;
+        const zoomScale=zoomSize/(Math.min(W,H)*.18);
+        octx.globalCompositeOperation='lighter';
+        exportParticles.forEach(p=>{
+          const zx=zoomX+zoomSize/2+(p.x-cropCX)*zoomScale;
+          const zy=zoomY+zoomSize/2+(p.y-cropCY)*zoomScale;
+          if(zx<zoomX-8||zx>zoomX+zoomSize+8||zy<zoomY-8||zy>zoomY+zoomSize+8)return;
+          const color=palette[p.s%palette.length];
+          octx.globalAlpha=.22; octx.fillStyle=color; octx.beginPath(); octx.arc(zx,zy,8,0,Math.PI*2); octx.fill();
+          octx.globalAlpha=.95; octx.beginPath(); octx.arc(zx,zy,2.5,0,Math.PI*2); octx.fill();
+        });
+      }
+      octx.restore();
+      octx.strokeStyle='rgba(239,230,210,.85)'; octx.strokeRect(zoomX,zoomY,zoomSize,zoomSize);
+      const markX=zoomX-zoomSize*.62, markY=zoomY-zoomSize*1.45;
+      octx.beginPath(); octx.arc(markX,markY,zoomSize*.10,0,Math.PI*2); octx.stroke();
+      octx.beginPath(); octx.moveTo(markX+zoomSize*.08,markY+zoomSize*.08); octx.lineTo(zoomX+zoomSize*.5,zoomY); octx.stroke();
+
+      // 頁尾使用獨立繪圖狀態，避免粒子疊加模式或透明度令文字消失。
+      octx.save();
+      octx.globalCompositeOperation='source-over'; octx.globalAlpha=1; octx.shadowBlur=0;
+      octx.fillStyle='#050506';
+      octx.fillRect(0,th-safe-footerH+2,tw,footerH+safe);
+      const footerCenterY=th-safe-footerH/2;
+      octx.fillStyle='#EFE6D2'; octx.textAlign='center'; octx.textBaseline='middle';
+      const footerTitleFont=Math.max(20,Math.round(tw*.021));
+      const footerMetaFont=Math.max(13,Math.round(tw*.0115));
+      octx.font=`italic 400 ${footerTitleFont}px Georgia,'Noto Serif TC',serif`;
+      const footerTitle='Taipei Popop · Dec. 11-12, 2026';
+      const footerGroupX=safe+octx.measureText(footerTitle).width/2;
+      octx.fillText(footerTitle,footerGroupX,footerCenterY-14);
+      octx.fillStyle='#A79C86';
+      octx.font=`400 ${footerMetaFont}px monospace`;
+      octx.fillText('AGENT · CONNECTIONS · CODE',footerGroupX,footerCenterY+17);
+      octx.fillStyle='#EFE6D2'; octx.textAlign='right';
+      octx.font=`italic 400 ${Math.max(44,Math.round(tw*.06))}px Georgia,serif`;
+      octx.fillText('WebConf',tw-safe,footerCenterY);
+      octx.restore();
+    }
+
+    const safeRatio = ratioKey.replace(':', 'x');
+    const filename = `webconf-${theme}-${safeRatio}.png`;
+
+    // 優先用 Blob 產生下載連結,相容性比純 data URL 更好
+    const blob = await new Promise(resolve => {
+      if(off.toBlob){
+        off.toBlob(b => resolve(b), 'image/png');
+      } else {
+        resolve(null);
+      }
+    });
+
+    let objectUrl = null;
+    let href;
+    if(blob){
+      objectUrl = URL.createObjectURL(blob);
+      href = objectUrl;
+    } else {
+      // 後備方案:瀏覽器不支援 toBlob 時改用 data URL
+      href = off.toDataURL('image/png');
+    }
+
+    const a = document.createElement('a');
+    const supportsDownload = 'download' in a;
+    a.href = href;
+    a.download = filename;
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+
+    if(supportsDownload){
+      a.click();
+    } else {
+      // 舊版瀏覽器不支援 download 屬性,改開新分頁讓使用者自行長按/右鍵儲存
+      window.open(href, '_blank', 'noopener');
+    }
+
+    setTimeout(() => {
+      document.body.removeChild(a);
+      if(objectUrl) URL.revokeObjectURL(objectUrl);
+    }, 1000);
+  }
+
+  exportBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const ratioKey = btn.dataset.ratio;
+      btn.classList.add('is-busy');
+      try{
+        await exportImage(ratioKey);
+        btn.classList.remove('is-busy');
+        btn.classList.add('is-done');
+        setTimeout(() => btn.classList.remove('is-done'), 1200);
+      }catch(err){
+        btn.classList.remove('is-busy');
+        console.error(err);
+        alert('圖片產生失敗,請再試一次。');
+      }
+    });
+  });
+
+  // 動畫迴圈已交給 particle-life 引擎自己的內部渲染迴圈負責,
+  // 這裡只需要維護標籤光暈疊加層(glowLoop,已在上方啟動)。
+})();
+</script>
+</body>
+</html>
