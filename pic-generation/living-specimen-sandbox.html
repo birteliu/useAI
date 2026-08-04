@@ -142,7 +142,7 @@
     color: var(--ink);
   }
   .sp-kicker{
-    font-size:clamp(16px,2vw,28px); letter-spacing:0.28em; text-transform:uppercase;
+    font-size:clamp(18px,2.2vw,32px); letter-spacing:0.28em; text-transform:uppercase;
     color: var(--glow);
   }
 
@@ -156,6 +156,7 @@
     border:1px solid rgba(239,230,210,0.42); border-radius:0;
     min-height:150px; margin-right:24%;
     padding:34px 28px 26px;
+    display:flex; flex-direction:column; justify-content:center;
   }
   #speakerNameOut{
     font-family:'Inria Serif','Noto Serif TC',serif;
@@ -168,7 +169,7 @@
     margin-top:8px;
     font-size: clamp(18px, 2vw, 28px);
     color: var(--ink-dim);
-    word-break: break-word;
+    white-space:normal; overflow-wrap:anywhere; word-break:break-word;
   }
   .sp-photo{
     position:absolute; top:0; right:0;
@@ -191,14 +192,14 @@
     padding:34px 38px;
     font-size: clamp(20px, 2.4vw, 34px);
     line-height:1.55;
-    word-break: break-word;
+    white-space:normal; overflow-wrap:anywhere; word-break:break-word;
   }
   .sp-tags-box{
     background: rgba(5,5,6,0.94);
     border:1px solid rgba(239,230,210,0.42); border-top:none;
     padding:20px 38px;
     font-size:clamp(14px,1.4vw,20px); letter-spacing:0.12em; color:var(--ink);
-    word-break: break-word;
+    white-space:normal; overflow-wrap:anywhere; word-break:break-word;
   }
 
   /* 小型觀察視窗(透出背景粒子場) */
@@ -423,8 +424,32 @@
   .export-btn:hover{ border-color:var(--glow); background: rgba(113,193,240,0.08); }
   .export-btn.is-busy{ opacity:0.55; pointer-events:none; }
   .export-btn.is-done{ border-color:var(--glow); color:var(--glow); }
-  body.is-speaker .export-btn[data-ratio="16:9"]{ display:none; }
-  body.is-speaker .export-row{ grid-template-columns:1fr 1fr; }
+
+  /* 編輯與下載比例固定並排於畫面下方 */
+  .quick-actions{
+    position:fixed; left:50%; bottom:26px; z-index:11;
+    transform:translateX(-50%); display:flex; align-items:stretch; gap:10px;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .quick-actions.is-hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(12px);}
+  .quick-actions .fab{position:static;left:auto;bottom:auto;transform:none;white-space:nowrap;}
+  .quick-actions .fab:hover{transform:translateY(-2px);}
+  .quick-actions .fab:active{transform:scale(.97);}
+  .quick-actions .mode-launch:not(.is-current){
+    background:rgba(8,10,14,.9);color:var(--ink);border:1px solid var(--line);box-shadow:none;
+  }
+  .quick-actions .mode-launch.is-current{box-shadow:0 6px 26px rgba(113,193,240,.28),0 0 0 1px rgba(255,255,255,.12) inset;}
+  .quick-actions .export-section{display:flex;align-items:stretch;}
+  .quick-actions .export-row{display:flex;gap:8px;}
+  .quick-actions .export-btn{
+    min-width:58px;padding:7px 10px;background:rgba(8,10,14,.9);
+    backdrop-filter:blur(12px);border-radius:14px;
+  }
+  @media (max-width:560px){
+    .quick-actions{bottom:18px;gap:6px;max-width:calc(100vw - 24px);}
+    .quick-actions .fab{padding:11px 14px;font-size:12px;}
+    .quick-actions .export-btn{min-width:48px;padding:6px;font-size:10px;}
+  }
 
   /* ── 下載預覽燈箱 ── */
   .preview-modal{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.86);backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease;}
@@ -508,7 +533,7 @@
 
     <div class="sp-footer">
       <div class="sp-footer-left">
-        <div class="sp-event">Taipei Popop · Dec. 11-12, 2026</div>
+        <div class="sp-event">瓶蓋工廠台北製造所 · Dec. 11-12, 2026</div>
         <div class="sp-footkicker">AGENT · CONNECTIONS · CODE</div>
       </div>
       <div class="sp-wordmark">WebConf</div>
@@ -516,18 +541,23 @@
   </div>
 </div>
 
-<button class="fab" id="fabToggle">✎ 編輯公告</button>
+<div class="quick-actions" id="quickActions">
+  <button class="fab mode-launch is-current" data-open-theme="general">一般公告</button>
+  <button class="fab mode-launch" data-open-theme="speaker">公告講者</button>
+  <div class="export-section" aria-label="預覽下載圖片比例">
+    <div class="export-row">
+      <button class="export-btn" data-ratio="9:16"><span class="ratio-icon" style="width:12px;height:22px;"></span>9:16</button>
+      <button class="export-btn" data-ratio="1:1"><span class="ratio-icon" style="width:16px;height:16px;"></span>1:1</button>
+      <button class="export-btn" data-ratio="3:4"><span class="ratio-icon" style="width:13px;height:17px;"></span>3:4</button>
+    </div>
+  </div>
+</div>
 <div class="backdrop" id="backdrop"></div>
 
 <div class="drawer" id="drawer">
   <div class="drawer-head">
     <h2>公告設定</h2>
     <button id="closeDrawer">×</button>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn is-active" data-theme="general">一般公告</button>
-    <button class="tab-btn" data-theme="speaker">公告講者</button>
   </div>
 
   <!-- 一般公告欄位 -->
@@ -586,17 +616,6 @@
 
   <button class="apply-btn" id="applyBtn">套用變更</button>
 
-  <div class="divider"></div>
-
-  <div class="export-section">
-    <span class="label">下載社群圖</span>
-    <div class="export-row">
-      <button class="export-btn" data-ratio="16:9"><span class="ratio-icon" style="width:22px;height:12px;"></span>16:9</button>
-      <button class="export-btn" data-ratio="1:1"><span class="ratio-icon" style="width:16px;height:16px;"></span>1:1</button>
-      <button class="export-btn" data-ratio="3:4"><span class="ratio-icon" style="width:13px;height:17px;"></span>3:4</button>
-    </div>
-  </div>
-
   <button id="resetBtn">還原目前主題的預設內容</button>
 </div>
 
@@ -630,12 +649,12 @@
   const speakerTopicOut = document.getElementById('speakerTopicOut');
   const speakerTagsOut = document.getElementById('speakerTagsOut');
 
-  const fabToggle = document.getElementById('fabToggle');
+  const themeLaunchBtns = document.querySelectorAll('.mode-launch');
+  const quickActions = document.getElementById('quickActions');
   const backdrop = document.getElementById('backdrop');
   const drawer = document.getElementById('drawer');
   const closeDrawer = document.getElementById('closeDrawer');
 
-  const tabBtns = document.querySelectorAll('.tab-btn');
   const generalFields = document.getElementById('generalFields');
   const speakerFields = document.getElementById('speakerFields');
 
@@ -655,14 +674,13 @@
   function openDrawer(){
     drawer.classList.add('is-open');
     backdrop.classList.add('is-open');
-    fabToggle.classList.add('is-hidden');
+    quickActions.classList.add('is-hidden');
   }
   function closeDrawerFn(){
     drawer.classList.remove('is-open');
     backdrop.classList.remove('is-open');
-    fabToggle.classList.remove('is-hidden');
+    quickActions.classList.remove('is-hidden');
   }
-  fabToggle.addEventListener('click', openDrawer);
   closeDrawer.addEventListener('click', closeDrawerFn);
   backdrop.addEventListener('click', closeDrawerFn);
 
@@ -670,13 +688,16 @@
   function setTheme(next){
     theme = next;
     document.body.classList.toggle('is-speaker', next === 'speaker');
-    tabBtns.forEach(b => b.classList.toggle('is-active', b.dataset.theme === next));
+    themeLaunchBtns.forEach(b => b.classList.toggle('is-current', b.dataset.openTheme === next));
     generalFields.classList.toggle('is-active', next === 'general');
     speakerFields.classList.toggle('is-active', next === 'speaker');
     stageGeneral.classList.toggle('is-active', next === 'general');
     stageSpeaker.classList.toggle('is-active', next === 'speaker');
   }
-  tabBtns.forEach(btn => btn.addEventListener('click', () => setTheme(btn.dataset.theme)));
+  themeLaunchBtns.forEach(btn => btn.addEventListener('click', () => {
+    setTheme(btn.dataset.openTheme);
+    openDrawer();
+  }));
 
   // ───────────────────── 頭像上傳 ─────────────────────
   avatarUploadBtn.addEventListener('click', () => avatarInput.click());
@@ -932,7 +953,7 @@
   const previewConfirm = document.getElementById('previewConfirm');
   let pendingDownload = null;
   const RATIO_MAP = {
-    '16:9': { w: 1600, h: 900  },
+    '9:16': { w: 900, h: 1600  },
     '1:1':  { w: 1200, h: 1200 },
     '3:4':  { w: 1200, h: 1600 }
   };
@@ -1129,7 +1150,7 @@
       octx.fillText('Speakers', safe, safe + headerH*.44);
       octx.textAlign = 'right';
       octx.fillStyle = '#71C1F0';
-      octx.font = `400 ${Math.round(Math.min(tw*.027, headerH*.30))}px 'Noto Serif TC',serif`;
+      octx.font = `400 ${Math.round(Math.min(tw*.03, headerH*.34))}px 'Noto Serif TC',serif`;
       octx.fillText('講 者 開 箱', tw-safe, safe + headerH*.45);
 
       const photoW = Math.min(tw*.22, (th-headerH-footerH-safe*2)*.28);
@@ -1138,7 +1159,18 @@
       const photoY = safe+headerH+Math.max(40, th*.055);
       const nameX = Math.max(safe, photoX-Math.min(tw*.46, 570));
       const nameW = photoX-nameX;
-      const nameH = photoH*.64;
+      const nameFs=Math.max(34,Math.round(tw*.05));
+      const roleFs=Math.max(18,Math.round(tw*.022));
+      octx.font=`400 ${roleFs}px 'Noto Serif TC',serif`;
+      const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60);
+      const roleLineH=roleFs*1.42;
+      const nameRoleGap=Math.max(16,nameFs*.3);
+      const roleBlockH=Math.max(roleFs,roleLines.length*roleLineH);
+      const nameGroupH=nameFs+nameRoleGap+roleBlockH;
+      const nameH=Math.max(photoH*.64,nameGroupH+48);
+      const nameGroupTop=photoY+(nameH-nameGroupH)/2;
+      const nameY=nameGroupTop+nameFs/2;
+      const roleStartY=nameGroupTop+nameFs+nameRoleGap+roleLineH/2;
       octx.fillStyle = 'rgba(5,5,6,.9)'; octx.fillRect(nameX,photoY,nameW,nameH);
       octx.strokeStyle = line; octx.strokeRect(nameX,photoY,nameW,nameH);
       if(avatarImage) drawImageCover(octx, avatarImage, photoX, photoY, photoW, photoH);
@@ -1146,28 +1178,33 @@
       octx.strokeRect(photoX,photoY,photoW,photoH);
 
       octx.textAlign='left'; octx.fillStyle='#EFE6D2';
-      const nameFs=Math.max(34,Math.round(tw*.05));
       octx.font=`italic 400 ${nameFs}px 'Inria Serif','Noto Serif TC',serif`;
-      octx.fillText(speakerNameOut.textContent,nameX+30,photoY+nameH*.40);
-      octx.font=`400 ${Math.max(18,Math.round(tw*.022))}px 'Noto Serif TC',serif`;
-      octx.fillText(speakerRoleOut.textContent,nameX+30,photoY+nameH*.75);
+      octx.fillText(speakerNameOut.textContent,nameX+30,nameY);
+      octx.font=`400 ${roleFs}px 'Noto Serif TC',serif`;
+      roleLines.forEach((text,i)=>octx.fillText(text,nameX+30,roleStartY+i*roleLineH));
 
       const contentBottom=th-safe-footerH-40;
       const quoteW=Math.min(tw*.46,650), quoteX=safe;
       const topicFs=Math.max(22,Math.round(tw*.026));
       octx.font=`400 ${topicFs}px 'Noto Serif TC',serif`;
-      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64).slice(0,4);
+      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64);
       const quoteH=Math.max(150,topicLines.length*topicFs*1.55+58);
-      const tagsH=Math.max(52,th*.045);
+      const tagFs=Math.max(18,Math.round(tw*.017));
+      octx.font=`400 ${tagFs}px 'Noto Serif TC',serif`;
+      const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64);
+      const tagLineH=tagFs*1.45;
+      const tagsH=Math.max(52,tagLines.length*tagLineH+28);
       // 講題＋標籤整組固定靠齊內容區左下，不再跟著頭像高度浮動。
       const quoteY=contentBottom-tagsH-quoteH;
       octx.fillStyle='#EFE6D2'; octx.fillRect(quoteX,quoteY,quoteW,quoteH);
       octx.fillStyle='#141008';
+      octx.font=`400 ${topicFs}px 'Noto Serif TC',serif`;
       topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32,quoteY+38+topicFs*.78+i*topicFs*1.55));
       octx.fillStyle='rgba(5,5,6,.92)'; octx.fillRect(quoteX,quoteY+quoteH,quoteW,tagsH);
       octx.strokeStyle=line; octx.strokeRect(quoteX,quoteY+quoteH,quoteW,tagsH);
-      octx.fillStyle='#EFE6D2'; octx.font=`400 ${Math.max(18,Math.round(tw*.017))}px 'Noto Serif TC',serif`;
-      octx.fillText(speakerTagsOut.textContent,quoteX+32,quoteY+quoteH+tagsH/2);
+      octx.fillStyle='#EFE6D2'; octx.font=`400 ${tagFs}px 'Noto Serif TC',serif`;
+      const tagStartY=quoteY+quoteH+(tagsH-(tagLines.length-1)*tagLineH)/2;
+      tagLines.forEach((text,i)=>octx.fillText(text,quoteX+32,tagStartY+i*tagLineH));
 
       // 顯微鏡觀察指示：分別從講者卡與講題卡連到粒子標記點。
       octx.save();
@@ -1231,14 +1268,12 @@
       // 頁尾使用獨立繪圖狀態，避免粒子疊加模式或透明度令文字消失。
       octx.save();
       octx.globalCompositeOperation='source-over'; octx.globalAlpha=1; octx.shadowBlur=0;
-      octx.fillStyle='#050506';
-      octx.fillRect(0,th-safe-footerH+2,tw,footerH+safe);
       const footerCenterY=th-safe-footerH/2;
       octx.fillStyle='#EFE6D2'; octx.textAlign='center'; octx.textBaseline='middle';
       const footerTitleFont=Math.max(20,Math.round(tw*.021));
       const footerMetaFont=Math.max(13,Math.round(tw*.0115));
       octx.font=`italic 400 ${footerTitleFont}px Georgia,'Noto Serif TC',serif`;
-      const footerTitle='Taipei Popop · Dec. 11-12, 2026';
+      const footerTitle='瓶蓋工廠台北製造所 · Dec. 11-12, 2026';
       const footerGroupX=safe+octx.measureText(footerTitle).width/2;
       octx.fillText(footerTitle,footerGroupX,footerCenterY-14);
       octx.fillStyle='#A79C86';
