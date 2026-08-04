@@ -80,6 +80,25 @@
     }
   }
 
+  // Edge-weighted field for announcement layouts: particles occupy the outer
+  // frame while a large elliptical quiet zone remains available for copy.
+  function edgeCloud(write, N, T, W, H) {
+    const cx = W * 0.5, cy = H * 0.5;
+    let t = 0;
+    for (let i = 0; i < N; i++) {
+      let x, y, d;
+      do {
+        x = rnd() * W;
+        y = rnd() * H;
+        const nx = (x - cx) / (W * 0.5);
+        const ny = (y - cy) / (H * 0.5);
+        d = Math.sqrt(nx * nx + ny * ny);
+      } while (d < 0.58);
+      write(i, x, y, 0, 0, t);
+      if (++t === T) t = 0;
+    }
+  }
+
   // Disk where colour is determined by angular sector, sweeping a rotated
   // pie chart so each species occupies a contiguous wedge.
   function rainbowDisk(write, N, T, W, H) {
@@ -112,14 +131,18 @@
     const m = Math.min(W, H);
     const cx = W * 0.5, cy = H * 0.5;
     const R = 0.46 * m;
-    const thick = R * 0.2;
+    const thick = R * 0.34;
     const ROT = rnd() * TAU;
     const dth = TAU / Math.max(1, N);
     const c = Math.cos(dth), s = Math.sin(dth);
     let ux = Math.cos(ROT), uy = Math.sin(ROT);
     let t = 0;
     for (let i = 0; i < N; i++) {
-      const rr = R - rnd() * thick;
+      // Average several samples so density peaks naturally around the middle
+      // of the band and fades toward both radial edges instead of forming a
+      // visibly hard inner/outer circle.
+      const radialMix = (rnd() + rnd() + rnd()) / 3;
+      const rr = R - radialMix * thick;
       write(i, cx + rr * ux, cy + rr * uy, 0, 0, t);
       const nx = ux * c - uy * s;
       uy = ux * s + uy * c;
@@ -732,7 +755,7 @@
   // ============================================================
   const PATTERNS = {
     random,
-    disk, centeredCloud, rainbowDisk,
+    disk, centeredCloud, edgeCloud, rainbowDisk,
     ring, rainbowRing,
     rings, rainbowRings,
     spiral, rainbowSpiral, twinSpirals, spiralArms,

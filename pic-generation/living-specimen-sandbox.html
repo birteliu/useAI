@@ -106,16 +106,22 @@
     font-optical-sizing:auto;
     font-weight:400; font-style:italic;
     font-size: clamp(30px, 5.6vw, 68px);
-    line-height:1.08; letter-spacing:-0.01em;
+    line-height:1.22; letter-spacing:-0.01em;
     color: var(--ink);
     text-shadow: 0 0 24px rgba(113,193,240,0.35), 0 0 60px rgba(113,193,240,0.12);
     transition: text-shadow 0.4s ease;
     word-break: break-word;
   }
+  #titleOut .zh-title{
+    font-family:'Noto Serif TC',serif;
+    font-style:normal;
+    font-weight:700;
+  }
   #subtitleOut{
-    font-size: clamp(12px, 1.6vw, 16px);
-    letter-spacing:0.24em; text-transform:uppercase;
+    font-size: clamp(19px, 2.4vw, 28px);
+    letter-spacing:2px; text-transform:uppercase;
     color: var(--glow-dim);
+    font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     word-break: break-word;
   }
 
@@ -143,7 +149,7 @@
   }
   .sp-kicker{
     font-size:clamp(18px,2.2vw,32px); letter-spacing:0.28em; text-transform:uppercase;
-    color: var(--glow);
+    color: var(--glow); font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
   }
 
   .sp-canvas-area{ position:relative; flex:1; min-height:0; overflow:visible; }
@@ -160,7 +166,7 @@
   }
   #speakerNameOut{
     font-family:'Inria Serif','Noto Serif TC',serif;
-    font-style:italic; font-weight:400;
+    font-style:normal; font-weight:700;
     font-size: clamp(42px, 5vw, 70px);
     color: var(--ink); line-height:1.1;
     word-break: break-word;
@@ -168,7 +174,7 @@
   #speakerRoleOut{
     margin-top:8px;
     font-size: clamp(18px, 2vw, 28px);
-    color: var(--ink-dim);
+    color: var(--ink-dim); font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     white-space:normal; overflow-wrap:anywhere; word-break:break-word;
   }
   .sp-photo{
@@ -190,7 +196,7 @@
     background: var(--ink);
     color:#141008;
     padding:34px 38px;
-    font-size: clamp(20px, 2.4vw, 34px);
+    font-size: clamp(20px, 2.4vw, 34px); font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     line-height:1.55;
     white-space:normal; overflow-wrap:anywhere; word-break:break-word;
   }
@@ -199,6 +205,7 @@
     border:1px solid rgba(239,230,210,0.42); border-top:none;
     padding:20px 38px;
     font-size:clamp(14px,1.4vw,20px); letter-spacing:0.12em; color:var(--ink);
+    font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     white-space:normal; overflow-wrap:anywhere; word-break:break-word;
   }
 
@@ -237,7 +244,7 @@
   }
   .sp-footer-left{ display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; }
   .sp-event{
-    font-family:'Inria Serif','Noto Serif TC',serif; font-style:italic;
+    font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     font-size: clamp(13px, 1.3vw, 17px); color: var(--ink);
   }
   .sp-footkicker{
@@ -347,13 +354,14 @@
   .field span{
     font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim);
   }
-  .field input[type="text"]{
+  .field input[type="text"], .field textarea{
     width:100%; background: rgba(255,255,255,0.03); border:1px solid var(--line);
     border-radius:10px; padding:11px 13px; color:var(--ink); font-family:inherit;
     font-size:14px; outline:none; transition:border-color 0.15s ease;
   }
-  .field input[type="text"]:focus{ border-color:var(--glow); }
-  .field input::placeholder{ color: rgba(239,230,210,0.3); }
+  .field textarea{ min-height:88px; resize:vertical; line-height:1.55; }
+  .field input[type="text"]:focus, .field textarea:focus{ border-color:var(--glow); }
+  .field input::placeholder, .field textarea::placeholder{ color: rgba(239,230,210,0.3); }
 
   .avatar-field{ flex-direction:row; align-items:center; gap:14px; }
 
@@ -439,6 +447,7 @@
     background:rgba(8,10,14,.9);color:var(--ink);border:1px solid var(--line);box-shadow:none;
   }
   .quick-actions .mode-launch.is-current{box-shadow:0 6px 26px rgba(113,193,240,.28),0 0 0 1px rgba(255,255,255,.12) inset;}
+  .quick-actions .particle-refresh{background:rgba(8,10,14,.9);color:var(--ink);border:1px solid var(--line);box-shadow:none;}
   .quick-actions .export-section{display:flex;align-items:stretch;}
   .quick-actions .export-row{display:flex;gap:8px;}
   .quick-actions .export-btn{
@@ -446,7 +455,7 @@
     backdrop-filter:blur(12px);border-radius:14px;
   }
   @media (max-width:560px){
-    .quick-actions{bottom:18px;gap:6px;max-width:calc(100vw - 24px);}
+    .quick-actions{bottom:18px;gap:6px;width:calc(100vw - 24px);flex-wrap:wrap;justify-content:center;}
     .quick-actions .fab{padding:11px 14px;font-size:12px;}
     .quick-actions .export-btn{min-width:48px;padding:6px;font-size:10px;}
   }
@@ -544,6 +553,7 @@
 <div class="quick-actions" id="quickActions">
   <button class="fab mode-launch is-current" data-open-theme="general">一般公告</button>
   <button class="fab mode-launch" data-open-theme="speaker">公告講者</button>
+  <button class="fab particle-refresh" id="refreshParticles">↻ 重整粒子</button>
   <div class="export-section" aria-label="預覽下載圖片比例">
     <div class="export-row">
       <button class="export-btn" data-ratio="9:16"><span class="ratio-icon" style="width:12px;height:22px;"></span>9:16</button>
@@ -564,7 +574,7 @@
   <div class="field-group is-active" id="generalFields">
     <label class="field">
       <span>主標題</span>
-      <input type="text" id="titleInput" placeholder="輸入主標題…" maxlength="40">
+      <textarea id="titleInput" placeholder="輸入主標題，可按 Enter 自行換行…" maxlength="80" rows="3"></textarea>
     </label>
     <label class="field">
       <span>副標題</span>
@@ -632,6 +642,15 @@
   // ───────────────────── 狀態 ─────────────────────
   let theme = 'general'; // 'general' | 'speaker'
   let avatarImage = null; // HTMLImageElement,供匯出圖片使用
+  const SPEAKER_SEED_PATTERNS = [
+    'auto', 'centeredCloud', 'twinSpirals', 'rainbowSpiral',
+    'softClusters', 'linkedClusters', 'chromaticFlower', 'orbitalBelts',
+    'spiralArms', 'yinYang'
+  ];
+
+  function pickSpeakerSeed(){
+    return SPEAKER_SEED_PATTERNS[(Math.random()*SPEAKER_SEED_PATTERNS.length)|0];
+  }
 
   const DEFAULTS = {
     general: { title: 'Living Specimen<br>— Sandbox', subtitle: '取素材實驗場 · SANDBOX MODE' },
@@ -650,6 +669,7 @@
   const speakerTagsOut = document.getElementById('speakerTagsOut');
 
   const themeLaunchBtns = document.querySelectorAll('.mode-launch');
+  const refreshParticles = document.getElementById('refreshParticles');
   const quickActions = document.getElementById('quickActions');
   const backdrop = document.getElementById('backdrop');
   const drawer = document.getElementById('drawer');
@@ -686,6 +706,7 @@
 
   // ───────────────────── 主題切換 ─────────────────────
   function setTheme(next){
+    const themeChanged = theme !== next;
     theme = next;
     document.body.classList.toggle('is-speaker', next === 'speaker');
     themeLaunchBtns.forEach(b => b.classList.toggle('is-current', b.dataset.openTheme === next));
@@ -693,11 +714,24 @@
     speakerFields.classList.toggle('is-active', next === 'speaker');
     stageGeneral.classList.toggle('is-active', next === 'general');
     stageSpeaker.classList.toggle('is-active', next === 'speaker');
+    if(themeChanged && engine?.respawn){
+      const seed = next === 'general' ? 'ring' : pickSpeakerSeed();
+      window.activeSpeakerSeed = next === 'speaker' ? seed : null;
+      engine.respawn(seed);
+      holdSeedComposition();
+    }
   }
   themeLaunchBtns.forEach(btn => btn.addEventListener('click', () => {
     setTheme(btn.dataset.openTheme);
     openDrawer();
   }));
+  refreshParticles.addEventListener('click', () => {
+    if(!engine?.respawn) return;
+    const seed = theme === 'general' ? 'ring' : pickSpeakerSeed();
+    window.activeSpeakerSeed = theme === 'speaker' ? seed : null;
+    engine.respawn(seed);
+    holdSeedComposition();
+  });
 
   // ───────────────────── 頭像上傳 ─────────────────────
   avatarUploadBtn.addEventListener('click', () => avatarInput.click());
@@ -726,11 +760,35 @@
     setTimeout(() => { el.style.textShadow = '0 0 24px rgba(113,193,240,0.35), 0 0 60px rgba(113,193,240,0.12)'; }, 400);
   }
 
+  function setStyledTitle(text){
+    titleOut.innerHTML = '';
+    const isChinese = ch => /[\u3400-\u9FFF\uF900-\uFAFF，。！？、；：「」『』（）《》〈〉]/.test(ch);
+    text.split('\n').forEach((line, lineIndex, lines) => {
+      let buffer = '', bufferIsChinese = null;
+      const flush = () => {
+        if(!buffer) return;
+        const span = document.createElement('span');
+        if(bufferIsChinese) span.className = 'zh-title';
+        span.textContent = buffer;
+        titleOut.appendChild(span);
+        buffer = '';
+      };
+      for(const ch of line){
+        const currentIsChinese = isChinese(ch);
+        if(bufferIsChinese !== null && currentIsChinese !== bufferIsChinese) flush();
+        bufferIsChinese = currentIsChinese;
+        buffer += ch;
+      }
+      flush();
+      if(lineIndex < lines.length - 1) titleOut.appendChild(document.createElement('br'));
+    });
+  }
+
   applyBtn.addEventListener('click', () => {
     if(theme === 'general'){
       const t = titleInput.value.trim();
       const s = subtitleInput.value.trim();
-      if(t) titleOut.innerHTML = t.replace(/\n/g,'<br>');
+      if(t) setStyledTitle(t);
       if(s) subtitleOut.textContent = s;
       flashGlow(titleOut);
     } else {
@@ -792,7 +850,20 @@
     { key: 'uxdesign', x: 0.50, y: 0.50, r: 0.46, color: '#EFE6D2', preset: 'symbiosis', label: '設計實務' },
   ];
   const TAG_BY_KEY = Object.fromEntries(TAGS.map(t => [t.key, t]));
-  const BASE_PALETTE = ['#71C1F0', '#3E7DA8', '#EFE6D2', '#A9D8F5'];
+  // 色票同步自 WebConf 2026 Sandbox；每次重新整理隨機選一組。
+  const PARTICLE_PALETTES = [
+    { name:'Cobalt', colors:['#7CC8F2','#3E8FE0','#1B3FA8','#97DFF5','#1453D6','#E8E8E8','#0F1530'] },
+    { name:'Amber', colors:['#7CC8F2','#E8B547','#C66A1F','#F4DCA0','#FFC97E','#5A8FBF','#0F1530'] },
+    { name:'Parchment', colors:['#7C2A1A','#1F3A2D','#3B5070','#A6712F','#4A7F7C','#C09B5C','#1A1410'] },
+    { name:'Specimen Mix', colors:['#7CC8F2','#E8B547','#7C2A1A','#A6BFB0','#ECE6D6','#5A6F87','#C89A6B'] },
+    { name:'Bioluminescence', colors:['#2BFFE0','#38B0FF','#E6FCFF','#B8FF8E','#FF9EFA','#FFCD5C','#0E1A2A'] },
+    { name:'Coral Reef', colors:['#FF6B7C','#F0B27A','#66D5B5','#4FA8C5','#FFE8D6','#B85C4C','#1A2B3D'] },
+    { name:'Fluoro Stain', colors:['#4F7AFA','#3AE85E','#FF3A5E','#3AE8DE','#F0E03A','#B83AE8','#FFFFFF'] },
+    { name:'Slime / Lichen', colors:['#C9A227','#6B5B2E','#8B7A4F','#4F6B3D','#C26A22','#E6D8AE','#2A2418'] },
+  ];
+  const ACTIVE_PARTICLE_PALETTE = PARTICLE_PALETTES[(Math.random()*PARTICLE_PALETTES.length)|0];
+  const BASE_PALETTE = ACTIVE_PARTICLE_PALETTE.colors.slice();
+  window.activeParticlePalette = { name:ACTIVE_PARTICLE_PALETTE.name, colors:BASE_PALETTE.slice() };
 
   const selectedTags = new Map();   // key -> color(hex),用於背景光暈疊加
   const tagOrder = [];              // 記錄勾選順序,決定目前生效的 preset
@@ -871,20 +942,52 @@
   const canvas = document.getElementById('field');
   const HAS_GPU = !!(window.ParticleLifeGPU && window.ParticleLifeGPU.isSupported && window.ParticleLifeGPU.isSupported());
   let engine = null;
+  let seedHoldTimer = 0;
+  let seedRampTimer = 0;
+  let seedRevealActive = false;
+
+  function holdSeedComposition(){
+    if(!engine) return;
+    clearTimeout(seedHoldTimer);
+    clearInterval(seedRampTimer);
+    seedRevealActive = true;
+    engine.pause(true);
+    engine.setSimSpeed?.(0.05);
+    // 先完整展示 Seed 構圖，再以慢速漸進恢復生命運動。
+    seedHoldTimer = setTimeout(() => {
+      engine?.pause(false);
+      const startedAt = performance.now();
+      const rampDuration = 9000;
+      seedRampTimer = setInterval(() => {
+        if(!engine){ clearInterval(seedRampTimer); return; }
+        const progress = Math.min(1,(performance.now()-startedAt)/rampDuration);
+        engine.setSimSpeed?.(0.05+(0.2-0.05)*progress);
+        if(progress >= 1){
+          clearInterval(seedRampTimer);
+          seedRevealActive = false;
+        }
+      },250);
+    },3500);
+  }
 
   const ENGINE_OPTS = {
-    species: 5,
-    count: HAS_GPU ? 8000 : 1600,
+    species: 6,
+    count: HAS_GPU ? 100000 : 6000,
     preset: 'cellular',
-    seedPattern: 'centeredCloud',
+    seedPattern: 'ring',
     palette: BASE_PALETTE,
     bgFade: 'rgba(5,5,6,0.16)',
-    pointSize: 1.1,
-    glow: 0.02,
+    pointSize: 0.9,
+    particleOpacity: 0.6,
+    glowSize: 3.2,
+    glowIntensity: 0.016,
+    glowSteepness: 6.5,
+    showGlow: false,
     forceFactor: 1.2,
     friction: HAS_GPU ? 0.31 : 0.92,
     rMax: 55,
-    simSpeed: 0.35,
+    simSpeed: 0.2,
+    cameraZoom: 1.4,
     mouseRepel: 2.2,
     showFps: false,
     gpuCompute: false,
@@ -900,11 +1003,12 @@
     window.livingSpecimenEngine = engine; // 方便在 console 手動調參
     engine.setMouseRadius?.(260);
     applyTagsToEngine(); // 若使用者在引擎就緒前已經勾選標籤,啟動後立刻補套用
+    holdSeedComposition();
 
     // 輕量「呼吸感」擾動:每隔幾秒在畫面隨機位置輕輕擾動一下粒子場,
     // 讓畫面在沒有人操作時也不會完全靜止(仿照原網站 Hero 的 metabolism 效果)。
     setInterval(() => {
-      if(!engine) return;
+      if(!engine || seedRevealActive) return;
       const { W, H } = engine.size;
       engine.disturb(W * (0.35 + Math.random()*0.3), H * (0.30 + Math.random()*0.4), 90 + Math.random()*80, 3 + Math.random()*3);
     }, 2600);
@@ -1079,14 +1183,16 @@
         const y = p.y*scale + offY;
         if(x < -30 || x > tw+30 || y < -30 || y > th+30) return;
         const color = palette[p.s % palette.length];
-        // 柔光外圈
-        octx.globalAlpha = 0.14;
-        octx.fillStyle = color;
-        octx.beginPath();
-        octx.arc(x, y, pSize * 4.2, 0, Math.PI*2);
-        octx.fill();
+        // 依畫面引擎設定決定是否繪製光暈；高密度模式僅保留細小核心。
+        if(engine.config.showGlow !== false){
+          octx.globalAlpha = 0.14;
+          octx.fillStyle = color;
+          octx.beginPath();
+          octx.arc(x, y, pSize * 4.2, 0, Math.PI*2);
+          octx.fill();
+        }
         // 清晰粒子核心
-        octx.globalAlpha = 0.9;
+        octx.globalAlpha = engine.config.particleOpacity ?? 0.9;
         octx.fillStyle = color;
         octx.beginPath();
         octx.arc(x, y, pSize, 0, Math.PI*2);
@@ -1116,21 +1222,46 @@
         const tmp = document.createElement('div'); tmp.innerHTML = s; return tmp.textContent;
       });
       const fontSize = Math.round(tw * 0.072);
-      octx.font = `italic 400 ${fontSize}px 'Inria Serif', 'Noto Serif TC', serif`;
-      const lineHeight = fontSize * 1.12;
+      const lineHeight = fontSize * 1.25;
       const totalH = lineHeight * lines.length;
       const startY = th/2 - totalH/2 + lineHeight/2;
       lines.forEach((line, i) => {
         const y = startY + i*lineHeight;
+        const runs = [];
+        for(const ch of line){
+          const zh = /[\u3400-\u9FFF\uF900-\uFAFF，。！？、；：「」『』（）《》〈〉]/.test(ch);
+          const last = runs[runs.length-1];
+          if(last && last.zh === zh) last.text += ch;
+          else runs.push({ text:ch, zh });
+        }
+        let totalWidth = 0;
+        runs.forEach(run => {
+          octx.font = run.zh
+            ? `normal 700 ${fontSize}px 'Noto Serif TC', serif`
+            : `italic 400 ${fontSize}px 'Inria Serif', serif`;
+          run.width = octx.measureText(run.text).width;
+          totalWidth += run.width;
+        });
         octx.shadowColor = 'rgba(113,193,240,0.55)';
         octx.shadowBlur = fontSize*0.5;
         octx.fillStyle = '#EFE6D2';
-        octx.fillText(line, tw/2, y);
+        octx.textAlign = 'left';
+        let x = tw/2-totalWidth/2;
+        runs.forEach(run => {
+          octx.font = run.zh
+            ? `normal 700 ${fontSize}px 'Noto Serif TC', serif`
+            : `italic 400 ${fontSize}px 'Inria Serif', serif`;
+          octx.fillText(run.text,x,y);
+          x += run.width;
+        });
         octx.shadowBlur = 0;
       });
-      octx.font = `400 ${Math.round(tw*0.02)}px 'Inria Serif', 'Noto Serif TC', serif`;
+      octx.textAlign = 'center';
+      octx.font = `normal 700 ${Math.round(tw*0.032)}px 'Noto Serif TC', serif`;
+      if('letterSpacing' in octx) octx.letterSpacing = '2px';
       octx.fillStyle = '#3E7DA8';
-      octx.fillText(subtitleOut.textContent, tw/2, startY + lines.length*lineHeight + fontSize*0.42);
+      octx.fillText(subtitleOut.textContent, tw/2, startY + lines.length*lineHeight + fontSize*0.55);
+      if('letterSpacing' in octx) octx.letterSpacing = '0px';
     } else {
       // 講者匯出：使用和畫面一致的海報式構圖，所有主要物件距邊緣 40px。
       const safe = 40;
@@ -1150,7 +1281,7 @@
       octx.fillText('Speakers', safe, safe + headerH*.44);
       octx.textAlign = 'right';
       octx.fillStyle = '#71C1F0';
-      octx.font = `400 ${Math.round(Math.min(tw*.03, headerH*.34))}px 'Noto Serif TC',serif`;
+      octx.font = `normal 700 ${Math.round(Math.min(tw*.03, headerH*.34))}px 'Noto Serif TC',serif`;
       octx.fillText('講 者 開 箱', tw-safe, safe + headerH*.45);
 
       const photoW = Math.min(tw*.22, (th-headerH-footerH-safe*2)*.28);
@@ -1161,7 +1292,7 @@
       const nameW = photoX-nameX;
       const nameFs=Math.max(34,Math.round(tw*.05));
       const roleFs=Math.max(18,Math.round(tw*.022));
-      octx.font=`400 ${roleFs}px 'Noto Serif TC',serif`;
+      octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
       const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60);
       const roleLineH=roleFs*1.42;
       const nameRoleGap=Math.max(16,nameFs*.3);
@@ -1178,19 +1309,19 @@
       octx.strokeRect(photoX,photoY,photoW,photoH);
 
       octx.textAlign='left'; octx.fillStyle='#EFE6D2';
-      octx.font=`italic 400 ${nameFs}px 'Inria Serif','Noto Serif TC',serif`;
+      octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
       octx.fillText(speakerNameOut.textContent,nameX+30,nameY);
-      octx.font=`400 ${roleFs}px 'Noto Serif TC',serif`;
+      octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
       roleLines.forEach((text,i)=>octx.fillText(text,nameX+30,roleStartY+i*roleLineH));
 
       const contentBottom=th-safe-footerH-40;
       const quoteW=Math.min(tw*.46,650), quoteX=safe;
       const topicFs=Math.max(22,Math.round(tw*.026));
-      octx.font=`400 ${topicFs}px 'Noto Serif TC',serif`;
+      octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
       const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64);
       const quoteH=Math.max(150,topicLines.length*topicFs*1.55+58);
       const tagFs=Math.max(18,Math.round(tw*.017));
-      octx.font=`400 ${tagFs}px 'Noto Serif TC',serif`;
+      octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
       const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64);
       const tagLineH=tagFs*1.45;
       const tagsH=Math.max(52,tagLines.length*tagLineH+28);
@@ -1198,11 +1329,11 @@
       const quoteY=contentBottom-tagsH-quoteH;
       octx.fillStyle='#EFE6D2'; octx.fillRect(quoteX,quoteY,quoteW,quoteH);
       octx.fillStyle='#141008';
-      octx.font=`400 ${topicFs}px 'Noto Serif TC',serif`;
+      octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
       topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32,quoteY+38+topicFs*.78+i*topicFs*1.55));
       octx.fillStyle='rgba(5,5,6,.92)'; octx.fillRect(quoteX,quoteY+quoteH,quoteW,tagsH);
       octx.strokeStyle=line; octx.strokeRect(quoteX,quoteY+quoteH,quoteW,tagsH);
-      octx.fillStyle='#EFE6D2'; octx.font=`400 ${tagFs}px 'Noto Serif TC',serif`;
+      octx.fillStyle='#EFE6D2'; octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
       const tagStartY=quoteY+quoteH+(tagsH-(tagLines.length-1)*tagLineH)/2;
       tagLines.forEach((text,i)=>octx.fillText(text,quoteX+32,tagStartY+i*tagLineH));
 
@@ -1272,7 +1403,7 @@
       octx.fillStyle='#EFE6D2'; octx.textAlign='center'; octx.textBaseline='middle';
       const footerTitleFont=Math.max(20,Math.round(tw*.021));
       const footerMetaFont=Math.max(13,Math.round(tw*.0115));
-      octx.font=`italic 400 ${footerTitleFont}px Georgia,'Noto Serif TC',serif`;
+      octx.font=`normal 700 ${footerTitleFont}px 'Noto Serif TC',serif`;
       const footerTitle='瓶蓋工廠台北製造所 · Dec. 11-12, 2026';
       const footerGroupX=safe+octx.measureText(footerTitle).width/2;
       octx.fillText(footerTitle,footerGroupX,footerCenterY-14);

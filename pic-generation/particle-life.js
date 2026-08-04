@@ -271,6 +271,13 @@
     }
 
     function setBgFade(v) { config.bgFade = v; }
+    function setSeedPattern(name) {
+      if (name === 'auto' || window.PLSeeds?.PATTERNS[name]) config.seedPattern = name;
+    }
+    function respawn(patternOverride) {
+      if (patternOverride) setSeedPattern(patternOverride);
+      seedParticles(config.count);
+    }
     function setCount(n) {
       // canvas2D path: now feasible up to ~25-40k with the sprite cache.
       // GPU path (webgl/webgpu) goes higher; ceiling kept generous either way.
@@ -983,6 +990,7 @@
         if (gpu) gpu.destroy();
       },
       setPalette, setPreset, setSpecies, setBgFade, setCount,
+      setSeedPattern, respawn,
       setPointSize, setGlow, setForce, setRMax,
       disturb,
       pause(v) { config.paused = !!v; },
