@@ -34,6 +34,14 @@
   }
   canvas{position:fixed; inset:0; width:100vw; height:100vh; display:block; cursor:crosshair; z-index:1;}
   #tagGlow{ pointer-events:none; z-index:2; cursor:default; }
+  /* 講者版上下保留呼吸空間：柔和壓低進入標題與頁尾區的粒子。 */
+  body.is-speaker::before{
+    content:''; position:fixed; inset:0; z-index:3; pointer-events:none;
+    background:linear-gradient(to bottom,
+      rgba(5,5,6,.94) 0%, rgba(5,5,6,.72) 11%, rgba(5,5,6,.18) 22%,
+      transparent 31%, transparent 69%,
+      rgba(5,5,6,.18) 78%, rgba(5,5,6,.72) 89%, rgba(5,5,6,.94) 100%);
+  }
 
   /* ── 邊框裝飾:讓畫面有「圖卡發文」的裝裱感 ── */
   .frame{
@@ -325,13 +333,13 @@
   }
   .drawer-head h2{
     font-family:'Inria Serif', 'Noto Serif TC', serif;
-    font-size:12px; letter-spacing:0.2em; text-transform:uppercase;
+    font-size:15px; letter-spacing:0.16em; text-transform:uppercase;
     color: var(--ink-dim); font-weight:600;
   }
   #closeDrawer{
     background:none; border:1px solid var(--line); color:var(--ink-dim);
     width:28px; height:28px; border-radius:50%; cursor:pointer;
-    font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center;
+    font-size:18px; line-height:1; display:flex; align-items:center; justify-content:center;
   }
   #closeDrawer:hover{ color:var(--glow); border-color:var(--glow); }
 
@@ -355,12 +363,12 @@
 
   .field{ display:flex; flex-direction:column; gap:6px; width:100%; }
   .field span{
-    font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim);
+    font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim);
   }
   .field input[type="text"], .field textarea{
     width:100%; background: rgba(255,255,255,0.03); border:1px solid var(--line);
     border-radius:10px; padding:11px 13px; color:var(--ink); font-family:inherit;
-    font-size:14px; outline:none; transition:border-color 0.15s ease;
+    font-size:17px; outline:none; transition:border-color 0.15s ease;
   }
   .field textarea{ min-height:88px; resize:vertical; line-height:1.55; }
   .field input[type="text"]:focus, .field textarea:focus{ border-color:var(--glow); }
@@ -374,7 +382,7 @@
   }
   .tag-chip{
     display:flex; align-items:center; gap:9px; cursor:pointer;
-    font-size:13px; color:var(--ink-dim); user-select:none;
+    font-size:15px; color:var(--ink-dim); user-select:none;
     transition: color 0.15s ease;
   }
   .tag-chip input{ position:absolute; opacity:0; width:0; height:0; }
@@ -404,13 +412,13 @@
   .avatar-upload img{ width:100%; height:100%; object-fit:cover; }
   .avatar-upload span{ font-size:20px; color:var(--ink-dim); }
   .avatar-meta{ display:flex; flex-direction:column; gap:2px; }
-  .avatar-meta b{ font-size:12px; color:var(--ink); font-weight:600; }
-  .avatar-meta small{ font-size:10px; color:var(--ink-dim); letter-spacing:0.04em; }
+  .avatar-meta b{ font-size:15px; color:var(--ink); font-weight:600; }
+  .avatar-meta small{ font-size:13px; color:var(--ink-dim); letter-spacing:0.04em; }
 
   .apply-btn{
     margin-top:18px; width:100%;
     border:none; cursor:pointer; background:var(--glow); color:#0A2233;
-    font-family:inherit; font-weight:700; font-size:13px; letter-spacing:0.06em;
+    font-family:inherit; font-weight:700; font-size:15px; letter-spacing:0.06em;
     text-transform:uppercase; padding:12px; border-radius:11px;
     transition: background 0.15s ease, transform 0.15s ease;
   }
@@ -479,7 +487,7 @@
 
   #resetBtn{
     margin-top:16px; width:100%; background:none; border:none; cursor:pointer;
-    color:var(--ink-dim); font-family:inherit; font-size:11px; letter-spacing:0.06em;
+    color:var(--ink-dim); font-family:inherit; font-size:13px; letter-spacing:0.06em;
     text-decoration:underline; text-underline-offset:3px; padding:4px;
   }
   #resetBtn:hover{ color:var(--glow); }
@@ -646,6 +654,7 @@
   // ───────────────────── 狀態 ─────────────────────
   let theme = 'general'; // 'general' | 'speaker'
   let avatarImage = null; // HTMLImageElement,供匯出圖片使用
+  const particlePauseReasons = new Set();
   const SPEAKER_SEED_PATTERNS = [
     'auto', 'centeredCloud', 'twinSpirals', 'rainbowSpiral',
     'softClusters', 'linkedClusters', 'chromaticFlower', 'orbitalBelts',
@@ -671,7 +680,8 @@
       const focusedRadius=Math.pow(Math.min(radius,1),1.18)*.78;
       const scale=focusedRadius/radius;
       pX[i]=cx+nx*scale*rx;
-      pY[i]=cy+ny*scale*ry;
+      // 垂直方向額外收斂，減少 seed 進入 Speakers／WebConf 上下區塊。
+      pY[i]=cy+ny*scale*ry*.72;
       pVX[i]*=.35;
       pVY[i]*=.35;
     }
@@ -741,6 +751,7 @@
 
   // ───────────────────── 抽屜開關 ─────────────────────
   function openDrawer(){
+    setParticleUIPause('drawer',true);
     drawer.classList.add('is-open');
     backdrop.classList.add('is-open');
     quickActions.classList.add('is-hidden');
@@ -749,6 +760,7 @@
     drawer.classList.remove('is-open');
     backdrop.classList.remove('is-open');
     quickActions.classList.remove('is-hidden');
+    setParticleUIPause('drawer',false);
   }
   closeDrawer.addEventListener('click', closeDrawerFn);
   backdrop.addEventListener('click', closeDrawerFn);
@@ -1022,17 +1034,30 @@
   let seedHoldTimer = 0;
   let seedRampTimer = 0;
   let seedRevealActive = false;
+  let seedCompositionHardPaused = false;
+
+  function syncParticlePause(){
+    engine?.pause(seedCompositionHardPaused || particlePauseReasons.size > 0);
+  }
+
+  function setParticleUIPause(reason,shouldPause){
+    if(shouldPause) particlePauseReasons.add(reason);
+    else particlePauseReasons.delete(reason);
+    syncParticlePause();
+  }
 
   function holdSeedComposition(){
     if(!engine) return;
     clearTimeout(seedHoldTimer);
     clearInterval(seedRampTimer);
     seedRevealActive = true;
-    engine.pause(true);
+    seedCompositionHardPaused = true;
+    syncParticlePause();
     engine.setSimSpeed?.(0.05);
     // 先完整展示 Seed 構圖，再以慢速漸進恢復生命運動。
     seedHoldTimer = setTimeout(() => {
-      engine?.pause(false);
+      seedCompositionHardPaused = false;
+      syncParticlePause();
       const startedAt = performance.now();
       const rampDuration = 9000;
       seedRampTimer = setInterval(() => {
@@ -1260,16 +1285,21 @@
         const y = p.y*scale + offY;
         if(x < -30 || x > tw+30 || y < -30 || y > th+30) return;
         const color = palette[p.s % palette.length];
+        // 公告講者的上下標題帶降低粒子可見度，中央區域保持完整亮度。
+        const edgeDistance = Math.min(y/th, 1-y/th);
+        const fadeProgress = Math.max(0,Math.min(1,(edgeDistance-.06)/.22));
+        const smoothFade = fadeProgress*fadeProgress*(3-2*fadeProgress);
+        const speakerVerticalAlpha = theme === 'speaker' ? .10+.90*smoothFade : 1;
         // 依畫面引擎設定決定是否繪製光暈；高密度模式僅保留細小核心。
         if(engine.config.showGlow !== false){
-          octx.globalAlpha = 0.14;
+          octx.globalAlpha = 0.14*speakerVerticalAlpha;
           octx.fillStyle = color;
           octx.beginPath();
           octx.arc(x, y, pSize * 4.2, 0, Math.PI*2);
           octx.fill();
         }
         // 清晰粒子核心
-        octx.globalAlpha = engine.config.particleOpacity ?? 0.9;
+        octx.globalAlpha = (engine.config.particleOpacity ?? 0.9)*speakerVerticalAlpha;
         octx.fillStyle = color;
         octx.beginPath();
         octx.arc(x, y, pSize, 0, Math.PI*2);
@@ -1556,6 +1586,7 @@
     previewImage.removeAttribute('src');
     if(pendingDownload?.objectUrl) URL.revokeObjectURL(pendingDownload.objectUrl);
     pendingDownload = null;
+    setParticleUIPause('preview',false);
   }
 
   function confirmDownload(){
@@ -1571,6 +1602,7 @@
     document.body.style.overflow = '';
     previewImage.removeAttribute('src');
     pendingDownload = null;
+    setParticleUIPause('preview',false);
     if(objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
   }
 
@@ -1586,6 +1618,8 @@
     btn.addEventListener('click', async () => {
       const ratioKey = btn.dataset.ratio;
       btn.classList.add('is-busy');
+      // 產圖前先凍結粒子，讓預覽與最終下載使用完全相同的構圖。
+      setParticleUIPause('preview',true);
       try{
         await exportImage(ratioKey);
         btn.classList.remove('is-busy');
@@ -1593,6 +1627,7 @@
         setTimeout(() => btn.classList.remove('is-done'), 1200);
       }catch(err){
         btn.classList.remove('is-busy');
+        setParticleUIPause('preview',false);
         console.error(err);
         alert('圖片產生失敗,請再試一次。');
       }
