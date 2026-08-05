@@ -593,7 +593,6 @@
       </label>
       <div class="avatar-meta">
         <b>講者頭像</b>
-        <small>建議上傳正方形圖片</small>
       </div>
     </div>
     <label class="field">
@@ -717,6 +716,9 @@
     speakerFields.classList.toggle('is-active', next === 'speaker');
     stageGeneral.classList.toggle('is-active', next === 'general');
     stageSpeaker.classList.toggle('is-active', next === 'speaker');
+    // 講者 tag 的色票與互動樣式只在「公告講者」模式生效。
+    // 切回一般公告時立即恢復目前選取的基礎色票，避免沿用 tag 背景色。
+    applyTagsToEngine();
     if(themeChanged && engine?.respawn){
       const seed = next === 'general' ? 'ring' : pickSpeakerSeed();
       window.activeSpeakerSeed = next === 'speaker' ? seed : null;
@@ -884,7 +886,7 @@
     }
     ACTIVE_PARTICLE_PALETTE = next;
     BASE_PALETTE = next.colors.slice();
-    const palette = selectedTags.size
+    const palette = theme === 'speaker' && selectedTags.size
       ? BASE_PALETTE.concat(Array.from(selectedTags.values()))
       : BASE_PALETTE;
     engine?.setPalette(palette);
@@ -921,13 +923,14 @@
   // 並套用「最後勾選的標籤」對應的互動規則(preset)。
   function applyTagsToEngine(){
     if(!engine) return; // 引擎尚未啟動完成,等 boot 完再套一次
-    const palette = selectedTags.size
+    const speakerMode = theme === 'speaker';
+    const palette = speakerMode && selectedTags.size
       ? BASE_PALETTE.concat(Array.from(selectedTags.values()))
       : BASE_PALETTE;
     engine.setPalette(palette);
 
     const lastKey = tagOrder[tagOrder.length - 1];
-    const tag = lastKey ? TAG_BY_KEY[lastKey] : null;
+    const tag = speakerMode && lastKey ? TAG_BY_KEY[lastKey] : null;
     engine.setPreset(tag ? tag.preset : 'cellular');
   }
 
@@ -941,7 +944,7 @@
 
   // 依目前選取的標籤,把對應的光暈疊加畫到任意畫布上(主畫面 tagGlow 層或匯出畫布共用)
   function drawTagOverlay(targetCtx, w, h){
-    if(selectedTags.size === 0) return;
+    if(theme !== 'speaker' || selectedTags.size === 0) return;
     targetCtx.save();
     targetCtx.globalCompositeOperation = 'lighter';
     selectedTags.forEach((color, key) => {
