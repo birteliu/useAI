@@ -91,7 +91,7 @@
     position:fixed; inset:0; z-index:4;
     display:flex; align-items:center; justify-content:center;
     pointer-events:none;
-    padding: 100px 24px 140px;
+    padding: 100px 24px;
   }
   .stage-view{
     display:none;
@@ -120,7 +120,7 @@
   #subtitleOut{
     font-size: clamp(19px, 2.4vw, 28px);
     letter-spacing:2px; text-transform:uppercase;
-    color: var(--glow-dim);
+    color: var(--glow);
     font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     white-space:pre-line; word-break:break-word;
   }
@@ -156,11 +156,14 @@
   .sp-card{ position:absolute; }
 
   /* 講者名稱卡 + 頭像 */
-  .sp-card-name{ top:7%; right:0; width:min(62vw, 760px); min-height:190px; }
+  .sp-card-name{
+    --speaker-photo-w:clamp(150px,17vw,230px);
+    top:7%; right:0; width:min(62vw,760px); max-width:100%; min-height:190px;
+  }
   .sp-name-box{
     background: rgba(5,5,6,0.9);
     border:1px solid rgba(239,230,210,0.42); border-radius:0;
-    min-height:150px; margin-right:24%;
+    min-height:150px; margin-right:var(--speaker-photo-w);
     padding:34px 28px 26px;
     display:flex; flex-direction:column; justify-content:center;
   }
@@ -179,7 +182,7 @@
   }
   .sp-photo{
     position:absolute; top:0; right:0;
-    width: clamp(150px, 17vw, 230px);
+    width:var(--speaker-photo-w);
     height: clamp(190px, 21vw, 280px);
     border:1px solid rgba(239,230,210,0.55);
     overflow:hidden; background: rgba(255,255,255,0.06);
@@ -483,7 +486,7 @@
 
   @media (max-width:560px){
     .hint{ display:none; }
-    .stage{ padding: 90px 18px 120px; }
+    .stage{ padding: 90px 18px; }
     .drawer{ width:100%; border-radius:20px 20px 0 0; }
   }
 </style>
@@ -653,6 +656,27 @@
     return SPEAKER_SEED_PATTERNS[(Math.random()*SPEAKER_SEED_PATTERNS.length)|0];
   }
 
+  // 保留各種講者 seed 的結構，但將外圍位置非線性收向中心。
+  // 中央仍有擴散感，四邊與四角則留下較多呼吸空間。
+  function focusSpeakerParticles(){
+    if(!engine?.particleArrays) return;
+    const { pX, pY, pVX, pVY, count } = engine.particleArrays;
+    const { W, H } = engine.size;
+    const cx=W*.5, cy=H*.5, rx=W*.5, ry=H*.5;
+    for(let i=0;i<count;i++){
+      const nx=(pX[i]-cx)/rx;
+      const ny=(pY[i]-cy)/ry;
+      const radius=Math.hypot(nx,ny);
+      if(radius===0) continue;
+      const focusedRadius=Math.pow(Math.min(radius,1),1.18)*.78;
+      const scale=focusedRadius/radius;
+      pX[i]=cx+nx*scale*rx;
+      pY[i]=cy+ny*scale*ry;
+      pVX[i]*=.35;
+      pVY[i]*=.35;
+    }
+  }
+
   const DEFAULTS = {
     general: { title: 'Living Specimen<br>— Sandbox', subtitle: '取素材實驗場 · SANDBOX MODE' },
     speaker: { name: '講者姓名', role: '職稱 / 單位', topic: '講題 / 講者主題描述文字', tags: '尚未選擇標籤' }
@@ -661,6 +685,8 @@
   // ───────────────────── DOM 參照 ─────────────────────
   const stageGeneral = document.getElementById('stageGeneral');
   const stageSpeaker = document.getElementById('stageSpeaker');
+  const speakerCanvasArea = stageSpeaker.querySelector('.sp-canvas-area');
+  const speakerNameCard = stageSpeaker.querySelector('.sp-card-name');
   const titleOut = document.getElementById('titleOut');
   const subtitleOut = document.getElementById('subtitleOut');
   const avatarOut = document.getElementById('avatarOut');
@@ -692,6 +718,27 @@
   const applyBtn = document.getElementById('applyBtn');
   const resetBtn = document.getElementById('resetBtn');
 
+  // 依姓名與職稱的實際文字寬度調整卡片；超過安全寬度時由既有換行規則承接。
+  function updateSpeakerNameCardWidth(){
+    if(!speakerNameCard || !speakerCanvasArea) return;
+    const areaW = speakerCanvasArea.clientWidth;
+    if(!areaW) return;
+    const photo = speakerNameCard.querySelector('.sp-photo');
+    const photoW = photo?.getBoundingClientRect().width || 230;
+    const measure = document.createElement('canvas').getContext('2d');
+    const nameStyle = getComputedStyle(speakerNameOut);
+    const roleStyle = getComputedStyle(speakerRoleOut);
+    measure.font = `${nameStyle.fontWeight} ${nameStyle.fontSize} ${nameStyle.fontFamily}`;
+    const nameTextW = measure.measureText(speakerNameOut.textContent || '').width;
+    measure.font = `${roleStyle.fontWeight} ${roleStyle.fontSize} ${roleStyle.fontFamily}`;
+    const roleTextW = measure.measureText(speakerRoleOut.textContent || '').width;
+    const panelMin = Math.min(300, areaW*.42);
+    const panelMax = Math.max(panelMin, areaW-photoW);
+    const panelW = Math.min(panelMax, Math.max(panelMin, nameTextW+58, roleTextW+58));
+    speakerNameCard.style.width = `${Math.min(areaW,panelW+photoW)}px`;
+  }
+  window.addEventListener('resize', updateSpeakerNameCardWidth);
+
   // ───────────────────── 抽屜開關 ─────────────────────
   function openDrawer(){
     drawer.classList.add('is-open');
@@ -716,6 +763,7 @@
     speakerFields.classList.toggle('is-active', next === 'speaker');
     stageGeneral.classList.toggle('is-active', next === 'general');
     stageSpeaker.classList.toggle('is-active', next === 'speaker');
+    if(next === 'speaker') requestAnimationFrame(updateSpeakerNameCardWidth);
     // 講者 tag 的色票與互動樣式只在「公告講者」模式生效。
     // 切回一般公告時立即恢復目前選取的基礎色票，避免沿用 tag 背景色。
     applyTagsToEngine();
@@ -723,6 +771,7 @@
       const seed = next === 'general' ? 'ring' : pickSpeakerSeed();
       window.activeSpeakerSeed = next === 'speaker' ? seed : null;
       engine.respawn(seed);
+      if(next === 'speaker') focusSpeakerParticles();
       holdSeedComposition();
     }
   }
@@ -735,6 +784,7 @@
     const seed = theme === 'general' ? 'ring' : pickSpeakerSeed();
     window.activeSpeakerSeed = theme === 'speaker' ? seed : null;
     engine.respawn(seed);
+    if(theme === 'speaker') focusSpeakerParticles();
     holdSeedComposition();
   });
   changeParticleColor.addEventListener('click', changeToRandomPalette);
@@ -810,6 +860,7 @@
         img.src = avatarImage.src;
         avatarOut.appendChild(img);
       }
+      requestAnimationFrame(updateSpeakerNameCardWidth);
       flashGlow(speakerNameOut);
     }
     closeDrawerFn();
@@ -835,6 +886,7 @@
       selectedTags.clear();
       tagOrder.length = 0;
       speakerTagsOut.textContent = DEFAULTS.speaker.tags;
+      requestAnimationFrame(updateSpeakerNameCardWidth);
     }
   });
 
@@ -1082,7 +1134,7 @@
   const previewConfirm = document.getElementById('previewConfirm');
   let pendingDownload = null;
   const RATIO_MAP = {
-    '9:16': { w: 900, h: 1600  },
+    '9:16': { w: 1080, h: 1920 },
     '1:1':  { w: 1200, h: 1200 },
     '3:4':  { w: 1200, h: 1600 }
   };
@@ -1248,8 +1300,15 @@
       });
       const fontSize = Math.round(tw * 0.072);
       const lineHeight = fontSize * 1.25;
-      const totalH = lineHeight * lines.length;
-      const startY = th/2 - totalH/2 + lineHeight/2;
+      const subtitleFontSize = Math.round(tw*0.032);
+      const subtitleLines = subtitleOut.textContent.split(/\r?\n/);
+      const subtitleLineHeight = subtitleFontSize*1.35;
+      const titleH = lineHeight * lines.length;
+      const subtitleH = subtitleLineHeight * subtitleLines.length;
+      const titleSubtitleGap = fontSize * 0.55;
+      const contentH = titleH + titleSubtitleGap + subtitleH;
+      const contentTop = th/2 - contentH/2;
+      const startY = contentTop + lineHeight/2;
       lines.forEach((line, i) => {
         const y = startY + i*lineHeight;
         const runs = [];
@@ -1282,18 +1341,16 @@
         octx.shadowBlur = 0;
       });
       octx.textAlign = 'center';
-      const subtitleFontSize = Math.round(tw*0.032);
-      const subtitleLines = subtitleOut.textContent.split(/\r?\n/);
-      const subtitleLineHeight = subtitleFontSize*1.35;
-      const subtitleStartY = startY+lines.length*lineHeight+fontSize*0.55;
+      const subtitleStartY = contentTop + titleH + titleSubtitleGap + subtitleLineHeight/2;
       octx.font = `normal 700 ${subtitleFontSize}px 'Noto Serif TC', serif`;
       if('letterSpacing' in octx) octx.letterSpacing = '2px';
-      octx.fillStyle = '#3E7DA8';
+      octx.fillStyle = '#71C1F0';
       subtitleLines.forEach((line,i)=>octx.fillText(line,tw/2,subtitleStartY+i*subtitleLineHeight));
       if('letterSpacing' in octx) octx.letterSpacing = '0px';
     } else {
       // 講者匯出：使用和畫面一致的海報式構圖，所有主要物件距邊緣 40px。
       const safe = 40;
+      const isPortraitExport = ratioKey === '9:16';
       const line = 'rgba(239,230,210,0.55)';
       const headerH = Math.max(92, th * 0.12);
       const footerH = Math.max(92, th * 0.12);
@@ -1313,24 +1370,35 @@
       octx.font = `normal 700 ${Math.round(Math.min(tw*.03, headerH*.34))}px 'Noto Serif TC',serif`;
       octx.fillText('講 者 開 箱', tw-safe, safe + headerH*.45);
 
-      const photoW = Math.min(tw*.22, (th-headerH-footerH-safe*2)*.28);
+      const photoW = Math.min(tw*(isPortraitExport ? .28 : .22), (th-headerH-footerH-safe*2)*.28);
       const photoH = photoW*1.22;
       const photoX = tw-safe-photoW;
       const photoY = safe+headerH+Math.max(40, th*.055);
-      const nameX = Math.max(safe, photoX-Math.min(tw*.46, 570));
-      const nameW = photoX-nameX;
-      const nameFs=Math.max(34,Math.round(tw*.05));
-      const roleFs=Math.max(18,Math.round(tw*.022));
+      const nameFs=Math.max(34,Math.round(tw*(isPortraitExport ? .062 : .06)));
+      const roleFs=Math.max(18,Math.round(tw*.028));
+      // 先量測姓名與職稱，再讓卡片由照片左緣向左伸縮。
+      octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
+      const measuredNameW=octx.measureText(speakerNameOut.textContent).width+60;
+      octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
+      const measuredRoleW=octx.measureText(speakerRoleOut.textContent).width+60;
+      const nameMinW=Math.min(tw*.28,photoX-safe);
+      const nameMaxW=photoX-safe;
+      const nameW=Math.min(nameMaxW,Math.max(nameMinW,measuredNameW,measuredRoleW));
+      const nameX=photoX-nameW;
+      octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
+      const nameLines=wrapText(octx,speakerNameOut.textContent,nameW-60);
+      const nameLineH=nameFs*1.18;
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
       const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60);
       const roleLineH=roleFs*1.42;
       const nameRoleGap=Math.max(16,nameFs*.3);
+      const nameBlockH=Math.max(nameFs,nameLines.length*nameLineH);
       const roleBlockH=Math.max(roleFs,roleLines.length*roleLineH);
-      const nameGroupH=nameFs+nameRoleGap+roleBlockH;
+      const nameGroupH=nameBlockH+nameRoleGap+roleBlockH;
       const nameH=Math.max(photoH*.64,nameGroupH+48);
       const nameGroupTop=photoY+(nameH-nameGroupH)/2;
-      const nameY=nameGroupTop+nameFs/2;
-      const roleStartY=nameGroupTop+nameFs+nameRoleGap+roleLineH/2;
+      const nameStartY=nameGroupTop+nameLineH/2;
+      const roleStartY=nameGroupTop+nameBlockH+nameRoleGap+roleLineH/2;
       octx.fillStyle = 'rgba(5,5,6,.9)'; octx.fillRect(nameX,photoY,nameW,nameH);
       octx.strokeStyle = line; octx.strokeRect(nameX,photoY,nameW,nameH);
       if(avatarImage) drawImageCover(octx, avatarImage, photoX, photoY, photoW, photoH);
@@ -1339,17 +1407,17 @@
 
       octx.textAlign='left'; octx.fillStyle='#EFE6D2';
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      octx.fillText(speakerNameOut.textContent,nameX+30,nameY);
+      nameLines.forEach((text,i)=>octx.fillText(text,nameX+30,nameStartY+i*nameLineH));
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
       roleLines.forEach((text,i)=>octx.fillText(text,nameX+30,roleStartY+i*roleLineH));
 
       const contentBottom=th-safe-footerH-40;
-      const quoteW=Math.min(tw*.46,650), quoteX=safe;
-      const topicFs=Math.max(22,Math.round(tw*.026));
+      const quoteW=Math.min(tw*(isPortraitExport ? .54 : .46),650), quoteX=safe;
+      const topicFs=Math.max(22,Math.round(tw*.032));
       octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
       const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64);
       const quoteH=Math.max(150,topicLines.length*topicFs*1.55+58);
-      const tagFs=Math.max(18,Math.round(tw*.017));
+      const tagFs=Math.max(18,Math.round(tw*.022));
       octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
       const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64);
       const tagLineH=tagFs*1.45;
@@ -1399,7 +1467,7 @@
       octx.restore();
 
       // 右下顯微鏡標本：截取目前粒子畫布的一小塊並以連接線標示。
-      const zoomSize=Math.min(tw*.13,180), zoomX=tw-safe-zoomSize, zoomY=contentBottom-zoomSize;
+      const zoomSize=Math.min(tw*(isPortraitExport ? .17 : .13),180), zoomX=tw-safe-zoomSize, zoomY=contentBottom-zoomSize;
       octx.save();
       octx.beginPath(); octx.rect(zoomX,zoomY,zoomSize,zoomSize); octx.clip();
       octx.fillStyle='#050506'; octx.fillRect(zoomX,zoomY,zoomSize,zoomSize);
@@ -1421,9 +1489,17 @@
       }
       octx.restore();
       octx.strokeStyle='rgba(239,230,210,.85)'; octx.strokeRect(zoomX,zoomY,zoomSize,zoomSize);
-      const markX=zoomX-zoomSize*.62, markY=zoomY-zoomSize*1.45;
-      octx.beginPath(); octx.arc(markX,markY,zoomSize*.10,0,Math.PI*2); octx.stroke();
-      octx.beginPath(); octx.moveTo(markX+zoomSize*.08,markY+zoomSize*.08); octx.lineTo(zoomX+zoomSize*.5,zoomY); octx.stroke();
+      // 1:1 畫布較矮，將右下標記靠近標本框，避開右上講者指向線。
+      const isSquareExport=ratioKey==='1:1';
+      const markX=zoomX-zoomSize*(isSquareExport ? .45 : .62);
+      const markY=zoomY-zoomSize*(isSquareExport ? .45 : 1.45);
+      const zoomMarkerR=zoomSize*.10;
+      const zoomTargetX=zoomX+zoomSize*.5, zoomTargetY=zoomY;
+      const zoomLineD=Math.hypot(zoomTargetX-markX,zoomTargetY-markY)||1;
+      const zoomLineStartX=markX+(zoomTargetX-markX)/zoomLineD*zoomMarkerR;
+      const zoomLineStartY=markY+(zoomTargetY-markY)/zoomLineD*zoomMarkerR;
+      octx.beginPath(); octx.arc(markX,markY,zoomMarkerR,0,Math.PI*2); octx.stroke();
+      octx.beginPath(); octx.moveTo(zoomLineStartX,zoomLineStartY); octx.lineTo(zoomTargetX,zoomTargetY); octx.stroke();
 
       // 頁尾使用獨立繪圖狀態，避免粒子疊加模式或透明度令文字消失。
       octx.save();
