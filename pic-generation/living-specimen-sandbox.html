@@ -448,6 +448,7 @@
   }
   .quick-actions .mode-launch.is-current{box-shadow:0 6px 26px rgba(113,193,240,.28),0 0 0 1px rgba(255,255,255,.12) inset;}
   .quick-actions .particle-refresh{background:rgba(8,10,14,.9);color:var(--ink);border:1px solid var(--line);box-shadow:none;}
+  .quick-actions .palette-change{background:rgba(8,10,14,.9);color:var(--ink);border:1px solid var(--line);box-shadow:none;}
   .quick-actions .export-section{display:flex;align-items:stretch;}
   .quick-actions .export-row{display:flex;gap:8px;}
   .quick-actions .export-btn{
@@ -554,6 +555,7 @@
   <button class="fab mode-launch is-current" data-open-theme="general">一般公告</button>
   <button class="fab mode-launch" data-open-theme="speaker">公告講者</button>
   <button class="fab particle-refresh" id="refreshParticles">↻ 重整粒子</button>
+  <button class="fab palette-change" id="changeParticleColor">◐ 換顏色</button>
   <div class="export-section" aria-label="預覽下載圖片比例">
     <div class="export-row">
       <button class="export-btn" data-ratio="9:16"><span class="ratio-icon" style="width:12px;height:22px;"></span>9:16</button>
@@ -670,6 +672,7 @@
 
   const themeLaunchBtns = document.querySelectorAll('.mode-launch');
   const refreshParticles = document.getElementById('refreshParticles');
+  const changeParticleColor = document.getElementById('changeParticleColor');
   const quickActions = document.getElementById('quickActions');
   const backdrop = document.getElementById('backdrop');
   const drawer = document.getElementById('drawer');
@@ -732,6 +735,7 @@
     engine.respawn(seed);
     holdSeedComposition();
   });
+  changeParticleColor.addEventListener('click', changeToRandomPalette);
 
   // ───────────────────── 頭像上傳 ─────────────────────
   avatarUploadBtn.addEventListener('click', () => avatarInput.click());
@@ -861,14 +865,32 @@
     { name:'Fluoro Stain', colors:['#4F7AFA','#3AE85E','#FF3A5E','#3AE8DE','#F0E03A','#B83AE8','#FFFFFF'] },
     { name:'Slime / Lichen', colors:['#C9A227','#6B5B2E','#8B7A4F','#4F6B3D','#C26A22','#E6D8AE','#2A2418'] },
   ];
-  const ACTIVE_PARTICLE_PALETTE = PARTICLE_PALETTES[(Math.random()*PARTICLE_PALETTES.length)|0];
-  const BASE_PALETTE = ACTIVE_PARTICLE_PALETTE.colors.slice();
+  let ACTIVE_PARTICLE_PALETTE = PARTICLE_PALETTES[(Math.random()*PARTICLE_PALETTES.length)|0];
+  let BASE_PALETTE = ACTIVE_PARTICLE_PALETTE.colors.slice();
   window.activeParticlePalette = { name:ACTIVE_PARTICLE_PALETTE.name, colors:BASE_PALETTE.slice() };
+  changeParticleColor.title = `目前色票：${ACTIVE_PARTICLE_PALETTE.name}`;
 
   const selectedTags = new Map();   // key -> color(hex),用於背景光暈疊加
   const tagOrder = [];              // 記錄勾選順序,決定目前生效的 preset
   const tagGrid = document.getElementById('tagGrid');
   const tagCheckboxes = tagGrid.querySelectorAll('input[type="checkbox"]');
+
+  function changeToRandomPalette(){
+    let next = ACTIVE_PARTICLE_PALETTE;
+    if(PARTICLE_PALETTES.length > 1){
+      while(next === ACTIVE_PARTICLE_PALETTE){
+        next = PARTICLE_PALETTES[(Math.random()*PARTICLE_PALETTES.length)|0];
+      }
+    }
+    ACTIVE_PARTICLE_PALETTE = next;
+    BASE_PALETTE = next.colors.slice();
+    const palette = selectedTags.size
+      ? BASE_PALETTE.concat(Array.from(selectedTags.values()))
+      : BASE_PALETTE;
+    engine?.setPalette(palette);
+    window.activeParticlePalette = { name:next.name, colors:BASE_PALETTE.slice() };
+    changeParticleColor.title = `目前色票：${next.name}`;
+  }
 
   tagCheckboxes.forEach(cb => {
     cb.addEventListener('change', () => {
