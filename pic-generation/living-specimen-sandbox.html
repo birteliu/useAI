@@ -122,7 +122,7 @@
     letter-spacing:2px; text-transform:uppercase;
     color: var(--glow-dim);
     font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
-    word-break: break-word;
+    white-space:pre-line; word-break:break-word;
   }
 
   /* 講者公告 — 依講者開箱視覺重排，四周保留 40px 安全距離 */
@@ -578,7 +578,7 @@
     </label>
     <label class="field">
       <span>副標題</span>
-      <input type="text" id="subtitleInput" placeholder="輸入副標題…" maxlength="60">
+      <textarea id="subtitleInput" placeholder="輸入副標題，可按 Enter 自行換行…" maxlength="120" rows="2"></textarea>
     </label>
   </div>
 
@@ -1257,10 +1257,14 @@
         octx.shadowBlur = 0;
       });
       octx.textAlign = 'center';
-      octx.font = `normal 700 ${Math.round(tw*0.032)}px 'Noto Serif TC', serif`;
+      const subtitleFontSize = Math.round(tw*0.032);
+      const subtitleLines = subtitleOut.textContent.split(/\r?\n/);
+      const subtitleLineHeight = subtitleFontSize*1.35;
+      const subtitleStartY = startY+lines.length*lineHeight+fontSize*0.55;
+      octx.font = `normal 700 ${subtitleFontSize}px 'Noto Serif TC', serif`;
       if('letterSpacing' in octx) octx.letterSpacing = '2px';
       octx.fillStyle = '#3E7DA8';
-      octx.fillText(subtitleOut.textContent, tw/2, startY + lines.length*lineHeight + fontSize*0.55);
+      subtitleLines.forEach((line,i)=>octx.fillText(line,tw/2,subtitleStartY+i*subtitleLineHeight));
       if('letterSpacing' in octx) octx.letterSpacing = '0px';
     } else {
       // 講者匯出：使用和畫面一致的海報式構圖，所有主要物件距邊緣 40px。
