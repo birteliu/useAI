@@ -6,7 +6,8 @@
 <title>Living Specimen — Sandbox (My Version)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 
 <!-- 沿用你原網站的粒子生命引擎(需與這支 html 放在同一個資料夾) -->
 <script src="particle-life-seeds.js"></script>
@@ -432,6 +433,13 @@
     margin-bottom:10px; display:block;
   }
   .export-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .export-format-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+  .format-btn{
+    border:1px solid var(--line);border-radius:9px;padding:8px 10px;
+    background:rgba(255,255,255,.02);color:var(--ink-dim);
+    font:700 13px inherit;cursor:pointer;
+  }
+  .format-btn.is-active{color:#0A2233;background:var(--glow);border-color:var(--glow);}
   .export-btn{
     border:1px solid var(--line); background: rgba(255,255,255,0.02);
     color:var(--ink); font-family:inherit; font-size:11px; font-weight:600;
@@ -480,7 +488,8 @@
   .preview-head{border-bottom:1px solid var(--line);}.preview-head h3{font-size:13px;letter-spacing:.16em;color:var(--ink);font-weight:600;}
   .preview-close{width:30px;height:30px;border-radius:50%;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink-dim);font-size:18px;}
   .preview-image-wrap{min-height:0;padding:18px;display:flex;align-items:center;justify-content:center;background:#020203;overflow:auto;}
-  #previewImage{display:block;max-width:100%;max-height:calc(94vh - 150px);object-fit:contain;}
+  #previewImage,#previewVideo{display:block;max-width:100%;max-height:calc(94vh - 150px);object-fit:contain;}
+  #previewVideo{display:none;background:#050506;}
   .preview-actions{justify-content:flex-end;border-top:1px solid var(--line);}
   .preview-action{border:1px solid var(--line);border-radius:999px;padding:10px 20px;background:transparent;color:var(--ink);font:600 13px inherit;cursor:pointer;}
   .preview-action.confirm{background:var(--glow);border-color:var(--glow);color:#0A2233;}
@@ -565,9 +574,14 @@
 <div class="quick-actions" id="quickActions">
   <button class="fab mode-launch is-current" data-open-theme="general">一般公告</button>
   <button class="fab mode-launch" data-open-theme="speaker">公告講者</button>
-  <button class="fab particle-refresh" id="refreshParticles">↻ 重整粒子</button>
+  <button class="fab particle-refresh" id="newParticles">✦ 變成新粒子</button>
+  <button class="fab particle-refresh" id="restartParticles">↻ 當前粒子重來一次</button>
   <button class="fab palette-change" id="changeParticleColor">◐ 換顏色</button>
-  <div class="export-section" aria-label="預覽下載圖片比例">
+  <div class="export-section" aria-label="預覽下載比例與格式">
+    <div class="export-format-toggle" aria-label="下載格式">
+      <button type="button" class="format-btn is-active" data-format="image">下載圖檔</button>
+      <button type="button" class="format-btn" data-format="video">10 秒影片</button>
+    </div>
     <div class="export-row">
       <button class="export-btn" data-ratio="9:16"><span class="ratio-icon" style="width:12px;height:22px;"></span>9:16</button>
       <button class="export-btn" data-ratio="1:1"><span class="ratio-icon" style="width:16px;height:16px;"></span>1:1</button>
@@ -638,13 +652,16 @@
 
   <button class="apply-btn" id="applyBtn">套用變更</button>
 
-  <button id="resetBtn">還原目前主題的預設內容</button>
+  <button type="button" id="resetBtn">還原目前主題的預設內容</button>
 </div>
 
 <div class="preview-modal" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
   <div class="preview-dialog">
     <div class="preview-head"><h3 id="previewTitle">下載圖片預覽</h3><button class="preview-close" id="previewClose" aria-label="關閉預覽">×</button></div>
-    <div class="preview-image-wrap"><img id="previewImage" alt="即將下載的圖片預覽"></div>
+    <div class="preview-image-wrap">
+      <img id="previewImage" alt="即將下載的圖片預覽">
+      <video id="previewVideo" controls loop playsinline aria-label="即將下載的影片預覽"></video>
+    </div>
     <div class="preview-actions"><button class="preview-action" id="previewCancel">取消</button><button class="preview-action confirm" id="previewConfirm">確認下載</button></div>
   </div>
 </div>
@@ -655,14 +672,22 @@
   let theme = 'general'; // 'general' | 'speaker'
   let avatarImage = null; // HTMLImageElement,供匯出圖片使用
   const particlePauseReasons = new Set();
+  let videoRecordingActive = false;
+  const GENERAL_SEED_PATTERNS = ['ring','rainbowRing','rings','rainbowDisk'];
   const SPEAKER_SEED_PATTERNS = [
     'auto', 'centeredCloud', 'twinSpirals', 'rainbowSpiral',
     'softClusters', 'linkedClusters', 'chromaticFlower', 'orbitalBelts',
     'spiralArms', 'yinYang'
   ];
 
+  function pickGeneralSeed(){
+    const choices = GENERAL_SEED_PATTERNS.filter(seed => seed !== window.activeGeneralSeed);
+    return choices[(Math.random()*choices.length)|0];
+  }
+
   function pickSpeakerSeed(){
-    return SPEAKER_SEED_PATTERNS[(Math.random()*SPEAKER_SEED_PATTERNS.length)|0];
+    const choices = SPEAKER_SEED_PATTERNS.filter(seed => seed !== window.activeSpeakerSeed);
+    return choices[(Math.random()*choices.length)|0];
   }
 
   // 保留各種講者 seed 的結構，但將外圍位置非線性收向中心。
@@ -706,7 +731,8 @@
   const speakerTagsOut = document.getElementById('speakerTagsOut');
 
   const themeLaunchBtns = document.querySelectorAll('.mode-launch');
-  const refreshParticles = document.getElementById('refreshParticles');
+  const newParticles = document.getElementById('newParticles');
+  const restartParticles = document.getElementById('restartParticles');
   const changeParticleColor = document.getElementById('changeParticleColor');
   const quickActions = document.getElementById('quickActions');
   const backdrop = document.getElementById('backdrop');
@@ -780,8 +806,9 @@
     // 切回一般公告時立即恢復目前選取的基礎色票，避免沿用 tag 背景色。
     applyTagsToEngine();
     if(themeChanged && engine?.respawn){
-      const seed = next === 'general' ? 'ring' : pickSpeakerSeed();
-      window.activeSpeakerSeed = next === 'speaker' ? seed : null;
+      const seed = next === 'general' ? pickGeneralSeed() : pickSpeakerSeed();
+      if(next === 'general') window.activeGeneralSeed = seed;
+      else window.activeSpeakerSeed = seed;
       engine.respawn(seed);
       if(next === 'speaker') focusSpeakerParticles();
       holdSeedComposition();
@@ -791,10 +818,20 @@
     setTheme(btn.dataset.openTheme);
     openDrawer();
   }));
-  refreshParticles.addEventListener('click', () => {
+  newParticles.addEventListener('click', () => {
     if(!engine?.respawn) return;
-    const seed = theme === 'general' ? 'ring' : pickSpeakerSeed();
-    window.activeSpeakerSeed = theme === 'speaker' ? seed : null;
+    const seed = theme === 'general' ? pickGeneralSeed() : pickSpeakerSeed();
+    if(theme === 'general') window.activeGeneralSeed = seed;
+    else window.activeSpeakerSeed = seed;
+    engine.respawn(seed);
+    if(theme === 'speaker') focusSpeakerParticles();
+    holdSeedComposition();
+  });
+  restartParticles.addEventListener('click', () => {
+    if(!engine?.respawn) return;
+    const seed = theme === 'general'
+      ? (window.activeGeneralSeed || engine.config.seedPattern || pickGeneralSeed())
+      : (window.activeSpeakerSeed || engine.config.seedPattern || pickSpeakerSeed());
     engine.respawn(seed);
     if(theme === 'speaker') focusSpeakerParticles();
     holdSeedComposition();
@@ -878,34 +915,39 @@
     closeDrawerFn();
   });
 
-  resetBtn.addEventListener('click', () => {
+  resetBtn.addEventListener('click', (event) => {
+    event.preventDefault();
     if(theme === 'general'){
+      generalFields.querySelectorAll('input,textarea').forEach(field => {
+        if(field.type === 'checkbox' || field.type === 'radio') field.checked = false;
+        else field.value = '';
+      });
       titleOut.innerHTML = DEFAULTS.general.title;
       subtitleOut.textContent = DEFAULTS.general.subtitle;
-      titleInput.value = ''; subtitleInput.value = '';
     } else {
+      speakerFields.querySelectorAll('input,textarea').forEach(field => {
+        if(field.type === 'checkbox' || field.type === 'radio') field.checked = false;
+        else field.value = '';
+      });
       speakerNameOut.textContent = DEFAULTS.speaker.name;
       speakerRoleOut.textContent = DEFAULTS.speaker.role;
       speakerTopicOut.textContent = DEFAULTS.speaker.topic;
-      speakerNameInput.value = ''; speakerRoleInput.value = ''; speakerTopicInput.value = '';
       avatarImage = null;
       avatarOut.innerHTML = '<span class="avatar-fallback">頭像</span>';
       avatarUploadBtn.querySelectorAll('img').forEach(el => el.remove());
       avatarUploadIcon.style.display = '';
-      avatarInput.value = '';
       // 清空已選標籤,並還原對應背景疊加與標籤文字顯示
       tagCheckboxes.forEach(cb => cb.checked = false);
       selectedTags.clear();
       tagOrder.length = 0;
-      speakerTagsOut.textContent = DEFAULTS.speaker.tags;
+      updateTagsText();
+      applyTagsToEngine();
       requestAnimationFrame(updateSpeakerNameCardWidth);
     }
   });
 
   // ───────────────────── 主題標籤 → 粒子生命引擎樣式 ─────────────────────
-  // 每個標籤除了對應一個顏色,也對應一種 particle-life 的互動規則(preset)。
-  // 不同規則會演化出完全不同的「生物形態」(蜂群/鏈狀/軌道/共生對…),
-  // 比單純換色更貼近你原本引擎的呈現方式。
+  // 每個標籤保留對應色彩與光暈位置；粒子物理統一由 disperse 控制。
   const TAGS = [
     { key: 'frontend', x: 0.18, y: 0.22, r: 0.42, color: '#71C1F0', preset: 'cellular', label: 'Frontend' },
     { key: 'backend',  x: 0.82, y: 0.20, r: 0.40, color: '#8E7CC3', preset: 'hub-spokes', label: 'Backend' },
@@ -937,7 +979,7 @@
   changeParticleColor.title = `目前色票：${ACTIVE_PARTICLE_PALETTE.name}`;
 
   const selectedTags = new Map();   // key -> color(hex),用於背景光暈疊加
-  const tagOrder = [];              // 記錄勾選順序,決定目前生效的 preset
+  const tagOrder = [];              // 記錄勾選順序，決定標籤文字與色彩順序
   const tagGrid = document.getElementById('tagGrid');
   const tagCheckboxes = tagGrid.querySelectorAll('input[type="checkbox"]');
 
@@ -983,8 +1025,8 @@
     speakerTagsOut.textContent = tagOrder.map(k => TAG_BY_KEY[k]?.label || k).join('　·　');
   }
 
-  // 把目前選取的標籤同步到粒子引擎:調色盤混入已選顏色,
-  // 並套用「最後勾選的標籤」對應的互動規則(preset)。
+  // 把目前選取的標籤同步到粒子引擎：調色盤混入已選顏色，
+  // 物理規則維持 disperse，避免後段重新聚集。
   function applyTagsToEngine(){
     if(!engine) return; // 引擎尚未啟動完成,等 boot 完再套一次
     const speakerMode = theme === 'speaker';
@@ -993,9 +1035,9 @@
       : BASE_PALETTE;
     engine.setPalette(palette);
 
-    const lastKey = tagOrder[tagOrder.length - 1];
-    const tag = speakerMode && lastKey ? TAG_BY_KEY[lastKey] : null;
-    engine.setPreset(tag ? tag.preset : 'cellular');
+    // Tag 仍控制色票與背景光暈，但物理規則固定使用 disperse。
+    // 避免 cellular / swarm 等吸引型 preset 在後段重新凝聚成粒子球。
+    engine.setPreset('disperse');
   }
 
   function hexToRgba(hex, alpha){
@@ -1030,6 +1072,7 @@
   // ───────────────────── 粒子生命引擎(沿用你原網站的 particle-life 系統)─────────────────────
   const canvas = document.getElementById('field');
   const HAS_GPU = !!(window.ParticleLifeGPU && window.ParticleLifeGPU.isSupported && window.ParticleLifeGPU.isSupported());
+  const NORMAL_SIM_SPEED = 0.2;
   let engine = null;
   let seedHoldTimer = 0;
   let seedRampTimer = 0;
@@ -1037,7 +1080,7 @@
   let seedCompositionHardPaused = false;
 
   function syncParticlePause(){
-    engine?.pause(seedCompositionHardPaused || particlePauseReasons.size > 0);
+    engine?.pause(!videoRecordingActive && (seedCompositionHardPaused || particlePauseReasons.size > 0));
   }
 
   function setParticleUIPause(reason,shouldPause){
@@ -1063,7 +1106,7 @@
       seedRampTimer = setInterval(() => {
         if(!engine){ clearInterval(seedRampTimer); return; }
         const progress = Math.min(1,(performance.now()-startedAt)/rampDuration);
-        engine.setSimSpeed?.(0.05+(0.2-0.05)*progress);
+        engine.setSimSpeed?.(0.05+(NORMAL_SIM_SPEED-0.05)*progress);
         if(progress >= 1){
           clearInterval(seedRampTimer);
           seedRevealActive = false;
@@ -1072,30 +1115,35 @@
     },3500);
   }
 
+  const initialGeneralSeed = pickGeneralSeed();
+  window.activeGeneralSeed = initialGeneralSeed;
   const ENGINE_OPTS = {
     species: 6,
-    count: HAS_GPU ? 100000 : 6000,
-    preset: 'cellular',
-    seedPattern: 'ring',
+    // 現行渲染仍走 Canvas 2D；避免因 GPU 偵測成功就同步建立十萬顆粒子。
+    count: HAS_GPU ? 100000 : 11000,
+    preset: 'disperse',
+    seedPattern: initialGeneralSeed,
     palette: BASE_PALETTE,
     bgFade: 'rgba(5,5,6,0.16)',
     pointSize: 0.9,
     particleOpacity: 0.6,
     glowSize: 3.2,
     glowIntensity: 0.016,
-    glowSteepness: 6.5,
+    glowSteepness: 5.5,
     showGlow: false,
-    forceFactor: 1.2,
+    forceFactor: 0.95,
     friction: HAS_GPU ? 0.31 : 0.92,
-    rMax: 55,
-    simSpeed: 0.2,
+    repel: 1.1,
+    minR: 5,
+    rMax: 74,
+    simSpeed: NORMAL_SIM_SPEED,
     cameraZoom: 1.4,
-    mouseRepel: 2.2,
+    mouseRepel: 2.4,
     showFps: false,
-    gpuCompute: false,
+    gpuCompute: true,
   };
 
-  (async function bootEngine(){
+  async function bootEngine(){
     try{
       engine = await window.makeEngine(canvas, ENGINE_OPTS);
     }catch(err){
@@ -1107,14 +1155,75 @@
     applyTagsToEngine(); // 若使用者在引擎就緒前已經勾選標籤,啟動後立刻補套用
     holdSeedComposition();
 
-    // 輕量「呼吸感」擾動:每隔幾秒在畫面隨機位置輕輕擾動一下粒子場,
-    // 讓畫面在沒有人操作時也不會完全靜止(仿照原網站 Hero 的 metabolism 效果)。
-    setInterval(() => {
-      if(!engine || seedRevealActive) return;
-      const { W, H } = engine.size;
-      engine.disturb(W * (0.35 + Math.random()*0.3), H * (0.30 + Math.random()*0.4), 90 + Math.random()*80, 3 + Math.random()*3);
-    }, 2600);
-  })();
+    // 與參考 Sandbox 相同的四層環境運動：metabolism / breath /
+    // noise field / tide。表單、預覽或 seed 展示期間不注入擾動。
+    const rand=(lo,hi)=>lo+Math.random()*(hi-lo);
+    const ambientAllowed=()=>engine && !seedRevealActive && particlePauseReasons.size===0;
+    const schedule=(fn,ms)=>window.setTimeout(fn,ms);
+    const noise2D=(x,y,t)=>{
+      const a=Math.sin(x*.0042+t*.31)*Math.cos(y*.0051+t*.27);
+      const b=.62*Math.sin(x*.0118-t*.19)*Math.cos(y*.0089+t*.43);
+      const c=.38*Math.sin((x+y)*.0073+t*.55);
+      return (a+b+c)*.55;
+    };
+    const metabolism=()=>{
+      if(ambientAllowed()){
+        const {W,H}=engine.size;
+        for(let i=0;i<2;i++) engine.disturb(W*rand(.10,.90),H*rand(.10,.90),rand(60,120),rand(1.6,3));
+      }
+      schedule(metabolism,rand(2200,4000));
+    };
+    const breath=()=>{
+      if(ambientAllowed()){
+        const {W,H}=engine.size;
+        engine.disturb(W*rand(.15,.85),H*rand(.15,.85),rand(200,400),rand(7,13));
+        if(Math.random()<.5) schedule(()=>{
+          if(ambientAllowed()) engine.disturb(W*Math.random(),H*Math.random(),rand(120,240),rand(4,8));
+        },rand(500,1100));
+      }
+      schedule(breath,rand(5000,10000));
+    };
+    const noiseField=()=>{
+      if(ambientAllowed()){
+        const {W,H}=engine.size,t=performance.now()*.001,pts=[];
+        for(let i=0;i<10;i++){
+          const x=W*rand(.05,.95),y=H*rand(.05,.95);
+          pts.push({x,y,n:Math.abs(noise2D(x,y,t))});
+        }
+        pts.sort((a,b)=>b.n-a.n);
+        for(let k=0;k<2;k++){
+          const p=pts[k];
+          if(p&&p.n>=.25) engine.disturb(p.x,p.y,220+p.n*280,5+p.n*11+(k===0?3:0));
+        }
+      }
+      schedule(noiseField,rand(1200,2400));
+    };
+    const tide=()=>{
+      if(ambientAllowed()){
+        const {W,H}=engine.size,m=Math.min(W,H),angle=Math.random()*Math.PI*2;
+        const cx=W*rand(.4,.6),cy=H*rand(.4,.6),len=m*.55;
+        const ux=Math.cos(angle),uy=Math.sin(angle),sx=cx-ux*len*.5,sy=cy-uy*len*.5;
+        for(let i=0;i<4;i++) schedule(()=>{
+          if(!ambientAllowed()) return;
+          const tt=i/3;
+          engine.disturb(sx+ux*len*tt,sy+uy*len*tt,m*.32+Math.random()*m*.10,rand(16,25));
+        },i*220);
+      }
+      schedule(tide,rand(10000,18000));
+    };
+    metabolism();
+    breath();
+    schedule(noiseField,800);
+    schedule(tide,6000);
+  }
+
+  // 先讓表單、標題與操作按鈕完成首屏繪製，再於空閒時啟動粒子引擎，
+  // 避免解析 HTML 後立刻進行大量粒子配置造成 loading 畫面停頓。
+  if('requestIdleCallback' in window){
+    requestIdleCallback(() => bootEngine(),{timeout:350});
+  }else{
+    requestAnimationFrame(() => setTimeout(bootEngine,60));
+  }
 
   let pointerDown = false;
   function pointerPos(e){
@@ -1152,17 +1261,26 @@
 
   // ───────────────────── 下載社群圖 ─────────────────────
   const exportBtns = document.querySelectorAll('.export-btn');
+  const formatBtns = document.querySelectorAll('.format-btn');
   const previewModal = document.getElementById('previewModal');
+  const previewTitle = document.getElementById('previewTitle');
   const previewImage = document.getElementById('previewImage');
+  const previewVideo = document.getElementById('previewVideo');
   const previewClose = document.getElementById('previewClose');
   const previewCancel = document.getElementById('previewCancel');
   const previewConfirm = document.getElementById('previewConfirm');
   let pendingDownload = null;
+  let exportFormat = 'image';
   const RATIO_MAP = {
     '9:16': { w: 1080, h: 1920 },
     '1:1':  { w: 1200, h: 1200 },
     '3:4':  { w: 1200, h: 1600 }
   };
+
+  formatBtns.forEach(btn => btn.addEventListener('click', () => {
+    exportFormat = btn.dataset.format;
+    formatBtns.forEach(item => item.classList.toggle('is-active', item === btn));
+  }));
 
   function wrapText(octx, text, maxWidth){
     const words = text.split('');
@@ -1246,32 +1364,43 @@
     targetCtx.stroke();
   }
 
-  async function exportImage(ratioKey){
+  async function exportImage(ratioKey, frameOnly = false, renderOptions = {}){
+    const {skipParticles=false,transparentBackground=false}=renderOptions;
     const { w: tw, h: th } = RATIO_MAP[ratioKey];
     const off = document.createElement('canvas');
     off.width = tw; off.height = th;
     const octx = off.getContext('2d');
 
-    const grad = octx.createRadialGradient(tw/2, th*0.4, 0, tw/2, th*0.4, Math.max(tw,th)*0.75);
-    grad.addColorStop(0, '#0A0D14');
-    grad.addColorStop(0.7, '#050506');
-    grad.addColorStop(1, '#050704');
-    octx.fillStyle = grad;
-    octx.fillRect(0,0,tw,th);
+    if(!transparentBackground){
+      const grad = octx.createRadialGradient(tw/2, th*0.4, 0, tw/2, th*0.4, Math.max(tw,th)*0.75);
+      grad.addColorStop(0, '#0A0D14');
+      grad.addColorStop(0.7, '#050506');
+      grad.addColorStop(1, '#050704');
+      octx.fillStyle = grad;
+      octx.fillRect(0,0,tw,th);
+    }
 
     // WebGPU 的顯示紋理在畫面呈現後可能已被瀏覽器回收，直接 drawImage(canvas)
     // 在部分瀏覽器會得到全黑圖。匯出時改讀回粒子座標並重新繪製，CPU / GPU
     // 兩種引擎都使用同一條可靠的輸出路徑。
     let exportParticles = [];
-    if(engine){
-      if(typeof engine.readParticles === 'function'){
+    if(engine && !skipParticles){
+      // 影片畫格只取等距樣本，避免每幀建立最多十萬個粒子物件。
+      // 靜態圖片仍讀取完整粒子資料，維持原有細節。
+      if(frameOnly && engine.particleArrays){
+        const {pX,pY,pVX,pVY,pS,count}=engine.particleArrays;
+        const sampleStep=Math.max(1,Math.ceil(count/30000));
+        for(let i=0;i<count;i+=sampleStep){
+          exportParticles.push({x:pX[i],y:pY[i],vx:pVX[i],vy:pVY[i],s:pS[i]});
+        }
+      }else if(typeof engine.readParticles === 'function'){
         exportParticles = await engine.readParticles();
       }else if(engine.particles && engine.particles.length){
         exportParticles = engine.particles;
       }
     }
 
-    if(engine && exportParticles.length){
+    if(!skipParticles && engine && exportParticles.length){
       const { W, H } = engine.size;
       const scale = Math.max(tw / W, th / H);
       const offX = (tw - W*scale) / 2;
@@ -1306,7 +1435,7 @@
         octx.fill();
       });
       octx.restore();
-    }else{
+    }else if(!skipParticles){
       // 最後備援：若引擎尚未完成初始化，才嘗試擷取 2D 畫布。
       try{ drawImageCover(octx, canvas, 0, 0, tw, th); }catch(e){}
     }
@@ -1500,7 +1629,7 @@
       const zoomSize=Math.min(tw*(isPortraitExport ? .17 : .13),180), zoomX=tw-safe-zoomSize, zoomY=contentBottom-zoomSize;
       octx.save();
       octx.beginPath(); octx.rect(zoomX,zoomY,zoomSize,zoomSize); octx.clip();
-      octx.fillStyle='#050506'; octx.fillRect(zoomX,zoomY,zoomSize,zoomSize);
+      if(!skipParticles){ octx.fillStyle='#050506'; octx.fillRect(zoomX,zoomY,zoomSize,zoomSize); }
       // 使用已讀回的粒子資料繪製放大標本，避免 WebGPU 畫布擷取後變黑。
       if(engine && exportParticles.length){
         const {W,H}=engine.size;
@@ -1551,6 +1680,9 @@
       octx.restore();
     }
 
+    // 影片錄製時重用同一套構圖器，只回傳當下畫格、不建立下載資料。
+    if(frameOnly) return off;
+
     const safeRatio = ratioKey.replace(':', 'x');
     const filename = `webconf-${theme}-${safeRatio}.png`;
 
@@ -1574,8 +1706,123 @@
     }
 
     if(pendingDownload?.objectUrl) URL.revokeObjectURL(pendingDownload.objectUrl);
-    pendingDownload = { href, filename, objectUrl };
+    pendingDownload = { href, filename, objectUrl, mediaType:'image' };
+    previewVideo.pause();
+    previewVideo.removeAttribute('src');
+    previewVideo.style.display = 'none';
+    previewImage.style.display = 'block';
     previewImage.src = href;
+    previewTitle.textContent = '下載圖片預覽';
+    previewModal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  async function exportVideo(ratioKey){
+    if(typeof MediaRecorder === 'undefined') throw new Error('此瀏覽器不支援影片錄製');
+    const { w, h } = RATIO_MAP[ratioKey];
+    const recordingCanvas = document.createElement('canvas');
+    recordingCanvas.width = w; recordingCanvas.height = h;
+    const recordingCtx = recordingCanvas.getContext('2d');
+    const capture = recordingCanvas.captureStream || recordingCanvas.mozCaptureStream;
+    if(!capture) throw new Error('此瀏覽器不支援 Canvas 影片錄製');
+
+    const mimeCandidates = [
+      'video/mp4;codecs=avc1.42E01E',
+      'video/webm;codecs=vp8',
+      'video/webm;codecs=vp9',
+      'video/webm'
+    ];
+    const mimeType = mimeCandidates.find(type => MediaRecorder.isTypeSupported?.(type)) || '';
+    const VIDEO_FPS = 30;
+    const stream = capture.call(recordingCanvas,VIDEO_FPS);
+    const recorderOptions = { videoBitsPerSecond: 7000000 };
+    if(mimeType) recorderOptions.mimeType = mimeType;
+    const recorder = new MediaRecorder(stream,recorderOptions);
+    const chunks = [];
+    recorder.addEventListener('dataavailable',event => { if(event.data?.size) chunks.push(event.data); });
+    const stopped = new Promise((resolve,reject) => {
+      recorder.addEventListener('stop',resolve,{once:true});
+      recorder.addEventListener('error',event => reject(event.error || new Error('影片錄製失敗')),{once:true});
+    });
+
+    const previousSimSpeed = engine?.config?.simSpeed ?? NORMAL_SIM_SPEED;
+    videoRecordingActive = true;
+    setParticleUIPause('preview',false);
+    engine?.setSimSpeed?.(NORMAL_SIM_SPEED);
+    syncParticlePause();
+    try{
+      // 所有靜態公告元素只畫一次；錄影期間每幀只合成即時粒子 Canvas。
+      const overlay = await exportImage(ratioKey,true,{skipParticles:true,transparentBackground:true});
+      const videoBg = recordingCtx.createRadialGradient(w/2,h*.4,0,w/2,h*.4,Math.max(w,h)*.75);
+      videoBg.addColorStop(0,'#0A0D14');
+      videoBg.addColorStop(.7,'#050506');
+      videoBg.addColorStop(1,'#050704');
+      const speakerMask = recordingCtx.createLinearGradient(0,0,0,h);
+      speakerMask.addColorStop(0,'rgba(5,5,6,.94)');
+      speakerMask.addColorStop(.11,'rgba(5,5,6,.72)');
+      speakerMask.addColorStop(.22,'rgba(5,5,6,.18)');
+      speakerMask.addColorStop(.31,'rgba(5,5,6,0)');
+      speakerMask.addColorStop(.69,'rgba(5,5,6,0)');
+      speakerMask.addColorStop(.78,'rgba(5,5,6,.18)');
+      speakerMask.addColorStop(.89,'rgba(5,5,6,.72)');
+      speakerMask.addColorStop(1,'rgba(5,5,6,.94)');
+      const drawLiveFrame=()=>{
+        recordingCtx.globalCompositeOperation='source-over';
+        recordingCtx.globalAlpha=1;
+        recordingCtx.fillStyle=videoBg;
+        recordingCtx.fillRect(0,0,w,h);
+        try{ drawImageCover(recordingCtx,canvas,0,0,w,h); }catch(_){ }
+        if(theme==='speaker'){
+          recordingCtx.fillStyle=speakerMask;
+          recordingCtx.fillRect(0,0,w,h);
+          // 動態更新右下顯微鏡放大圖，框線與指示線由 overlay 提供。
+          const safe=40,headerH=Math.max(92,h*.12),footerH=Math.max(92,h*.12);
+          const contentBottom=h-safe-footerH-40;
+          const portrait=ratioKey==='9:16';
+          const zoomSize=Math.min(w*(portrait ? .17 : .13),180);
+          const zoomX=w-safe-zoomSize,zoomY=contentBottom-zoomSize;
+          const sourceSide=Math.min(canvas.width,canvas.height)*.18;
+          const sourceX=canvas.width*.62-sourceSide/2;
+          const sourceY=canvas.height*.62-sourceSide/2;
+          recordingCtx.fillStyle='#050506';
+          recordingCtx.fillRect(zoomX,zoomY,zoomSize,zoomSize);
+          try{ recordingCtx.drawImage(canvas,sourceX,sourceY,sourceSide,sourceSide,zoomX,zoomY,zoomSize,zoomSize); }catch(_){ }
+        }
+        recordingCtx.drawImage(overlay,0,0,w,h);
+      };
+      drawLiveFrame();
+      recorder.start(250);
+      const startedAt = performance.now();
+      while(performance.now()-startedAt < 10000){
+        await new Promise(resolve=>requestAnimationFrame(resolve));
+        drawLiveFrame();
+      }
+      recorder.stop();
+      await stopped;
+    } finally {
+      if(recorder.state !== 'inactive') recorder.stop();
+      stream.getTracks().forEach(track => track.stop());
+      engine?.setSimSpeed?.(previousSimSpeed);
+      videoRecordingActive = false;
+      setParticleUIPause('preview',true);
+    }
+
+    if(!chunks.length) throw new Error('未取得影片資料');
+    const actualType = recorder.mimeType || mimeType || 'video/webm';
+    const blob = new Blob(chunks,{type:actualType});
+    const objectUrl = URL.createObjectURL(blob);
+    const extension = actualType.startsWith('video/mp4') ? 'mp4' : 'webm';
+    const safeRatio = ratioKey.replace(':','x');
+    const filename = `webconf-${theme}-${safeRatio}-10s.${extension}`;
+    if(pendingDownload?.objectUrl) URL.revokeObjectURL(pendingDownload.objectUrl);
+    pendingDownload = { href:objectUrl, filename, objectUrl, mediaType:'video' };
+    previewImage.removeAttribute('src');
+    previewImage.style.display = 'none';
+    previewVideo.style.display = 'block';
+    previewVideo.src = objectUrl;
+    previewVideo.currentTime = 0;
+    previewVideo.play().catch(()=>{});
+    previewTitle.textContent = '10 秒影片預覽';
     previewModal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
   }
@@ -1584,6 +1831,9 @@
     previewModal.classList.remove('is-open');
     document.body.style.overflow = '';
     previewImage.removeAttribute('src');
+    previewVideo.pause();
+    previewVideo.removeAttribute('src');
+    previewVideo.load();
     if(pendingDownload?.objectUrl) URL.revokeObjectURL(pendingDownload.objectUrl);
     pendingDownload = null;
     setParticleUIPause('preview',false);
@@ -1601,6 +1851,9 @@
     previewModal.classList.remove('is-open');
     document.body.style.overflow = '';
     previewImage.removeAttribute('src');
+    previewVideo.pause();
+    previewVideo.removeAttribute('src');
+    previewVideo.load();
     pendingDownload = null;
     setParticleUIPause('preview',false);
     if(objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
@@ -1618,10 +1871,14 @@
     btn.addEventListener('click', async () => {
       const ratioKey = btn.dataset.ratio;
       btn.classList.add('is-busy');
-      // 產圖前先凍結粒子，讓預覽與最終下載使用完全相同的構圖。
-      setParticleUIPause('preview',true);
       try{
-        await exportImage(ratioKey);
+        if(exportFormat === 'video'){
+          await exportVideo(ratioKey);
+        }else{
+          // 產圖前先凍結粒子，讓預覽與最終下載使用完全相同的構圖。
+          setParticleUIPause('preview',true);
+          await exportImage(ratioKey);
+        }
         btn.classList.remove('is-busy');
         btn.classList.add('is-done');
         setTimeout(() => btn.classList.remove('is-done'), 1200);
@@ -1629,7 +1886,7 @@
         btn.classList.remove('is-busy');
         setParticleUIPause('preview',false);
         console.error(err);
-        alert('圖片產生失敗,請再試一次。');
+        alert('下載檔案產生失敗，請再試一次。');
       }
     });
   });

@@ -55,6 +55,20 @@
     }
     return flat(m);
   }
+
+  // Disperse — gentle repulsion keeps the seed opening visible, then lets the
+  // field dissolve into an even living mist instead of compact particle balls.
+  function disperse(n) {
+    const m = new Array(n);
+    for (let i = 0; i < n; i++) {
+      m[i] = new Array(n);
+      for (let j = 0; j < n; j++) {
+        if (i === j) m[i][j] = -0.34;
+        else m[i][j] = -0.12 + (((i * 3 + j * 5) % 4) - 1.5) * 0.025;
+      }
+    }
+    return flat(m);
+  }
   function hubSpokes(n) {
     const m = new Array(n);
     for (let i = 0; i < n; i++) {
@@ -388,6 +402,7 @@
   const PRESETS = {
     // Brand defaults — kept first so existing callers still work
     cellular,
+    disperse,
     'hub-spokes': hubSpokes,
     orbital,
     // Sandbox "alive" ports
