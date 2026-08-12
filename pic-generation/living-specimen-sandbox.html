@@ -304,7 +304,7 @@
 
   /* ── 抽屜面板 ── */
   .backdrop{
-    position:fixed; inset:0; z-index:9;
+    position:fixed; inset:0; z-index:24;
     background: rgba(2,5,3,0.5);
     opacity:0; pointer-events:none;
     transition: opacity 0.25s ease;
@@ -312,7 +312,7 @@
   .backdrop.is-open{ opacity:1; pointer-events:auto; }
 
   .drawer{
-    position:fixed; z-index:10;
+    position:fixed; z-index:25;
     left:50%; bottom:0; transform:translate(-50%, 16px);
     width:min(460px, 100vw);
     max-height: min(82vh, 720px);
@@ -425,6 +425,16 @@
   }
   .apply-btn:hover{ background:#a3ffce; transform:translateY(-1px); }
   .apply-btn:active{ transform:translateY(0) scale(0.98); }
+
+  .drawer-actions{
+    position:sticky; bottom:-20px; z-index:50;
+    margin:18px -22px -20px; padding:14px 22px calc(18px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to bottom,rgba(8,10,14,.88),rgba(8,10,14,1) 24%);
+    border-top:1px solid var(--line);
+    isolation:isolate;
+  }
+  .drawer-actions .apply-btn{position:relative;z-index:52;margin-top:0;pointer-events:auto;}
+  .drawer-actions #resetBtn{position:relative;z-index:52;pointer-events:auto;}
 
   .divider{ height:1px; background:var(--line); margin:20px 0 16px; }
 
@@ -650,9 +660,10 @@
     </div>
   </div>
 
-  <button class="apply-btn" id="applyBtn">套用變更</button>
-
-  <button type="button" id="resetBtn">還原目前主題的預設內容</button>
+  <div class="drawer-actions">
+    <button type="button" class="apply-btn" id="closeFormBtn">關閉</button>
+    <button type="button" id="resetBtn">還原目前主題的預設內容</button>
+  </div>
 </div>
 
 <div class="preview-modal" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
@@ -751,7 +762,7 @@
   const speakerRoleInput = document.getElementById('speakerRoleInput');
   const speakerTopicInput = document.getElementById('speakerTopicInput');
 
-  const applyBtn = document.getElementById('applyBtn');
+  const closeFormBtn = document.getElementById('closeFormBtn');
   const resetBtn = document.getElementById('resetBtn');
 
   // 依姓名與職稱的實際文字寬度調整卡片；超過安全寬度時由既有換行規則承接。
@@ -786,7 +797,8 @@
     drawer.classList.remove('is-open');
     backdrop.classList.remove('is-open');
     quickActions.classList.remove('is-hidden');
-    setParticleUIPause('drawer',false);
+    try{ setParticleUIPause('drawer',false); }
+    catch(error){ console.warn('[粒子] 恢復動畫失敗',error); }
   }
   closeDrawer.addEventListener('click', closeDrawerFn);
   backdrop.addEventListener('click', closeDrawerFn);
@@ -853,13 +865,19 @@
       avatarUploadBtn.appendChild(previewImg);
 
       const img = new Image();
-      img.onload = () => { avatarImage = img; };
+      img.onload = () => {
+        avatarImage = img;
+        avatarOut.innerHTML = '';
+        const outputImg = document.createElement('img');
+        outputImg.src = dataUrl;
+        avatarOut.appendChild(outputImg);
+      };
       img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   });
 
-  // ───────────────────── 套用變更 ─────────────────────
+  // ───────────────────── 表單即時預覽 ─────────────────────
   function flashGlow(el){
     el.style.textShadow = '0 0 34px rgba(113,193,240,0.7), 0 0 90px rgba(113,193,240,0.25)';
     setTimeout(() => { el.style.textShadow = '0 0 24px rgba(113,193,240,0.35), 0 0 60px rgba(113,193,240,0.12)'; }, 400);
@@ -889,31 +907,38 @@
     });
   }
 
-  applyBtn.addEventListener('click', () => {
-    if(theme === 'general'){
-      const t = titleInput.value.trim();
-      const s = subtitleInput.value.trim();
-      if(t) setStyledTitle(t);
-      if(s) subtitleOut.textContent = s;
-      flashGlow(titleOut);
-    } else {
-      const n = speakerNameInput.value.trim();
-      const rl = speakerRoleInput.value.trim();
-      const tp = speakerTopicInput.value.trim();
-      if(n) speakerNameOut.textContent = n;
-      if(rl) speakerRoleOut.textContent = rl;
-      if(tp) speakerTopicOut.textContent = tp;
-      if(avatarImage){
-        avatarOut.innerHTML = '';
-        const img = document.createElement('img');
-        img.src = avatarImage.src;
-        avatarOut.appendChild(img);
-      }
-      requestAnimationFrame(updateSpeakerNameCardWidth);
-      flashGlow(speakerNameOut);
-    }
+  function applyGeneralFields(){
+    const titleValue = titleInput.value.trim();
+    const subtitleValue = subtitleInput.value.trim();
+    setStyledTitle(titleValue || DEFAULTS.general.title.replace(/<br\s*\/?>/gi,'\n'));
+    subtitleOut.textContent = subtitleValue || DEFAULTS.general.subtitle;
+  }
+
+  // 一般公告同步提供即時預覽，避免等待套用後才發現內容未更新。
+  titleInput.addEventListener('input',applyGeneralFields);
+  subtitleInput.addEventListener('input',applyGeneralFields);
+
+  function applySpeakerFields(){
+    const nameValue = speakerNameInput.value.trim();
+    const roleValue = speakerRoleInput.value.trim();
+    const topicValue = speakerTopicInput.value.trim();
+    speakerNameOut.textContent = nameValue || DEFAULTS.speaker.name;
+    speakerRoleOut.textContent = roleValue || DEFAULTS.speaker.role;
+    speakerTopicOut.textContent = topicValue || DEFAULTS.speaker.topic;
+    updateTagsText();
+    requestAnimationFrame(updateSpeakerNameCardWidth);
+  }
+
+  // 公告講者欄位同步即時預覽；套用按鈕只負責確認與關閉表單。
+  speakerNameInput.addEventListener('input',applySpeakerFields);
+  speakerRoleInput.addEventListener('input',applySpeakerFields);
+  speakerTopicInput.addEventListener('input',applySpeakerFields);
+
+  // 欄位皆為即時預覽，底部按鈕只負責關閉表單。
+  closeFormBtn.onclick = (event) => {
+    event.preventDefault();
     closeDrawerFn();
-  });
+  };
 
   resetBtn.addEventListener('click', (event) => {
     event.preventDefault();
@@ -1145,7 +1170,11 @@
 
   async function bootEngine(){
     try{
-      engine = await window.makeEngine(canvas, ENGINE_OPTS);
+      const engineFactory = window.makeEngine || ((target,options) => {
+        if(!window.ParticleLife?.create) throw new Error('粒子引擎檔案未載入');
+        return window.ParticleLife.create(target,options);
+      });
+      engine = await engineFactory(canvas, ENGINE_OPTS);
     }catch(err){
       console.error('[sandbox] 粒子引擎啟動失敗', err);
       return;
