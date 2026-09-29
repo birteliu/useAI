@@ -34,6 +34,10 @@
     color: var(--ink);
   }
   canvas{position:fixed; inset:0; width:100vw; height:100vh; display:block; cursor:crosshair; z-index:1;}
+  .particle-dimmer{
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:rgba(0,0,0,.10);
+  }
   /* 講者版上下保留呼吸空間：柔和壓低進入標題與頁尾區的粒子。 */
   body.is-speaker::before{
     content:''; position:fixed; inset:0; z-index:3; pointer-events:none;
@@ -521,6 +525,7 @@
 <body>
 
 <canvas id="field"></canvas>
+<div class="particle-dimmer" aria-hidden="true"></div>
 
 <div class="frame" aria-hidden="true">
   <span class="corner corner-tl"></span>
@@ -542,7 +547,7 @@
   <!-- 講者公告 -->
   <div class="stage-view" id="stageSpeaker">
     <div class="sp-header">
-      <div class="sp-title">Speakers</div>
+      <div class="sp-title">Speaker</div>
       <div class="sp-kicker">講者開箱</div>
     </div>
 
@@ -715,7 +720,7 @@
       const focusedRadius=Math.pow(Math.min(radius,1),1.18)*.78;
       const scale=focusedRadius/radius;
       pX[i]=cx+nx*scale*rx;
-      // 垂直方向額外收斂，減少 seed 進入 Speakers／WebConf 上下區塊。
+      // 垂直方向額外收斂，減少 seed 進入 Speaker／WebConf 上下區塊。
       pY[i]=cy+ny*scale*ry*.72;
       pVX[i]*=.35;
       pVY[i]*=.35;
@@ -1254,7 +1259,7 @@
   const RATIO_MAP = {
     '9:16': { w: 1080, h: 1920 },
     '1:1':  { w: 1200, h: 1200 },
-    '3:4':  { w: 1200, h: 1600 }
+    '3:4':  { w: 1600, h: 2133 }
   };
 
   formatBtns.forEach(btn => btn.addEventListener('click', () => {
@@ -1419,6 +1424,11 @@
       // 最後備援：若引擎尚未完成初始化，才嘗試擷取 2D 畫布。
       try{ drawImageCover(octx, canvas, 0, 0, tw, th); }catch(e){}
     }
+    if(!skipParticles){
+      // 與主畫面一致：在粒子和文字／照片之間覆蓋 10% 黑色，提高可讀性。
+      octx.fillStyle = 'rgba(0,0,0,.10)';
+      octx.fillRect(0,0,tw,th);
+    }
     octx.globalAlpha = 1;
 
     // 字型載入設定逾時保護,避免因字型讀取失敗導致下載卡住沒反應
@@ -1486,8 +1496,10 @@
       subtitleLines.forEach((line,i)=>octx.fillText(line,tw/2,subtitleStartY+i*subtitleLineHeight));
       if('letterSpacing' in octx) octx.letterSpacing = '0px';
     } else {
-      // 講者匯出：使用和畫面一致的海報式構圖，所有主要物件距邊緣 40px。
-      const safe = 40;
+      // 講者匯出：使用和畫面一致的海報式構圖。所有版面常數以 1200 寬為基準，
+      // 再乘上 S 等比縮放，讓不同輸出尺寸維持相同的視覺密度。
+      const S = tw/1200;
+      const safe = 40*S;
       const isPortraitExport = ratioKey === '9:16';
       const line = 'rgba(239,230,210,0.55)';
       const headerH = Math.max(92, th * 0.12);
@@ -1496,13 +1508,13 @@
       octx.textBaseline = 'middle';
       octx.textAlign = 'left';
       octx.strokeStyle = line;
-      octx.lineWidth = 1.5;
+      octx.lineWidth = 1.5*S;
       octx.beginPath(); octx.moveTo(safe, safe + headerH); octx.lineTo(tw-safe, safe+headerH); octx.stroke();
       octx.beginPath(); octx.moveTo(safe, th-safe-footerH); octx.lineTo(tw-safe, th-safe-footerH); octx.stroke();
 
       octx.fillStyle = '#EFE6D2';
       octx.font = `italic 400 ${Math.round(Math.min(tw*.075, headerH*.72))}px 'Inria Serif','Noto Serif TC',serif`;
-      octx.fillText('Speakers', safe, safe + headerH*.44);
+      octx.fillText('Speaker', safe, safe + headerH*.44);
       octx.textAlign = 'right';
       octx.fillStyle = '#71C1F0';
       octx.font = `normal 700 ${Math.round(Math.min(tw*.03, headerH*.34))}px 'Noto Serif TC',serif`;
@@ -1511,29 +1523,29 @@
       const photoW = Math.min(tw*(isPortraitExport ? .28 : .22), (th-headerH-footerH-safe*2)*.28);
       const photoH = photoW*1.22;
       const photoX = tw-safe-photoW;
-      const photoY = safe+headerH+Math.max(40, th*.055);
+      const photoY = safe+headerH+Math.max(40*S, th*.055);
       const nameFs=Math.max(34,Math.round(tw*(isPortraitExport ? .062 : .06)));
       const roleFs=Math.max(18,Math.round(tw*.028));
       // 先量測姓名與職稱，再讓卡片由照片左緣向左伸縮。
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      const measuredNameW=octx.measureText(speakerNameOut.textContent).width+60;
+      const measuredNameW=octx.measureText(speakerNameOut.textContent).width+60*S;
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
-      const measuredRoleW=octx.measureText(speakerRoleOut.textContent).width+60;
+      const measuredRoleW=octx.measureText(speakerRoleOut.textContent).width+60*S;
       const nameMinW=Math.min(tw*.28,photoX-safe);
       const nameMaxW=photoX-safe;
       const nameW=Math.min(nameMaxW,Math.max(nameMinW,measuredNameW,measuredRoleW));
       const nameX=photoX-nameW;
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      const nameLines=wrapText(octx,speakerNameOut.textContent,nameW-60);
+      const nameLines=wrapText(octx,speakerNameOut.textContent,nameW-60*S);
       const nameLineH=nameFs*1.18;
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
-      const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60);
+      const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60*S);
       const roleLineH=roleFs*1.42;
-      const nameRoleGap=Math.max(16,nameFs*.3);
+      const nameRoleGap=Math.max(16*S,nameFs*.3);
       const nameBlockH=Math.max(nameFs,nameLines.length*nameLineH);
       const roleBlockH=Math.max(roleFs,roleLines.length*roleLineH);
       const nameGroupH=nameBlockH+nameRoleGap+roleBlockH;
-      const nameH=Math.max(photoH*.64,nameGroupH+48);
+      const nameH=Math.max(photoH*.64,nameGroupH+48*S);
       const nameGroupTop=photoY+(nameH-nameGroupH)/2;
       const nameStartY=nameGroupTop+nameLineH/2;
       const roleStartY=nameGroupTop+nameBlockH+nameRoleGap+roleLineH/2;
@@ -1545,32 +1557,32 @@
 
       octx.textAlign='left'; octx.fillStyle='#EFE6D2';
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      nameLines.forEach((text,i)=>octx.fillText(text,nameX+30,nameStartY+i*nameLineH));
+      nameLines.forEach((text,i)=>octx.fillText(text,nameX+30*S,nameStartY+i*nameLineH));
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
-      roleLines.forEach((text,i)=>octx.fillText(text,nameX+30,roleStartY+i*roleLineH));
+      roleLines.forEach((text,i)=>octx.fillText(text,nameX+30*S,roleStartY+i*roleLineH));
 
-      const contentBottom=th-safe-footerH-40;
-      const quoteW=Math.min(tw*(isPortraitExport ? .54 : .46),650), quoteX=safe;
+      const contentBottom=th-safe-footerH-40*S;
+      const quoteW=Math.min(tw*(isPortraitExport ? .54 : .46),650*S), quoteX=safe;
       const topicFs=Math.max(22,Math.round(tw*.032));
       octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
-      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64);
-      const quoteH=Math.max(150,topicLines.length*topicFs*1.55+58);
+      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64*S);
+      const quoteH=Math.max(150*S,topicLines.length*topicFs*1.55+58*S);
       const tagFs=Math.max(18,Math.round(tw*.022));
       octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
-      const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64);
+      const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64*S);
       const tagLineH=tagFs*1.45;
-      const tagsH=Math.max(52,tagLines.length*tagLineH+28);
+      const tagsH=Math.max(52*S,tagLines.length*tagLineH+28*S);
       // 講題＋標籤整組固定靠齊內容區左下，不再跟著頭像高度浮動。
       const quoteY=contentBottom-tagsH-quoteH;
       octx.fillStyle='#EFE6D2'; octx.fillRect(quoteX,quoteY,quoteW,quoteH);
       octx.fillStyle='#141008';
       octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
-      topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32,quoteY+38+topicFs*.78+i*topicFs*1.55));
+      topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32*S,quoteY+38*S+topicFs*.78+i*topicFs*1.55));
       octx.fillStyle='rgba(5,5,6,.92)'; octx.fillRect(quoteX,quoteY+quoteH,quoteW,tagsH);
       octx.strokeStyle=line; octx.strokeRect(quoteX,quoteY+quoteH,quoteW,tagsH);
       octx.fillStyle='#EFE6D2'; octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
       const tagStartY=quoteY+quoteH+(tagsH-(tagLines.length-1)*tagLineH)/2;
-      tagLines.forEach((text,i)=>octx.fillText(text,quoteX+32,tagStartY+i*tagLineH));
+      tagLines.forEach((text,i)=>octx.fillText(text,quoteX+32*S,tagStartY+i*tagLineH));
 
       // 顯微鏡觀察指示：分別從講者卡與講題卡連到粒子標記點。
       octx.save();
@@ -1578,7 +1590,7 @@
       octx.lineWidth=Math.max(1.5,tw*.0011);
       const speakerMarkX=photoX-photoW*.72;
       const speakerMarkY=photoY+photoH*1.38;
-      const markerR=Math.max(12,tw*.011);
+      const markerR=Math.max(12*S,tw*.011);
       const speakerStartX=photoX+photoW*.55;
       const speakerStartY=photoY+photoH;
       const speakerD=Math.hypot(speakerStartX-speakerMarkX,speakerStartY-speakerMarkY)||1;
@@ -1591,7 +1603,7 @@
       octx.beginPath(); octx.arc(speakerMarkX,speakerMarkY,markerR,0,Math.PI*2); octx.stroke();
 
       const topicMarkX=quoteX+quoteW*.70;
-      const topicMarkY=quoteY-Math.max(44,th*.055);
+      const topicMarkY=quoteY-Math.max(44*S,th*.055);
       const topicStartX=quoteX+quoteW*.56;
       const topicStartY=quoteY;
       const topicD=Math.hypot(topicStartX-topicMarkX,topicStartY-topicMarkY)||1;
@@ -1605,7 +1617,7 @@
       octx.restore();
 
       // 右下顯微鏡標本：截取目前粒子畫布的一小塊並以連接線標示。
-      const zoomSize=Math.min(tw*(isPortraitExport ? .17 : .13),180), zoomX=tw-safe-zoomSize, zoomY=contentBottom-zoomSize;
+      const zoomSize=Math.min(tw*(isPortraitExport ? .17 : .13),180*S), zoomX=tw-safe-zoomSize, zoomY=contentBottom-zoomSize;
       octx.save();
       octx.beginPath(); octx.rect(zoomX,zoomY,zoomSize,zoomSize); octx.clip();
       if(!skipParticles){ octx.fillStyle='#050506'; octx.fillRect(zoomX,zoomY,zoomSize,zoomSize); }
@@ -1619,10 +1631,10 @@
         exportParticles.forEach(p=>{
           const zx=zoomX+zoomSize/2+(p.x-cropCX)*zoomScale;
           const zy=zoomY+zoomSize/2+(p.y-cropCY)*zoomScale;
-          if(zx<zoomX-8||zx>zoomX+zoomSize+8||zy<zoomY-8||zy>zoomY+zoomSize+8)return;
+          if(zx<zoomX-8*S||zx>zoomX+zoomSize+8*S||zy<zoomY-8*S||zy>zoomY+zoomSize+8*S)return;
           const color=palette[p.s%palette.length];
-          octx.globalAlpha=.22; octx.fillStyle=color; octx.beginPath(); octx.arc(zx,zy,8,0,Math.PI*2); octx.fill();
-          octx.globalAlpha=.95; octx.beginPath(); octx.arc(zx,zy,2.5,0,Math.PI*2); octx.fill();
+          octx.globalAlpha=.22; octx.fillStyle=color; octx.beginPath(); octx.arc(zx,zy,8*S,0,Math.PI*2); octx.fill();
+          octx.globalAlpha=.95; octx.beginPath(); octx.arc(zx,zy,2.5*S,0,Math.PI*2); octx.fill();
         });
       }
       octx.restore();
@@ -1649,10 +1661,10 @@
       octx.font=`normal 700 ${footerTitleFont}px 'Noto Serif TC',serif`;
       const footerTitle='瓶蓋工廠台北製造所 · Dec. 11-12, 2026';
       const footerGroupX=safe+octx.measureText(footerTitle).width/2;
-      octx.fillText(footerTitle,footerGroupX,footerCenterY-14);
+      octx.fillText(footerTitle,footerGroupX,footerCenterY-14*S);
       octx.fillStyle='#A79C86';
       octx.font=`400 ${footerMetaFont}px monospace`;
-      octx.fillText('AGENT · CONNECTIONS · CODE',footerGroupX,footerCenterY+17);
+      octx.fillText('AGENT · CONNECTIONS · CODE',footerGroupX,footerCenterY+17*S);
       octx.fillStyle='#EFE6D2'; octx.textAlign='right';
       octx.font=`italic 400 ${Math.max(44,Math.round(tw*.06))}px Georgia,serif`;
       octx.fillText('WebConf',tw-safe,footerCenterY);
@@ -1713,16 +1725,14 @@
     ];
     const mimeType = mimeCandidates.find(type => MediaRecorder.isTypeSupported?.(type)) || '';
     const VIDEO_FPS = 30;
-    const stream = capture.call(recordingCanvas,VIDEO_FPS);
     const recorderOptions = { videoBitsPerSecond: 7000000 };
     if(mimeType) recorderOptions.mimeType = mimeType;
-    const recorder = new MediaRecorder(stream,recorderOptions);
     const chunks = [];
-    recorder.addEventListener('dataavailable',event => { if(event.data?.size) chunks.push(event.data); });
-    const stopped = new Promise((resolve,reject) => {
-      recorder.addEventListener('stop',resolve,{once:true});
-      recorder.addEventListener('error',event => reject(event.error || new Error('影片錄製失敗')),{once:true});
-    });
+    // 影片開頭的黑畫面來自 captureStream 的自動取樣:它從建立串流當下就依自己
+    // 的時鐘抓畫布,overlay 產生期間(含 document.fonts.ready 最長 1.5 秒)的空白
+    // 畫布就這樣被錄進去。改用 frameRate 0 + requestFrame() 逐格手動推送,
+    // 瀏覽器便完全不會自動取樣,影片內容與我們畫出的畫格一一對應。
+    let stream = null, recorder = null, stopped = null, videoTrack = null;
 
     const previousSimSpeed = engine?.config?.simSpeed ?? NORMAL_SIM_SPEED;
     videoRecordingActive = true;
@@ -1751,14 +1761,17 @@
         recordingCtx.fillStyle=videoBg;
         recordingCtx.fillRect(0,0,w,h);
         try{ drawImageCover(recordingCtx,canvas,0,0,w,h); }catch(_){ }
+        recordingCtx.fillStyle='rgba(0,0,0,.10)';
+        recordingCtx.fillRect(0,0,w,h);
         if(theme==='speaker'){
           recordingCtx.fillStyle=speakerMask;
           recordingCtx.fillRect(0,0,w,h);
           // 動態更新右下顯微鏡放大圖，框線與指示線由 overlay 提供。
-          const safe=40,headerH=Math.max(92,h*.12),footerH=Math.max(92,h*.12);
-          const contentBottom=h-safe-footerH-40;
+          const S=w/1200;
+          const safe=40*S,headerH=Math.max(92,h*.12),footerH=Math.max(92,h*.12);
+          const contentBottom=h-safe-footerH-40*S;
           const portrait=ratioKey==='9:16';
-          const zoomSize=Math.min(w*(portrait ? .17 : .13),180);
+          const zoomSize=Math.min(w*(portrait ? .17 : .13),180*S);
           const zoomX=w-safe-zoomSize,zoomY=contentBottom-zoomSize;
           const sourceSide=Math.min(canvas.width,canvas.height)*.18;
           const sourceX=canvas.width*.62-sourceSide/2;
@@ -1769,25 +1782,76 @@
         }
         recordingCtx.drawImage(overlay,0,0,w,h);
       };
+      // WebGPU 的顯示紋理在畫面呈現後會被回收,在 rAF 之外讀取多半得到空白,
+      // 因此第一格必須和其餘畫格一樣在 rAF 回呼中繪製。另外先輪詢粒子畫布,
+      // 確認真的讀得到內容才開始錄製,避免開頭錄進只有背景與文字的黑畫格。
+      const probe = document.createElement('canvas');
+      probe.width = probe.height = 24;
+      const probeCtx = probe.getContext('2d',{willReadFrequently:true});
+      const liveCanvasHasContent = () => {
+        try{
+          probeCtx.clearRect(0,0,24,24);
+          probeCtx.drawImage(canvas,0,0,24,24);
+          const data = probeCtx.getImageData(0,0,24,24).data;
+          for(let i=0;i<data.length;i+=4){
+            if(data[i+3]>8 && data[i]+data[i+1]+data[i+2]>24) return true;
+          }
+          return false;
+        }catch(_){ return true; } // 讀取受阻時不要卡住錄製
+      };
+      const probeDeadline = performance.now()+1000;
+      do{
+        await new Promise(resolve=>requestAnimationFrame(resolve));
+      }while(!liveCanvasHasContent() && performance.now()<probeDeadline);
       drawLiveFrame();
+      stream = capture.call(recordingCanvas,0);
+      videoTrack = stream.getVideoTracks()[0];
+      if(typeof videoTrack?.requestFrame !== 'function'){
+        // 舊瀏覽器沒有 requestFrame:退回固定 FPS 取樣,並先畫幾格暖機,
+        // 盡量壓低開頭出現空白畫格的機會。
+        stream.getTracks().forEach(track => track.stop());
+        stream = capture.call(recordingCanvas,VIDEO_FPS);
+        videoTrack = null;
+        for(let i=0;i<2;i++){
+          await new Promise(resolve=>requestAnimationFrame(resolve));
+          drawLiveFrame();
+        }
+      }
+      recorder = new MediaRecorder(stream,recorderOptions);
+      recorder.addEventListener('dataavailable',event => { if(event.data?.size) chunks.push(event.data); });
+      stopped = new Promise((resolve,reject) => {
+        recorder.addEventListener('stop',resolve,{once:true});
+        recorder.addEventListener('error',event => reject(event.error || new Error('影片錄製失敗')),{once:true});
+      });
       recorder.start(250);
+      // 錄製開始後立刻推出已經畫好的第一格,確保影片首格就是完整構圖。
+      videoTrack?.requestFrame();
       const startedAt = performance.now();
+      const frameInterval = 1000/VIDEO_FPS;
+      let lastFrameAt = startedAt;
       while(performance.now()-startedAt < 10000){
         await new Promise(resolve=>requestAnimationFrame(resolve));
         drawLiveFrame();
+        if(!videoTrack) continue;
+        // rAF 多半是 60fps,節流到 VIDEO_FPS 以維持原本的檔案大小。
+        const now = performance.now();
+        if(now-lastFrameAt >= frameInterval-1){
+          videoTrack.requestFrame();
+          lastFrameAt = now;
+        }
       }
       recorder.stop();
       await stopped;
     } finally {
-      if(recorder.state !== 'inactive') recorder.stop();
-      stream.getTracks().forEach(track => track.stop());
+      if(recorder && recorder.state !== 'inactive') recorder.stop();
+      stream?.getTracks().forEach(track => track.stop());
       engine?.setSimSpeed?.(previousSimSpeed);
       videoRecordingActive = false;
       setParticleUIPause('preview',true);
     }
 
     if(!chunks.length) throw new Error('未取得影片資料');
-    const actualType = recorder.mimeType || mimeType || 'video/webm';
+    const actualType = recorder?.mimeType || mimeType || 'video/webm';
     const blob = new Blob(chunks,{type:actualType});
     const objectUrl = URL.createObjectURL(blob);
     const extension = actualType.startsWith('video/mp4') ? 'mp4' : 'webm';
