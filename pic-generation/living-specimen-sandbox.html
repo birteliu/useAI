@@ -34,7 +34,6 @@
     color: var(--ink);
   }
   canvas{position:fixed; inset:0; width:100vw; height:100vh; display:block; cursor:crosshair; z-index:1;}
-  #tagGlow{ pointer-events:none; z-index:2; cursor:default; }
   /* 講者版上下保留呼吸空間：柔和壓低進入標題與頁尾區的粒子。 */
   body.is-speaker::before{
     content:''; position:fixed; inset:0; z-index:3; pointer-events:none;
@@ -312,6 +311,7 @@
   .backdrop.is-open{ opacity:1; pointer-events:auto; }
 
   .drawer{
+    visibility:hidden;
     position:fixed; z-index:25;
     left:50%; bottom:0; transform:translate(-50%, 16px);
     width:min(460px, 100vw);
@@ -326,7 +326,7 @@
     opacity:0; pointer-events:none;
     transition: transform 0.28s cubic-bezier(.2,.8,.2,1), opacity 0.22s ease;
   }
-  .drawer.is-open{ opacity:1; pointer-events:auto; transform:translate(-50%, 0); }
+  .drawer.is-open{ opacity:1; visibility:visible; pointer-events:auto; transform:translate(-50%, 0); }
 
   .drawer-head{
     display:flex; align-items:center; justify-content:space-between;
@@ -433,8 +433,8 @@
     border-top:1px solid var(--line);
     isolation:isolate;
   }
-  .drawer-actions .apply-btn{position:relative;z-index:52;margin-top:0;pointer-events:auto;}
-  .drawer-actions #resetBtn{position:relative;z-index:52;pointer-events:auto;}
+  .drawer-actions .apply-btn{position:relative;z-index:52;margin-top:0;pointer-events:inherit;}
+  .drawer-actions #resetBtn{position:relative;z-index:52;pointer-events:inherit;}
 
   .divider{ height:1px; background:var(--line); margin:20px 0 16px; }
 
@@ -521,7 +521,6 @@
 <body>
 
 <canvas id="field"></canvas>
-<canvas id="tagGlow"></canvas>
 
 <div class="frame" aria-hidden="true">
   <span class="corner corner-tl"></span>
@@ -643,7 +642,7 @@
       <input type="text" id="speakerTopicInput" placeholder="輸入講題 / 主題描述…" maxlength="80">
     </label>
     <div class="field">
-      <span>主題標籤(可複選,會疊加對應背景樣式)</span>
+      <span>主題標籤(可複選)</span>
       <div class="tag-grid" id="tagGrid">
         <label class="tag-chip"><input type="checkbox" value="frontend" data-color="#71C1F0"><span class="tag-box"></span>Frontend</label>
         <label class="tag-chip"><input type="checkbox" value="backend" data-color="#8E7CC3"><span class="tag-box"></span>Backend</label>
@@ -972,7 +971,7 @@
   });
 
   // ───────────────────── 主題標籤 → 粒子生命引擎樣式 ─────────────────────
-  // 每個標籤保留對應色彩與光暈位置；粒子物理統一由 disperse 控制。
+  // 標籤保留對應色彩；粒子物理統一由 disperse 控制。
   const TAGS = [
     { key: 'frontend', x: 0.18, y: 0.22, r: 0.42, color: '#71C1F0', preset: 'cellular', label: 'Frontend' },
     { key: 'backend',  x: 0.82, y: 0.20, r: 0.40, color: '#8E7CC3', preset: 'hub-spokes', label: 'Backend' },
@@ -1003,7 +1002,7 @@
   window.activeParticlePalette = { name:ACTIVE_PARTICLE_PALETTE.name, colors:BASE_PALETTE.slice() };
   changeParticleColor.title = `目前色票：${ACTIVE_PARTICLE_PALETTE.name}`;
 
-  const selectedTags = new Map();   // key -> color(hex),用於背景光暈疊加
+  const selectedTags = new Map();   // key -> color(hex),用於粒子色票
   const tagOrder = [];              // 記錄勾選順序，決定標籤文字與色彩順序
   const tagGrid = document.getElementById('tagGrid');
   const tagCheckboxes = tagGrid.querySelectorAll('input[type="checkbox"]');
@@ -1060,38 +1059,9 @@
       : BASE_PALETTE;
     engine.setPalette(palette);
 
-    // Tag 仍控制色票與背景光暈，但物理規則固定使用 disperse。
+    // Tag 控制粒子色票，但物理規則固定使用 disperse。
     // 避免 cellular / swarm 等吸引型 preset 在後段重新凝聚成粒子球。
     engine.setPreset('disperse');
-  }
-
-  function hexToRgba(hex, alpha){
-    const h = hex.replace('#','');
-    const r = parseInt(h.substring(0,2),16);
-    const g = parseInt(h.substring(2,4),16);
-    const b = parseInt(h.substring(4,6),16);
-    return `rgba(${r},${g},${b},${alpha})`;
-  }
-
-  // 依目前選取的標籤,把對應的光暈疊加畫到任意畫布上(主畫面 tagGlow 層或匯出畫布共用)
-  function drawTagOverlay(targetCtx, w, h){
-    if(theme !== 'speaker' || selectedTags.size === 0) return;
-    targetCtx.save();
-    targetCtx.globalCompositeOperation = 'lighter';
-    selectedTags.forEach((color, key) => {
-      const t = TAG_BY_KEY[key];
-      if(!t) return;
-      const cx = t.x * w, cy = t.y * h;
-      const r = t.r * Math.max(w, h);
-      const grad = targetCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      grad.addColorStop(0, hexToRgba(color, 0.4));
-      grad.addColorStop(1, hexToRgba(color, 0));
-      targetCtx.fillStyle = grad;
-      targetCtx.beginPath();
-      targetCtx.arc(cx, cy, r, 0, Math.PI*2);
-      targetCtx.fill();
-    });
-    targetCtx.restore();
   }
 
   // ───────────────────── 粒子生命引擎(沿用你原網站的 particle-life 系統)─────────────────────
@@ -1268,25 +1238,6 @@
   canvas.addEventListener('pointermove', (e) => {
     if(pointerDown){ const p = pointerPos(e); engine?.disturb(p.x, p.y, 140, 8); }
   });
-
-  // ───────────────────── 標籤光暈疊加畫布(獨立於引擎的畫布之上)─────────────────────
-  const glowCanvas = document.getElementById('tagGlow');
-  const glowCtx = glowCanvas.getContext('2d');
-  function resizeGlow(){
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = window.innerWidth, h = window.innerHeight;
-    glowCanvas.width = w * dpr; glowCanvas.height = h * dpr;
-    glowCanvas.style.width = w + 'px'; glowCanvas.style.height = h + 'px';
-    glowCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  window.addEventListener('resize', resizeGlow);
-  resizeGlow();
-  function glowLoop(){
-    glowCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    drawTagOverlay(glowCtx, window.innerWidth, window.innerHeight);
-    requestAnimationFrame(glowLoop);
-  }
-  glowLoop();
 
   // ───────────────────── 下載社群圖 ─────────────────────
   const exportBtns = document.querySelectorAll('.export-btn');
@@ -1468,7 +1419,6 @@
       // 最後備援：若引擎尚未完成初始化，才嘗試擷取 2D 畫布。
       try{ drawImageCover(octx, canvas, 0, 0, tw, th); }catch(e){}
     }
-    drawTagOverlay(octx, tw, th);
     octx.globalAlpha = 1;
 
     // 字型載入設定逾時保護,避免因字型讀取失敗導致下載卡住沒反應
@@ -1921,7 +1871,6 @@
   });
 
   // 動畫迴圈已交給 particle-life 引擎自己的內部渲染迴圈負責,
-  // 這裡只需要維護標籤光暈疊加層(glowLoop,已在上方啟動)。
 })();
 </script>
 </body>

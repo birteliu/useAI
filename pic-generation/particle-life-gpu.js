@@ -1301,7 +1301,8 @@
       prevTimestamp = ts;
       updateFpsOverlay(ts);
 
-      if (!config.paused) {
+      {
+        // Render while paused so uploaded seeds and palettes appear immediately.
         // Re-check HDR every frame in case the canvas was resized
         const cw = Math.max(1, canvas.width), ch = Math.max(1, canvas.height);
         if (!hdrTexture || hdrTexture.width !== cw || hdrTexture.height !== ch) {
@@ -1315,6 +1316,7 @@
         const wgParticles = Math.ceil(config.count / 64);
         const wgBins = Math.ceil((binCount + 1) / 64);
 
+        if (!config.paused) {
         // 1. Clear binOffset, then fill counts
         {
           const pass = cmd.beginComputePass({ label: 'binFill' });
@@ -1372,6 +1374,8 @@
           pass.dispatchWorkgroups(wgParticles);
           pass.end();
         }
+
+        } // Simulation pauses independently of rendering.
 
         // 6a. Glow render → HDR (clear first, soft halos). Skippable: at
         // hero density + camera zoom the halos pile up into bloom, so

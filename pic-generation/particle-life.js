@@ -104,6 +104,7 @@
     // (handles 20k-50k particles at 60fps with soft glow sprites); on failure
     // or by default, falls back to canvas2D. Only ONE context can be created
     // per canvas, so this is decided up front.
+    let renderRequested = true;
     const wantsGL = opts.webgl === true;
     let ctx = null;
     let gl = null;
@@ -240,6 +241,7 @@
     }
 
     function seedParticles(n) {
+      renderRequested = true;
       allocParticleStorage(n);
       seedByPattern(config.seedPattern || 'random', n);
       // pIndex grows with pCount; cell arrays grow with grid size (per-frame).
@@ -267,6 +269,7 @@
       if (Array.isArray(palette) && palette.length >= 2) {
         config.palette = palette.slice();
         sprites = null; // invalidate sprite cache
+        renderRequested = true;
       }
     }
 
@@ -936,9 +939,12 @@
           _fpsOverlay.textContent = `${_fps.toFixed(0)} fps · ${pCount.toLocaleString()} · ${backend}`;
         }
       }
-      if (!config.paused) {
-        step();
+      if (!config.paused) step();
+      if (!config.paused || renderRequested) {
+        // Discard the old composition when reseeding or recoloring, even paused.
+        if (renderRequested) ctx.clearRect(0, 0, W, H);
         render();
+        renderRequested = false;
       }
       raf = requestAnimationFrame(loop);
     }
