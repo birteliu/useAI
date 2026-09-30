@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>爸爸的餵食紀錄</title>
+  <link rel="stylesheet" href="/feeding-style.css">
+  <link rel="stylesheet" href="/feeding-v2.css">
+  <link rel="stylesheet" href="/hand-drawn.css">
+  <script src="/feeding-app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div><p class="eyebrow">家庭共用紀錄</p><h1>爸爸的餵食紀錄</h1></div>
+      <button id="refresh" class="icon-button" type="button" aria-label="更新資料">↻<span>更新</span></button>
+    </header>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <div id="appPanel" hidden>
+      <section class="card overview" aria-labelledby="nextTitle">
+        <img class="care-doodle" src="/care-doodle.svg" alt="" aria-hidden="true" width="180" height="160">
+        <p class="eyebrow">下一餐參考時間</p>
+        <h2 id="nextTitle">最早可餵</h2>
+        <p id="earliest" class="hero-time">—</p>
+        <p id="countdown" class="subtle">依上一餐紀錄時間加上 3 小時 30 分</p>
+        <button id="addButton" class="button primary full big" type="button">＋ 記錄這餐</button>
+        <p class="helper">餵完時選奶品和罐數並儲存，會自動記下當下時間。實際餵食依家人的照護安排。</p>
+      </section>
+      <section class="card last-card" aria-labelledby="lastTitle">
+        <div class="section-head"><h2 id="lastTitle">上一餐</h2><span id="lastDate" class="subtle"></span></div>
+        <div id="lastRecord" class="last-record">尚無紀錄</div>
+      </section>
+      <section class="card" aria-labelledby="todayTitle">
+        <div class="section-head"><h2 id="todayTitle">今天的紀錄</h2><strong id="todayTotal" class="count-pill">0 餐</strong></div>
+        <div id="milkCounts" class="milk-grid"></div>
+        <p class="helper">奶品可重複、也可跳過；一天不一定要剛好四餐。</p>
+      </section>
+      <section class="card history" aria-labelledby="historyTitle">
+        <div class="section-head"><h2 id="historyTitle">最近紀錄</h2><button id="backfillButton" class="text-button" type="button">＋ 補記</button></div>
+        <div id="historyList" class="history-list"></div>
+      </section>
+      <footer class="footer"><span id="syncStatus">尚未同步</span></footer>
+    </div>
+  </main>
+
+  <dialog id="entryDialog" aria-labelledby="entryTitle">
+    <form id="entryForm" class="dialog-body">
+      <div class="dialog-top"><h2 id="entryTitle">記錄這餐</h2><button class="close-button" type="button" data-close="entryDialog" aria-label="關閉">×</button></div>
+      <fieldset><legend>餵哪一種奶？</legend><div id="milkChoices" class="milk-choices"></div></fieldset>
+      <fieldset><legend>餵多少？</legend><div class="amount-choices">
+        <label><input type="radio" name="amount" value="whole" checked>一罐</label>
+        <label><input type="radio" name="amount" value="half">半罐</label>
+      </div></fieldset>
+      <p class="helper">餵完後按「儲存」，會自動記下現在時間。</p>
+      <button class="button primary full" type="submit">儲存餵食紀錄</button>
+    </form>
+  </dialog>
+
+  <dialog id="recordDialog" aria-labelledby="recordTitle">
+    <form id="recordForm" class="dialog-body">
+      <div class="dialog-top"><h2 id="recordTitle">補記餵食</h2><button class="close-button" type="button" data-close="recordDialog" aria-label="關閉">×</button></div>
+      <label for="recordMilk">奶品</label>
+      <select id="recordMilk" required><option>高纖</option><option>補體素</option><option>雙卡</option><option>一般</option></select>
+      <label for="recordAmount">罐數</label>
+      <select id="recordAmount" required><option value="whole">一罐</option><option value="half">半罐</option></select>
+      <label for="recordTime">餵完時間</label><input id="recordTime" type="datetime-local" required>
+      <button id="recordSubmit" class="button primary full" type="submit">儲存紀錄</button>
+      <button id="voidRecord" class="text-button danger full" type="button" hidden>作廢這筆紀錄</button>
+    </form>
+  </dialog>
+</body>
+</html>
