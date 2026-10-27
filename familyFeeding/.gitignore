@@ -1,0 +1,10 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env
+dist/
+old-local-prototype/
+.chrome-test/
+preview-login.png
+feeding-data.json
+feeding-access-code.txt
