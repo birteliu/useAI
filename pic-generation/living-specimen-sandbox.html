@@ -184,13 +184,13 @@
     font-style:normal; font-weight:700;
     font-size: clamp(42px, 5vw, 70px);
     color: var(--ink); line-height:1.1;
-    word-break: break-word;
+    white-space:pre-line; word-break: break-word;
   }
   #speakerRoleOut{
     margin-top:8px;
     font-size: clamp(18px, 2vw, 28px);
     color: var(--ink-dim); font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
-    white-space:normal; overflow-wrap:anywhere; word-break:break-word;
+    white-space:pre-line; overflow-wrap:anywhere; word-break:break-word;
   }
   .sp-photo{
     position:absolute; top:0; right:0;
@@ -213,7 +213,7 @@
     padding:34px 38px;
     font-size: clamp(20px, 2.4vw, 34px); font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700;
     line-height:1.55;
-    white-space:normal; overflow-wrap:anywhere; word-break:break-word;
+    white-space:pre-line; overflow-wrap:anywhere; word-break:break-word;
   }
   .sp-tags-box{
     background: rgba(5,5,6,0.94);
@@ -636,15 +636,15 @@
     </div>
     <label class="field">
       <span>講者名稱</span>
-      <input type="text" id="speakerNameInput" placeholder="輸入講者名稱…" maxlength="30">
+      <textarea id="speakerNameInput" placeholder="輸入講者名稱，可按 Enter 自行換行…" maxlength="30" rows="2"></textarea>
     </label>
     <label class="field">
       <span>講者職稱 / 單位</span>
-      <input type="text" id="speakerRoleInput" placeholder="例如:商業思維學院・院長" maxlength="40">
+      <textarea id="speakerRoleInput" placeholder="例如:商業思維學院・院長，可按 Enter 自行換行…" maxlength="40" rows="2"></textarea>
     </label>
     <label class="field">
       <span>講者主題</span>
-      <input type="text" id="speakerTopicInput" placeholder="輸入講題 / 主題描述…" maxlength="80">
+      <textarea id="speakerTopicInput" placeholder="輸入講題 / 主題描述，可按 Enter 自行換行…" maxlength="80" rows="3"></textarea>
     </label>
     <div class="field">
       <span>主題標籤(可複選)</span>
@@ -780,9 +780,9 @@
     const nameStyle = getComputedStyle(speakerNameOut);
     const roleStyle = getComputedStyle(speakerRoleOut);
     measure.font = `${nameStyle.fontWeight} ${nameStyle.fontSize} ${nameStyle.fontFamily}`;
-    const nameTextW = measure.measureText(speakerNameOut.textContent || '').width;
+    const nameTextW = measureWidestLine(measure, speakerNameOut.textContent || '');
     measure.font = `${roleStyle.fontWeight} ${roleStyle.fontSize} ${roleStyle.fontFamily}`;
-    const roleTextW = measure.measureText(speakerRoleOut.textContent || '').width;
+    const roleTextW = measureWidestLine(measure, speakerRoleOut.textContent || '');
     const panelMin = Math.min(300, areaW*.42);
     const panelMax = Math.max(panelMin, areaW-photoW);
     const panelW = Math.min(panelMax, Math.max(panelMin, nameTextW+58, roleTextW+58));
@@ -1051,7 +1051,9 @@
       speakerTagsOut.textContent = DEFAULTS.speaker.tags;
       return;
     }
-    speakerTagsOut.textContent = tagOrder.map(k => TAG_BY_KEY[k]?.label || k).join('　·　');
+    const labels = tagOrder.map(k => TAG_BY_KEY[k]?.label || k);
+    // 只選一個標籤時以 hashtag 呈現；多個標籤維持「·」分隔。
+    speakerTagsOut.textContent = labels.length === 1 ? `#${labels[0]}` : labels.join('　·　');
   }
 
   // 把目前選取的標籤同步到粒子引擎：調色盤混入已選顏色，
@@ -1267,21 +1269,27 @@
     formatBtns.forEach(item => item.classList.toggle('is-active', item === btn));
   }));
 
+  // 先依使用者輸入的換行切段，每段再依寬度自動折行。
   function wrapText(octx, text, maxWidth){
-    const words = text.split('');
     const lines = [];
-    let line = '';
-    for(const ch of words){
-      const test = line + ch;
-      if(octx.measureText(test).width > maxWidth && line){
-        lines.push(line);
-        line = ch;
-      } else {
-        line = test;
+    text.split('\n').forEach(paragraph => {
+      let line = '';
+      for(const ch of paragraph){
+        const test = line + ch;
+        if(octx.measureText(test).width > maxWidth && line){
+          lines.push(line);
+          line = ch;
+        } else {
+          line = test;
+        }
       }
-    }
-    if(line) lines.push(line);
+      lines.push(line);
+    });
     return lines;
+  }
+  // 多行文字以最寬的那一行作為量測寬度。
+  function measureWidestLine(measureCtx, text){
+    return Math.max(0, ...text.split('\n').map(line => measureCtx.measureText(line).width));
   }
 
   function drawImageCover(targetCtx, source, x, y, w, h){
@@ -1501,6 +1509,7 @@
       const S = tw/1200;
       const safe = 40*S;
       const isPortraitExport = ratioKey === '9:16';
+      const isThreeFourExport = ratioKey === '3:4';
       const line = 'rgba(239,230,210,0.55)';
       const headerH = Math.max(92, th * 0.12);
       const footerH = Math.max(92, th * 0.12);
@@ -1520,32 +1529,35 @@
       octx.font = `normal 700 ${Math.round(Math.min(tw*.03, headerH*.34))}px 'Noto Serif TC',serif`;
       octx.fillText('講 者 開 箱', tw-safe, safe + headerH*.45);
 
-      const photoW = Math.min(tw*(isPortraitExport ? .28 : .22), (th-headerH-footerH-safe*2)*.28);
+      // 3:4 版面右上講者照片＋姓名職稱卡放大 1.15 倍。
+      const speakerScale = isThreeFourExport ? 1.15 : 1;
+      const SS = S*speakerScale;
+      const photoW = Math.min(tw*(isPortraitExport ? .28 : .22), (th-headerH-footerH-safe*2)*.28)*speakerScale;
       const photoH = photoW*1.22;
       const photoX = tw-safe-photoW;
       const photoY = safe+headerH+Math.max(40*S, th*.055);
-      const nameFs=Math.max(34,Math.round(tw*(isPortraitExport ? .062 : .06)));
-      const roleFs=Math.max(18,Math.round(tw*.028));
+      const nameFs=Math.max(34,Math.round(tw*(isPortraitExport ? .062 : .06)*speakerScale));
+      const roleFs=Math.max(18,Math.round(tw*.028*speakerScale));
       // 先量測姓名與職稱，再讓卡片由照片左緣向左伸縮。
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      const measuredNameW=octx.measureText(speakerNameOut.textContent).width+60*S;
+      const measuredNameW=measureWidestLine(octx,speakerNameOut.textContent)+60*SS;
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
-      const measuredRoleW=octx.measureText(speakerRoleOut.textContent).width+60*S;
-      const nameMinW=Math.min(tw*.28,photoX-safe);
+      const measuredRoleW=measureWidestLine(octx,speakerRoleOut.textContent)+60*SS;
+      const nameMinW=Math.min(tw*.28*speakerScale,photoX-safe);
       const nameMaxW=photoX-safe;
       const nameW=Math.min(nameMaxW,Math.max(nameMinW,measuredNameW,measuredRoleW));
       const nameX=photoX-nameW;
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      const nameLines=wrapText(octx,speakerNameOut.textContent,nameW-60*S);
+      const nameLines=wrapText(octx,speakerNameOut.textContent,nameW-60*SS);
       const nameLineH=nameFs*1.18;
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
-      const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60*S);
+      const roleLines=wrapText(octx,speakerRoleOut.textContent,nameW-60*SS);
       const roleLineH=roleFs*1.42;
-      const nameRoleGap=Math.max(16*S,nameFs*.3);
+      const nameRoleGap=Math.max(16*SS,nameFs*.3);
       const nameBlockH=Math.max(nameFs,nameLines.length*nameLineH);
       const roleBlockH=Math.max(roleFs,roleLines.length*roleLineH);
       const nameGroupH=nameBlockH+nameRoleGap+roleBlockH;
-      const nameH=Math.max(photoH*.64,nameGroupH+48*S);
+      const nameH=Math.max(photoH*.64,nameGroupH+48*SS);
       const nameGroupTop=photoY+(nameH-nameGroupH)/2;
       const nameStartY=nameGroupTop+nameLineH/2;
       const roleStartY=nameGroupTop+nameBlockH+nameRoleGap+roleLineH/2;
@@ -1557,32 +1569,35 @@
 
       octx.textAlign='left'; octx.fillStyle='#EFE6D2';
       octx.font=`normal 700 ${nameFs}px 'Noto Serif TC',serif`;
-      nameLines.forEach((text,i)=>octx.fillText(text,nameX+30*S,nameStartY+i*nameLineH));
+      nameLines.forEach((text,i)=>octx.fillText(text,nameX+30*SS,nameStartY+i*nameLineH));
       octx.font=`normal 700 ${roleFs}px 'Noto Serif TC',serif`;
-      roleLines.forEach((text,i)=>octx.fillText(text,nameX+30*S,roleStartY+i*roleLineH));
+      roleLines.forEach((text,i)=>octx.fillText(text,nameX+30*SS,roleStartY+i*roleLineH));
 
       const contentBottom=th-safe-footerH-40*S;
-      const quoteW=Math.min(tw*(isPortraitExport ? .54 : .46),650*S), quoteX=safe;
-      const topicFs=Math.max(22,Math.round(tw*.032));
+      // 3:4 版面左下留白較多，講題＋標籤整組放大 1.25 倍。
+      const quoteScale = isThreeFourExport ? 1.25 : 1;
+      const QS = S*quoteScale;
+      const quoteW=isThreeFourExport ? tw*.58 : Math.min(tw*(isPortraitExport ? .54 : .46),650*S), quoteX=safe;
+      const topicFs=Math.max(22,Math.round(tw*.032*quoteScale));
       octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
-      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64*S);
-      const quoteH=Math.max(150*S,topicLines.length*topicFs*1.55+58*S);
-      const tagFs=Math.max(18,Math.round(tw*.022));
+      const topicLines=wrapText(octx,speakerTopicOut.textContent,quoteW-64*QS);
+      const quoteH=Math.max(150*QS,topicLines.length*topicFs*1.55+58*QS);
+      const tagFs=Math.max(18,Math.round(tw*.022*quoteScale));
       octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
-      const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64*S);
+      const tagLines=wrapText(octx,speakerTagsOut.textContent,quoteW-64*QS);
       const tagLineH=tagFs*1.45;
-      const tagsH=Math.max(52*S,tagLines.length*tagLineH+28*S);
+      const tagsH=Math.max(52*QS,tagLines.length*tagLineH+28*QS);
       // 講題＋標籤整組固定靠齊內容區左下，不再跟著頭像高度浮動。
       const quoteY=contentBottom-tagsH-quoteH;
       octx.fillStyle='#EFE6D2'; octx.fillRect(quoteX,quoteY,quoteW,quoteH);
       octx.fillStyle='#141008';
       octx.font=`normal 700 ${topicFs}px 'Noto Serif TC',serif`;
-      topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32*S,quoteY+38*S+topicFs*.78+i*topicFs*1.55));
+      topicLines.forEach((text,i)=>octx.fillText(text,quoteX+32*QS,quoteY+38*QS+topicFs*.78+i*topicFs*1.55));
       octx.fillStyle='rgba(5,5,6,.92)'; octx.fillRect(quoteX,quoteY+quoteH,quoteW,tagsH);
       octx.strokeStyle=line; octx.strokeRect(quoteX,quoteY+quoteH,quoteW,tagsH);
       octx.fillStyle='#EFE6D2'; octx.font=`normal 700 ${tagFs}px 'Noto Serif TC',serif`;
       const tagStartY=quoteY+quoteH+(tagsH-(tagLines.length-1)*tagLineH)/2;
-      tagLines.forEach((text,i)=>octx.fillText(text,quoteX+32*S,tagStartY+i*tagLineH));
+      tagLines.forEach((text,i)=>octx.fillText(text,quoteX+32*QS,tagStartY+i*tagLineH));
 
       // 顯微鏡觀察指示：分別從講者卡與講題卡連到粒子標記點。
       octx.save();
