@@ -1,0 +1,14 @@
+name = "thai-learning"
+main = "worker.mjs"
+compatibility_date = "2026-11-25"
+preview_urls = false
+
+[assets]
+directory = "."
+binding = "ASSETS"
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "thai-learning"
+database_id = "29e4363a-2ce2-4b7e-bb2e-e50ae13076fb"

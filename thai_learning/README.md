@@ -12,6 +12,8 @@
 
 30 天課程、每週複習、常識卡、兩題測驗、雙人情境與角色交換、收藏與熟悉度、口袋卡搜尋與放大、十分鐘計時、進度與印章、匯出備份與匯入朋友快照。
 
+「學習護照」會顯示每堂課首次完成的日期與時間，匯出進度時會一併備份。舊進度依然會列出，未曾保存的完成日期會標示為無完成時間。
+
 ## 限制
 
 - 本機版沒有帳號、雲端同步或邀請連結，朋友間需手動交換進度 JSON 檔。
@@ -30,3 +32,17 @@ index.html（入口）、styles.css（樣式）、lessons.js（課程資料）�
 https://thailandfoundation.or.th/how-to-use-krub-and-kha-in-the-thai-language/
 
 https://thailand.go.th/useful-information-detail/009_138?hl=en
+
+## Cloudflare 雙人版
+
+Workers 僅接受旅伴 A、旅伴 B 的兩組獨立登入金鑰。兩人各自登入同一網址，護照和學習紀錄會分開存入 D1。網站載入時讀取該帳號的紀錄，變更後會自動儲存。若另一台裝置已更新，網站會提示先匯出本次紀錄，再重新讀取，避免直接覆寫。
+
+從本目錄操作。需要先以 Cloudflare 帳戶登入 Wrangler。
+
+1. 執行 `npx wrangler d1 create thai-learning`，將回傳的資料庫 ID 填入 `wrangler.toml`。
+2. 執行 `npx wrangler d1 migrations apply thai-learning --remote`。
+3. 為每位使用者各產生一組 64 位小寫十六進位金鑰，例如分別執行兩次 `openssl rand -hex 32`，存進密碼管理員。
+4. 執行 `npx wrangler deploy`。在兩組金鑰都設定好之前，網站會停在設定提示。
+5. 分別執行 `npx wrangler secret put LEARNER_A_KEY` 與 `npx wrangler secret put LEARNER_B_KEY`，依提示輸入各自的金鑰。登入時選擇對應帳號，使用自己的金鑰。更換金鑰會使該帳號舊的登入工作階段失效。
+
+要保留本機進度，先從原網頁匯出 JSON，再登入對應帳號，由「學習護照」匯入。匯入會取代該帳號目前的紀錄。
