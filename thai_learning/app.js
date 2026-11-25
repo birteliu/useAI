@@ -157,8 +157,49 @@ function displayPhrases(lesson) {
   return ids ? ids.map(findPhrase) : lesson.phrases;
 }
 function findPhrase(id){return allPhrases().find(p=>p.id===id);}
-let thaiVoices=[];function loadVoices(){thaiVoices=window.speechSynthesis?.getVoices().filter(v=>/^th(-|$)/i.test(v.lang))||[];}if(window.speechSynthesis){loadVoices();window.speechSynthesis.addEventListener('voiceschanged',loadVoices);}
-function speak(id,slow){const p=findPhrase(id),s=window.speechSynthesis;if(!p)return;if(!s){toast('此瀏覽器不支援語音播放。');return;}loadVoices();if(!thaiVoices.length){toast('此裝置尚無泰語語音。請先在系統安裝泰語語音，再重新開啟。');return;}s.cancel();const u=new SpeechSynthesisUtterance(p.th);u.lang='th-TH';u.voice=thaiVoices[0];u.rate=slow?.7:1;u.onerror=()=>toast('語音未能播放，請確認裝置語音設定。');s.speak(u);}
+function showVoiceFallback(phrase, button) {
+  if (!button.isConnected) return;
+  $('#voice-fallback')?.remove();
+  const message = document.createElement('div');
+  message.id = 'voice-fallback';
+  message.className = 'feedback';
+  message.setAttribute('role', 'status');
+  message.textContent = '這個瀏覽器目前無法播放泰語。到 Google 翻譯後，點泰文旁的喇叭。';
+  const link = document.createElement('a');
+  const url = new URL('https://translate.google.com/');
+  url.search = new URLSearchParams({sl:'th', tl:'zh-TW', text:phrase.th, op:'translate'});
+  link.href = url.toString();
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.className = 'btn small';
+  link.textContent = '到 Google 翻譯聽發音';
+  const actions = document.createElement('div');
+  actions.className = 'actions';
+  actions.append(link);
+  message.append(actions);
+  button.parentElement.after(message);
+}
+
+function speak(id, slow, button) {
+  const phrase = findPhrase(id);
+  if (!phrase) return;
+  $('#voice-fallback')?.remove();
+  const synth = window.speechSynthesis;
+  const voice = synth?.getVoices().find(item => /^th([-_]|$)/i.test(item.lang));
+  if (!voice || typeof SpeechSynthesisUtterance !== 'function') {
+    showVoiceFallback(phrase, button);
+    return;
+  }
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(phrase.th);
+  utterance.lang = 'th-TH';
+  utterance.voice = voice;
+  utterance.rate = slow ? 0.7 : 1;
+  utterance.onerror = event => {
+    if (event.error !== 'canceled' && event.error !== 'interrupted') showVoiceFallback(phrase, button);
+  };
+  synth.speak(utterance);
+}
 function phraseCard(p){return `<div class="phrase"><div class="phrase-line"><div><div class="thai" lang="th">${esc(p.th)}</div><div class="roman">${esc(p.roman)}</div></div><button class="star" data-action="favorite" data-id="${p.id}" aria-label="${state.favorites.includes(p.id)?'取消收藏':'收藏'}${esc(p.zh)}" aria-pressed="${state.favorites.includes(p.id)}">${state.favorites.includes(p.id)?'★':'☆'}</button></div><p class="translation">${esc(p.zh)}</p><div class="actions"><button class="btn small" data-action="speak" data-id="${p.id}">▷ 聽發音</button><button class="btn small" data-action="slow" data-id="${p.id}">慢速</button><button class="btn small" data-action="master" data-id="${p.id}" data-value="again" aria-pressed="${state.mastery[p.id]==='again'}">${state.mastery[p.id]==='again'?'● ':''}再練一次</button><button class="btn small" data-action="master" data-id="${p.id}" data-value="ok" aria-pressed="${state.mastery[p.id]==='ok'}">${state.mastery[p.id]==='ok'?'✓ ':''}我會了</button></div></div>`;}
 function dayLink(n){return '#today/'+n;}let activeQuiz = null;
 function shuffle(items) {
@@ -210,7 +251,7 @@ function today() {
       ${phrases.map(phraseCard).join('')}
       <details id="pronunciation" class="lesson-disclosure">
         <summary>發音與轉寫說明</summary>
-        <p class="note">轉寫未完整標示聲調與母音長短。播放使用裝置的泰語合成語音。</p>
+        <p class="note">轉寫未完整標示聲調與母音長短。播放使用裝置的泰語合成語音。若無法播放，會提供 Google 翻譯的聆聽連結。</p>
         ${current === 1 ? '<p>常見禮貌句尾為 ครับ，女性陳述用 ค่ะ、問句用 คะ。<a href="https://thailandfoundation.or.th/how-to-use-krub-and-kha-in-the-thai-language/" target="_blank" rel="noopener">句尾用法</a></p>' : ''}
       </details>
     </article>
@@ -304,5 +345,5 @@ else if(a==='switch-profile'){
 }
 else if(a==='retry-cloud')void syncCloud();
 else if(a==='reload-cloud'){if(confirm('重讀雲端會捨棄本次尚未同步的變更。要繼續嗎？')){pendingSnapshot=null;location.reload();}}
-else if(a==='speak'||a==='slow')speak(id,a==='slow');else if(a==='favorite'){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render(true);}else if(a==='master'){state.mastery[id]=b.dataset.value;save();render(true);}else if(a==='answer'){quizAnswers[+b.dataset.index]=b.dataset.answer;quizChecked=false;render(true);}else if(a==='check'){quizChecked=true;render(true);}else if(a==='complete'){if(state.done.includes(current)){toast('這一天已完成，可以繼續複習。');return;}if(!quizChecked||!quizData(displayPhrases(lessons[current-1])).every((q,i)=>quizAnswers[i]===q.p.zh)){toast('先完成並確認兩題測驗，再為今天蓋章。');return;}state.done.push(current);state.completedAt[current]=new Date().toISOString();save();render(true);toast('今天的學習，完成！');}else if(a==='swap'){roleSwap=!roleSwap;render(true);}else if(a==='hints'){hints=!hints;render(true);}else if(a==='show'){const p=findPhrase(id),d=document.createElement('dialog');d.className='modal';d.innerHTML=`<div class="thai" lang="th">${esc(p.th)}</div><p>${esc(p.zh)}</p><button class="btn" data-action="close">關閉</button>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();}else if(a==='close')b.closest('dialog').close();else if(a==='save-name'){state.name=$('#name').value.trim().slice(0,30)||'我的旅程';save();render(true);toast('名字已儲存。');}});
+else if(a==='speak'||a==='slow')speak(id,a==='slow',b);else if(a==='favorite'){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render(true);}else if(a==='master'){state.mastery[id]=b.dataset.value;save();render(true);}else if(a==='answer'){quizAnswers[+b.dataset.index]=b.dataset.answer;quizChecked=false;render(true);}else if(a==='check'){quizChecked=true;render(true);}else if(a==='complete'){if(state.done.includes(current)){toast('這一天已完成，可以繼續複習。');return;}if(!quizChecked||!quizData(displayPhrases(lessons[current-1])).every((q,i)=>quizAnswers[i]===q.p.zh)){toast('先完成並確認兩題測驗，再為今天蓋章。');return;}state.done.push(current);state.completedAt[current]=new Date().toISOString();save();render(true);toast('今天的學習，完成！');}else if(a==='swap'){roleSwap=!roleSwap;render(true);}else if(a==='hints'){hints=!hints;render(true);}else if(a==='show'){const p=findPhrase(id),d=document.createElement('dialog');d.className='modal';d.innerHTML=`<div class="thai" lang="th">${esc(p.th)}</div><p>${esc(p.zh)}</p><button class="btn" data-action="close">關閉</button>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();}else if(a==='close')b.closest('dialog').close();else if(a==='save-name'){state.name=$('#name').value.trim().slice(0,30)||'我的旅程';save();render(true);toast('名字已儲存。');}});
 document.addEventListener('input',e=>{if(e.target.id==='search'){search=e.target.value;$('#pocket-results').innerHTML=pocketCards();}});document.addEventListener('change',e=>{if(e.target.id==='pocket-filter'){filter=e.target.value;$('#pocket-results').innerHTML=pocketCards();}if(e.target.id==='practice-day')location.hash='#practice/'+e.target.value;});window.addEventListener('hashchange',()=>{quizAnswers={};quizChecked=false;activeQuiz=null;if(location.hash==='#today')current=nextDay();render();});if(useCloud){restoreCloudProfile();void loadCloud();}else render();
