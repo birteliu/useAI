@@ -35,14 +35,8 @@ https://thailand.go.th/useful-information-detail/009_138?hl=en
 
 ## Cloudflare 雙人版
 
-Workers 僅接受旅伴 A、旅伴 B 的兩組獨立登入金鑰。兩人各自登入同一網址，護照和學習紀錄會分開存入 D1。網站載入時讀取該帳號的紀錄，變更後會自動儲存。若另一台裝置已更新，網站會提示先匯出本次紀錄，再重新讀取，避免直接覆寫。
+開啟 GitHub Pages 後，選擇「旅伴 A」或「旅伴 B」即可開始。兩份紀錄分開存在 D1。這兩個身分無需驗證，知道網址的人可以查看或修改兩份紀錄。
 
-從本目錄操作。需要先以 Cloudflare 帳戶登入 Wrangler。
+既有的 D1 綁定及 progress 資料表可繼續使用。更新 GitHub 的 main 分支後，確認 GitHub Pages 和 Cloudflare Worker 都完成部署。若在新環境部署，先建立 D1，將資料庫 ID 填入 wrangler.toml，再執行 migrations/0001_progress.sql，最後部署 Worker。
 
-1. 執行 `npx wrangler d1 create thai-learning`，將回傳的資料庫 ID 填入 `wrangler.toml`。
-2. 執行 `npx wrangler d1 migrations apply thai-learning --remote`。
-3. 為每位使用者各設定一組不同的登入密碼。每組須有 16–128 個字元，可使用英文字母、數字和標點符號，不能有空格。原本的 64 字元金鑰仍可使用。
-4. 執行 `npx wrangler deploy`。在兩組金鑰都設定好之前，網站會停在設定提示。
-5. 分別執行 `npx wrangler secret put LEARNER_A_KEY` 與 `npx wrangler secret put LEARNER_B_KEY`，依提示輸入各自的金鑰。登入時選擇對應帳號，使用自己的金鑰。更換金鑰會使該帳號舊的登入工作階段失效。
-
-要保留本機進度，先從原網頁匯出 JSON，再登入對應帳號，由「學習護照」匯入。匯入會取代該帳號目前的紀錄。
+要保留本機進度，可先在選擇身分頁匯出 JSON，再選擇對應身分，由「學習護照」匯入。匯入會取代該身分目前的紀錄。

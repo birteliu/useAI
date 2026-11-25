@@ -12,11 +12,3 @@ run_worker_first = true
 binding = "DB"
 database_name = "thai-learning"
 database_id = "29e4363a-2ce2-4b7e-bb2e-e50ae13076fb"
-
-[[ratelimits]]
-name = "LOGIN_LIMITER"
-namespace_id = "2601125"
-
-[ratelimits.simple]
-limit = 8
-period = 60
