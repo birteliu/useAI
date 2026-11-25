@@ -22,19 +22,62 @@ function validate(s) {
       : {},
   };
 }
+const pagesMode = location.origin === 'https://birteliu.github.io' &&
+  ['/useAI/thai_learning/', '/useAI/thai_learning/index.html'].includes(location.pathname);
+const workerOrigin = 'https://thai-learning.family-feeding-web.workers.dev';
+const cloudSessionKey = 'thai-learning:cloud-session';
 const cloudAccount = document.querySelector('meta[name="thai-cloud"]')?.content;
+const useCloud = pagesMode || Boolean(cloudAccount);
+let pagesSession = '';
+
+function readPagesSession() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  if (params.has('cloud-session')) {
+    const token = params.get('cloud-session');
+    history.replaceState(null, '', location.pathname + location.search);
+    if (/^[ab]\.[0-9]{10}\.[a-f0-9]{64}$/.test(token)) {
+      try { sessionStorage.setItem(cloudSessionKey, token); } catch {}
+      return token;
+    }
+  }
+  try { return sessionStorage.getItem(cloudSessionKey) || ''; } catch { return ''; }
+}
+
+function clearPagesSession() {
+  pagesSession = '';
+  try { sessionStorage.removeItem(cloudSessionKey); } catch {}
+}
+
+function cloudRequest(path, options = {}) {
+  if (!pagesMode) return fetch(path, options);
+  return fetch(workerOrigin + path, {
+    ...options,
+    credentials: 'omit',
+    redirect: 'error',
+    headers: {...options.headers, Authorization: 'Bearer ' + pagesSession},
+  });
+}
+
+function renderPagesLogin() {
+  $('#app').innerHTML = '<section class="card"><h1>登入泰語旅伴</h1><p>選擇旅伴 A 或 B，就能接續你的學習紀錄。</p><a class="btn primary" href="' + workerOrigin + '/connect">前往登入</a><p class="note">如果之前在這個瀏覽器學過，可以先匯出舊進度，登入後再從學習護照匯入。</p><button class="btn small" data-action="export-offline">匯出這個瀏覽器的舊進度</button></section>';
+}
 let cloudReady = false;
 let revision = 0;
 let pendingSnapshot = null;
 let syncing = false;
 
 async function loadCloud() {
-  if (cloudReady || !cloudAccount) return;
+  if (cloudReady || !useCloud) return;
+  if (pagesMode && !pagesSession) return renderPagesLogin();
   const app = $('#app');
   app.innerHTML = '<p role="status">正在讀取學習紀錄…</p>';
   try {
-    const response = await fetch('/api/progress', {cache: 'no-store'});
-    if (response.status === 401) return location.reload();
+    const response = await cloudRequest('/api/progress', {cache: 'no-store'});
+    if (response.status === 401) {
+      if (!pagesMode) return location.reload();
+      clearPagesSession();
+      return renderPagesLogin();
+    }
     if (!response.ok) throw new Error('Unable to load progress');
     const data = await response.json();
     revision = data.revision;
@@ -43,8 +86,9 @@ async function loadCloud() {
     cloudReady = true;
     const profile = document.createElement('div');
     profile.className = 'cloud-profile';
-    const accountName = cloudAccount === 'a' ? '旅伴 A' : '旅伴 B';
-    profile.innerHTML = '<strong>' + accountName + '</strong><span id="cloud-status" role="status">已同步</span><button class="btn small" data-action="retry-cloud" hidden>重試同步</button><button class="btn small" data-action="reload-cloud" hidden>重讀雲端紀錄</button><form method="post" action="/logout"><button class="btn small">登出</button></form>';
+    const accountName = (data.account || cloudAccount) === 'a' ? '旅伴 A' : '旅伴 B';
+    profile.innerHTML = '<strong>' + accountName + '</strong><span id="cloud-status" role="status">已同步</span><button class="btn small" data-action="retry-cloud" hidden>重試同步</button><button class="btn small" data-action="reload-cloud" hidden>重讀雲端紀錄</button>' + (pagesMode ? '<button class="btn small" data-action="logout-pages">登出</button>'
+      : '<form method="post" action="/logout"><button class="btn small">登出</button></form>');
     app.before(profile);
     render();
   } catch {
@@ -65,7 +109,7 @@ async function syncCloud() {
   try {
     while (pendingSnapshot) {
       const snapshot = pendingSnapshot;
-      const response = await fetch('/api/progress', {
+      const response = await cloudRequest('/api/progress', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({revision, state: snapshot}),
@@ -88,16 +132,16 @@ async function syncCloud() {
   }
 }
 
-if (cloudAccount) {
+if (useCloud) {
   window.addEventListener('beforeunload', event => {
     if (pendingSnapshot) event.preventDefault();
   });
 }
 
-let state={...validate({}),friend:null},persisted=true;try{const s=cloudAccount?null:JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object')state={...validate(s),friend:s.friend&&typeof s.friend==='object'?validate(s.friend):null};}catch(e){persisted=false;}
+let state={...validate({}),friend:null},persisted=true;try{const s=useCloud?null:JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object')state={...validate(s),friend:s.friend&&typeof s.friend==='object'?validate(s.friend):null};}catch(e){persisted=false;}
 let current=lessons.find(l=>!state.done.includes(l.day))?.day||30,filter='全部',search='',quizAnswers={},quizChecked=false,roleSwap=false,hints=true,timer=null,timerEnd=0,remaining=600;
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function save(){
-  if (cloudAccount) {
+  if (useCloud) {
     pendingSnapshot = {...validate(state), friend: state.friend};
     void syncCloud();
     return;
@@ -167,13 +211,27 @@ function learningHistory() {
     ? `<ul>${rows.join('')}</ul>`
     : '<p class="muted">完成第一堂課後，這裡會顯示課程與完成時間。</p>'}</section>`;
 }
-function progress(){return `${heading('OUR LITTLE LEARNING PASSPORT','你們一起走過的每一步。',cloudAccount?'進度同步到已登入的帳號。匯出檔案可另外保留備份。':'進度儲存在這個瀏覽器。匯出檔案可備份，也可以交給旅伴交換進度。')}<div class="two"><article class="card"><h2>${esc(state.name)}</h2><label class="field">護照上的名字<input id="name" value="${esc(state.name)}" maxlength="30"></label><button class="btn small" data-action="save-name">儲存名字</button><div class="stat-row"><div><div class="big">${state.done.length}</div><span class="muted">完成天數</span></div><div><div class="big">${Object.values(state.mastery).filter(v=>v==='ok').length}</div><span class="muted">熟悉句子</span></div><div><div class="big">${state.favorites.length}</div><span class="muted">收藏句子</span></div></div><div class="progressbar"><div style="width:${state.done.length/30*100}%"></div></div><button class="btn primary" data-action="export">匯出我的進度</button><label class="field">從備份還原我的進度<input type="file" id="import-self" accept="application/json,.json"></label><p class="note">還原會取代目前的學習紀錄，選檔後會先顯示確認。</p></article><article class="card"><h2>和旅伴交換學習護照</h2><p>把匯出的 JSON 檔案傳給朋友，各自匯入對方的護照，就能看到上次交換時的進度。</p><label class="field">匯入旅伴的進度<input type="file" id="import-friend" accept="application/json,.json"></label>${state.friend?`<div class="feedback"><strong>${esc(state.friend.name)}</strong><p>已完成 ${state.friend.done.length} / 30 天</p><p>共同完成 ${state.done.filter(d=>state.friend.done.includes(d)).length} 天</p><button class="btn small" data-action="remove-friend">移除旅伴快照</button></div>`:'<div class="feedback">旅伴的護照還沒抵達，先邀請對方一起開始吧。</div>'}<p class="note">這是手動交換的旅伴進度快照。</p></article></div>${learningHistory()}<div class="card"><h2>每週一枚旅行印章</h2><div class="stat-row">${[[1,7,'開口'],[8,14,'點餐'],[15,21,'移動'],[22,28,'探索']].map(([a,b,t])=>{const done=Array.from({length:b-a+1},(_,i)=>a+i).every(d=>state.done.includes(d));return `<div><div class="stamp ${done?'':'locked'}"><strong>${done?'✓':'ท'}</strong>${t}旅人</div><p class="note" style="text-align:center">完成 Day ${a}–${b}</p></div>`;}).join('')}</div></div><div class="card"><h3>教材與使用方式</h3><p>旅行口說入門，簡化轉寫未完整標示聲調與母音長短。語音取決於裝置是否安裝泰語聲音，尚未經泰語教師逐句審校，也未加入真人錄音。</p><p><a href="https://thailandfoundation.or.th/how-to-use-krub-and-kha-in-the-thai-language/" target="_blank" rel="noopener">禮貌句尾參考：Thailand Foundation</a><br><a href="https://thailand.go.th/useful-information-detail/009_138?hl=en" target="_blank" rel="noopener">寺廟禮儀參考：泰國政府</a></p><p class="note">保留整個資料夾即可離線開啟教材。外部字型與來源連結需要網路，發音是否離線依裝置而定。清除瀏覽器資料可能遺失進度，請定期匯出。</p></div>`;}
-function render(keep=false){if(cloudAccount&&!cloudReady)return;const parts=(location.hash.slice(1)||'today').split('/'),page=['today','journey','practice','pocket','progress'].includes(parts[0])?parts[0]:'today';if(parts[1]&&Number.isInteger(+parts[1])&&+parts[1]>=1&&+parts[1]<=30)current=+parts[1];document.querySelectorAll('nav a').forEach(a=>{a.classList.toggle('active',a.hash==='#'+page);if(a.hash==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});const y=scrollY;$('#app').innerHTML=({today,journey,practice,pocket,progress}[page])();if(!persisted)$('#app').insertAdjacentHTML('afterbegin','<p class="feedback" role="status">目前無法使用瀏覽器儲存，請匯出進度避免遺失。</p>');window.scrollTo(0,keep?y:0);}
+function progress(){return `${heading('OUR LITTLE LEARNING PASSPORT','你們一起走過的每一步。',useCloud?'進度同步到已登入的帳號。匯出檔案可另外保留備份。':'進度儲存在這個瀏覽器。匯出檔案可備份，也可以交給旅伴交換進度。')}<div class="two"><article class="card"><h2>${esc(state.name)}</h2><label class="field">護照上的名字<input id="name" value="${esc(state.name)}" maxlength="30"></label><button class="btn small" data-action="save-name">儲存名字</button><div class="stat-row"><div><div class="big">${state.done.length}</div><span class="muted">完成天數</span></div><div><div class="big">${Object.values(state.mastery).filter(v=>v==='ok').length}</div><span class="muted">熟悉句子</span></div><div><div class="big">${state.favorites.length}</div><span class="muted">收藏句子</span></div></div><div class="progressbar"><div style="width:${state.done.length/30*100}%"></div></div><button class="btn primary" data-action="export">匯出我的進度</button><label class="field">從備份還原我的進度<input type="file" id="import-self" accept="application/json,.json"></label><p class="note">還原會取代目前的學習紀錄，選檔後會先顯示確認。</p></article><article class="card"><h2>和旅伴交換學習護照</h2><p>把匯出的 JSON 檔案傳給朋友，各自匯入對方的護照，就能看到上次交換時的進度。</p><label class="field">匯入旅伴的進度<input type="file" id="import-friend" accept="application/json,.json"></label>${state.friend?`<div class="feedback"><strong>${esc(state.friend.name)}</strong><p>已完成 ${state.friend.done.length} / 30 天</p><p>共同完成 ${state.done.filter(d=>state.friend.done.includes(d)).length} 天</p><button class="btn small" data-action="remove-friend">移除旅伴快照</button></div>`:'<div class="feedback">旅伴的護照還沒抵達，先邀請對方一起開始吧。</div>'}<p class="note">這是手動交換的旅伴進度快照。</p></article></div>${learningHistory()}<div class="card"><h2>每週一枚旅行印章</h2><div class="stat-row">${[[1,7,'開口'],[8,14,'點餐'],[15,21,'移動'],[22,28,'探索']].map(([a,b,t])=>{const done=Array.from({length:b-a+1},(_,i)=>a+i).every(d=>state.done.includes(d));return `<div><div class="stamp ${done?'':'locked'}"><strong>${done?'✓':'ท'}</strong>${t}旅人</div><p class="note" style="text-align:center">完成 Day ${a}–${b}</p></div>`;}).join('')}</div></div><div class="card"><h3>教材與使用方式</h3><p>旅行口說入門，簡化轉寫未完整標示聲調與母音長短。語音取決於裝置是否安裝泰語聲音，尚未經泰語教師逐句審校，也未加入真人錄音。</p><p><a href="https://thailandfoundation.or.th/how-to-use-krub-and-kha-in-the-thai-language/" target="_blank" rel="noopener">禮貌句尾參考：Thailand Foundation</a><br><a href="https://thailand.go.th/useful-information-detail/009_138?hl=en" target="_blank" rel="noopener">寺廟禮儀參考：泰國政府</a></p><p class="note">保留整個資料夾即可離線開啟教材。外部字型與來源連結需要網路，發音是否離線依裝置而定。清除瀏覽器資料可能遺失進度，請定期匯出。</p></div>`;}
+function render(keep=false){if(useCloud&&!cloudReady)return;const parts=(location.hash.slice(1)||'today').split('/'),page=['today','journey','practice','pocket','progress'].includes(parts[0])?parts[0]:'today';if(parts[1]&&Number.isInteger(+parts[1])&&+parts[1]>=1&&+parts[1]<=30)current=+parts[1];document.querySelectorAll('nav a').forEach(a=>{a.classList.toggle('active',a.hash==='#'+page);if(a.hash==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});const y=scrollY;$('#app').innerHTML=({today,journey,practice,pocket,progress}[page])();if(!persisted)$('#app').insertAdjacentHTML('afterbegin','<p class="feedback" role="status">目前無法使用瀏覽器儲存，請匯出進度避免遺失。</p>');window.scrollTo(0,keep?y:0);}
 function formatTime(n){return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;}function clockUpdate(){if($('#clock'))$('#clock').textContent=formatTime(remaining);if($('#timer-btn'))$('#timer-btn').textContent=timer?'暫停':'開始計時';}function stopTimer(){clearInterval(timer);timer=null;clockUpdate();}
-function exportProgress(){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({schema:'thai-together',version:1,...validate(state),exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}));a.href=url;a.download='thai-learning-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('已匯出進度檔案。');}
+function exportProgress(snapshot=state){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({schema:'thai-together',version:1,...validate(snapshot),exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}));a.href=url;a.download='thai-learning-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('已匯出進度檔案。');}
 async function importProgress(file,friend){if(!file)return;if(file.size>1000000){toast('檔案太大，請使用本網頁匯出的進度檔。');return;}try{const s=JSON.parse(await file.text());if(s.schema!=='thai-together'||s.version!==1||!Array.isArray(s.done)||!Array.isArray(s.favorites))throw Error('format');const v=validate(s);if(friend)state.friend={name:v.name,done:v.done};else{if(!confirm(`還原「${v.name}」的 ${v.done.length} 天進度？目前的學習紀錄將被取代。`))return;state={...state,...v};}save();render(true);toast(friend?'已更新旅伴進度快照。':'已還原學習進度。');}catch(e){toast('檔案格式不正確，請選擇本網頁匯出的 JSON 檔。');}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='load-cloud')void loadCloud();
+else if(a==='export-offline'){
+  try {
+    const snapshot=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(snapshot)exportProgress(snapshot);
+    else toast('此瀏覽器沒有舊的學習紀錄。');
+  } catch { toast('無法讀取此瀏覽器的舊紀錄。'); }
+}
+else if(a==='logout-pages'){
+  if(!pendingSnapshot||confirm('本次紀錄尚未同步。確定要登出？')){
+    pendingSnapshot=null;
+    clearPagesSession();
+    location.reload();
+  }
+}
 else if(a==='retry-cloud')void syncCloud();
 else if(a==='reload-cloud'){if(confirm('確定已備份本次紀錄並重新讀取雲端？')){pendingSnapshot=null;location.reload();}}
 else if(a==='speak'||a==='slow')speak(id,a==='slow');else if(a==='favorite'){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render(true);}else if(a==='master'){state.mastery[id]=b.dataset.value;save();render(true);}else if(a==='answer'){quizAnswers[+b.dataset.index]=b.dataset.answer;quizChecked=false;render(true);}else if(a==='check'){quizChecked=true;render(true);}else if(a==='complete'){if(state.done.includes(current)){toast('這一天已完成，可以繼續複習。');return;}if(!quizChecked||!quizData(displayPhrases(lessons[current-1])).every((q,i)=>quizAnswers[i]===q.p.zh)){toast('先完成並確認兩題測驗，再為今天蓋章。');return;}state.done.push(current);state.completedAt[current]=new Date().toISOString();save();render(true);toast('今天的學習，完成！');}else if(a==='swap'){roleSwap=!roleSwap;render(true);}else if(a==='hints'){hints=!hints;render(true);}else if(a==='filter'){filter=b.dataset.value;render(true);}else if(a==='show'){const p=findPhrase(id),d=document.createElement('dialog');d.className='modal';d.innerHTML=`<p class="eyebrow">PLEASE TAKE A LOOK</p><div class="thai" lang="th">${esc(p.th)}</div><p>${esc(p.zh)}</p><button class="btn" data-action="close">關閉</button>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();}else if(a==='close')b.closest('dialog').close();else if(a==='timer'){if(timer){remaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));stopTimer();}else{if(!remaining)remaining=600;timerEnd=Date.now()+remaining*1000;timer=setInterval(()=>{remaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));if(!remaining){stopTimer();toast('十分鐘到了，今天也有好好練習。');}clockUpdate();},250);clockUpdate();}}else if(a==='reset-timer'){stopTimer();remaining=600;clockUpdate();}else if(a==='save-name'){state.name=$('#name').value.trim().slice(0,30)||'我的旅程';save();render(true);toast('名字已儲存。');}else if(a==='export')exportProgress();else if(a==='remove-friend'){state.friend=null;save();render(true);}});
-document.addEventListener('input',e=>{if(e.target.id==='search'){search=e.target.value;$('#pocket-results').innerHTML=pocketCards();}});document.addEventListener('change',e=>{if(e.target.id==='practice-day')location.hash='#practice/'+e.target.value;if(e.target.id==='import-self')importProgress(e.target.files[0],false);if(e.target.id==='import-friend')importProgress(e.target.files[0],true);});window.addEventListener('hashchange',()=>{quizAnswers={};quizChecked=false;activeQuiz=null;if(location.hash==='#today')current=nextDay();render();});if(cloudAccount)void loadCloud();else render();
+document.addEventListener('input',e=>{if(e.target.id==='search'){search=e.target.value;$('#pocket-results').innerHTML=pocketCards();}});document.addEventListener('change',e=>{if(e.target.id==='practice-day')location.hash='#practice/'+e.target.value;if(e.target.id==='import-self')importProgress(e.target.files[0],false);if(e.target.id==='import-friend')importProgress(e.target.files[0],true);});window.addEventListener('hashchange',()=>{quizAnswers={};quizChecked=false;activeQuiz=null;if(location.hash==='#today')current=nextDay();render();});if(pagesMode)pagesSession=readPagesSession();if(useCloud)void loadCloud();else render();
