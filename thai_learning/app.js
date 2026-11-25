@@ -65,7 +65,7 @@ function renderCloudProfiles() {
       <button class="profile-option" data-action="select-profile" data-profile="b"><span aria-hidden="true">B</span>旅伴 B</button>
       <button class="profile-option" data-action="select-profile" data-profile="guest"><span aria-hidden="true">訪</span>訪客</button>
     </div>
-    <p class="note">訪客進度只存在這個瀏覽器。知道網站網址的人都可以查看或修改 A、B 的雲端紀錄。</p>
+    <p class="note">如果你是訪客，請選擇「訪客」，不要修改 A、B 用戶的資料。</p>
   </section>`;
 }
 let profileReady = false;
