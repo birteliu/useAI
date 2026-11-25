@@ -41,7 +41,7 @@ Workers 僅接受旅伴 A、旅伴 B 的兩組獨立登入金鑰。兩人各自�
 
 1. 執行 `npx wrangler d1 create thai-learning`，將回傳的資料庫 ID 填入 `wrangler.toml`。
 2. 執行 `npx wrangler d1 migrations apply thai-learning --remote`。
-3. 為每位使用者各產生一組 64 位小寫十六進位金鑰，例如分別執行兩次 `openssl rand -hex 32`，存進密碼管理員。
+3. 為每位使用者各設定一組不同的登入密碼。每組須有 16–128 個字元，可使用英文字母、數字和標點符號，不能有空格。原本的 64 字元金鑰仍可使用。
 4. 執行 `npx wrangler deploy`。在兩組金鑰都設定好之前，網站會停在設定提示。
 5. 分別執行 `npx wrangler secret put LEARNER_A_KEY` 與 `npx wrangler secret put LEARNER_B_KEY`，依提示輸入各自的金鑰。登入時選擇對應帳號，使用自己的金鑰。更換金鑰會使該帳號舊的登入工作階段失效。
 
