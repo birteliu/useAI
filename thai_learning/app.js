@@ -1,4 +1,5 @@
 const $=s=>document.querySelector(s),lessons=window.LESSONS,KEY='thai-together-v1';
+const GUEST_KEY = 'thai-together-guest-v1';
 function allPhrases(){return lessons.flatMap(l=>l.phrases.map(p=>({...p,category:l.category,day:l.day})));}
 function validate(s) {
   const done = Array.isArray(s.done)
@@ -26,8 +27,9 @@ const pagesMode = location.origin === 'https://birteliu.github.io' &&
   ['/useAI/thai_learning/', '/useAI/thai_learning/index.html'].includes(location.pathname);
 const workerOrigin = 'https://thai-learning.family-feeding-web.workers.dev';
 const cloudProfileKey = 'thai-learning:cloud-profile';
-const useCloud = pagesMode || Boolean(document.querySelector('meta[name="thai-cloud"]'));
+const hasProfilePicker = pagesMode || Boolean(document.querySelector('meta[name="thai-cloud"]'));
 let selectedProfile = '';
+const profileNames = {a: '旅伴 A', b: '旅伴 B', guest: '訪客'};
 
 function setCloudProfile(profile) {
   selectedProfile = profile;
@@ -45,7 +47,7 @@ function restoreCloudProfile() {
   try {
     sessionStorage.removeItem('thai-learning:cloud-session');
     const profile = sessionStorage.getItem(cloudProfileKey);
-    if (profile === 'a' || profile === 'b') selectedProfile = profile;
+    if (Object.hasOwn(profileNames, profile)) selectedProfile = profile;
   } catch {}
 }
 
@@ -61,18 +63,23 @@ function renderCloudProfiles() {
     <div class="profile-options">
       <button class="profile-option" data-action="select-profile" data-profile="a"><span aria-hidden="true">A</span>旅伴 A</button>
       <button class="profile-option" data-action="select-profile" data-profile="b"><span aria-hidden="true">B</span>旅伴 B</button>
+      <button class="profile-option" data-action="select-profile" data-profile="guest"><span aria-hidden="true">訪</span>訪客</button>
     </div>
-    <p class="note">知道網站網址的人都可以查看或修改這兩份紀錄。</p>
+    <p class="note">訪客進度只存在這個瀏覽器。知道網站網址的人都可以查看或修改 A、B 的雲端紀錄。</p>
   </section>`;
 }
-let cloudReady = false;
+let profileReady = false;
 let revision = 0;
 let pendingSnapshot = null;
 let syncing = false;
 
-async function loadCloud() {
-  if (cloudReady || !useCloud) return;
+async function loadProfile() {
+  if (profileReady || !hasProfilePicker) return;
   if (!selectedProfile) return renderCloudProfiles();
+  if (selectedProfile === 'guest') {
+    state = readLocalProgress(GUEST_KEY, profileNames.guest);
+    return openProfile();
+  }
   const app = $('#app');
   app.innerHTML = '<p role="status">正在讀取學習紀錄…</p>';
   try {
@@ -82,17 +89,24 @@ async function loadCloud() {
     if (data.account !== selectedProfile) throw new Error('Unexpected profile');
     revision = data.revision;
     state = {...validate(data.state), friend: data.state.friend ? validate(data.state.friend) : null};
-    current = nextDay();
-    cloudReady = true;
-    const profile = document.createElement('div');
-    profile.className = 'cloud-profile';
-    const accountName = selectedProfile === 'a' ? '旅伴 A' : '旅伴 B';
-    profile.innerHTML = '<strong>' + accountName + '</strong><span id="cloud-status" role="status">已同步</span><button class="btn small" data-action="retry-cloud" hidden>重試同步</button><button class="btn small" data-action="reload-cloud" hidden>重讀雲端紀錄</button><button class="btn small" data-action="switch-profile">切換身分</button>';
-    app.before(profile);
-    render();
+    openProfile();
   } catch {
     app.innerHTML = '<div class="card"><p role="status">目前無法讀取雲端紀錄。</p><div class="actions"><button class="btn" data-action="load-cloud">再試一次</button><button class="btn" data-action="switch-profile">切換身分</button></div></div>';
   }
+}
+
+function openProfile() {
+  current = nextDay();
+  profileReady = true;
+  const profile = document.createElement('div');
+  profile.className = 'cloud-profile';
+  const status = selectedProfile === 'guest'
+    ? '<span role="status">此裝置</span>'
+    : '<span id="cloud-status" role="status">已同步</span><button class="btn small" data-action="retry-cloud" hidden>重試同步</button><button class="btn small" data-action="reload-cloud" hidden>重讀雲端紀錄</button>';
+  profile.innerHTML = '<strong>' + profileNames[selectedProfile] + '</strong>' + status +
+    '<button class="btn small" data-action="switch-profile">切換身分</button>';
+  $('#app').before(profile);
+  render();
 }
 
 function cloudStatus(message, action = '') {
@@ -129,21 +143,33 @@ async function syncCloud() {
   }
 }
 
-if (useCloud) {
+if (hasProfilePicker) {
   window.addEventListener('beforeunload', event => {
     if (pendingSnapshot) event.preventDefault();
   });
 }
 
-let state={...validate({}),friend:null},persisted=true;try{const s=useCloud?null:JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object')state={...validate(s),friend:s.friend&&typeof s.friend==='object'?validate(s.friend):null};}catch(e){persisted=false;}
+let persisted = true;
+function readLocalProgress(key, defaultName) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(key) || 'null');
+    if (saved && typeof saved === 'object') {
+      return {...validate(saved), friend: saved.friend && typeof saved.friend === 'object' ? validate(saved.friend) : null};
+    }
+  } catch {
+    persisted = false;
+  }
+  return {...validate({name: defaultName}), friend: null};
+}
+let state = hasProfilePicker ? {...validate({}), friend: null} : readLocalProgress(KEY);
 let current=lessons.find(l=>!state.done.includes(l.day))?.day||30,filter='全部',search='',quizAnswers={},quizChecked=false,roleSwap=false,hints=true;
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function save(){
-  if (useCloud) {
+  if (selectedProfile === 'a' || selectedProfile === 'b') {
     pendingSnapshot = {...validate(state), friend: state.friend};
     void syncCloud();
     return;
   }
-  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){persisted=false;toast('瀏覽器無法儲存進度。');}}function toast(s){$('#toast').textContent=s;$('#toast').style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>$('#toast').style.display='none',4000);}function nextDay(){return lessons.find(l=>!state.done.includes(l.day))?.day||30;}
+  try{localStorage.setItem(selectedProfile === 'guest' ? GUEST_KEY : KEY,JSON.stringify(state));}catch(e){persisted=false;toast('瀏覽器無法儲存進度。');}}function toast(s){$('#toast').textContent=s;$('#toast').style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>$('#toast').style.display='none',4000);}function nextDay(){return lessons.find(l=>!state.done.includes(l.day))?.day||30;}
 const reviewPhraseIds = {
   7: ['1-0', '3-0', '3-1', '4-0', '4-1', '1-1'],
   14: ['8-0', '9-1', '10-2', '11-1', '13-0', '1-1'],
@@ -312,7 +338,7 @@ function progress() {
         <div><div class="big">${state.favorites.length}</div><span class="muted">收藏</span></div>
       </div>
       <div class="progressbar"><div style="width:${state.done.length/30*100}%"></div></div>
-      <p class="note">${useCloud ? '進度同步到目前身分。' : '進度存於這個瀏覽器。'}</p>
+      <p class="note">${selectedProfile === 'a' || selectedProfile === 'b' ? '進度同步到目前身分。' : '進度存於這個瀏覽器。'}</p>
     </article>
     ${learningHistory()}
     <details class="card" id="weekly-stamps">
@@ -333,17 +359,17 @@ function progress() {
       <p><a href="https://thailandfoundation.or.th/how-to-use-krub-and-kha-in-the-thai-language/" target="_blank" rel="noopener">禮貌句尾</a> · <a href="https://thailand.go.th/useful-information-detail/009_138?hl=en" target="_blank" rel="noopener">寺廟禮儀</a></p>
     </details>`;
 }
-function render(keep=false){if(useCloud&&!cloudReady)return;const parts=(location.hash.slice(1)||'today').split('/'),page=['today','journey','practice','pocket','progress'].includes(parts[0])?parts[0]:'today';if(parts[1]&&Number.isInteger(+parts[1])&&+parts[1]>=1&&+parts[1]<=30)current=+parts[1];document.querySelectorAll('nav a').forEach(a=>{a.classList.toggle('active',a.hash==='#'+page);if(a.hash==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});const y=scrollY;const openPanels=keep?Array.from(document.querySelectorAll('#app details[open][id]'),panel=>panel.id):[];$('#app').innerHTML=({today,journey,practice,pocket,progress}[page])();if(!persisted)$('#app').insertAdjacentHTML('afterbegin','<p class="feedback" role="status">目前無法儲存進度，關閉頁面可能會遺失這次的紀錄。</p>');for(const id of openPanels){const panel=document.getElementById(id);if(panel)panel.open=true;}window.scrollTo(0,keep?y:0);}
+function render(keep=false){if(hasProfilePicker&&!profileReady)return;const parts=(location.hash.slice(1)||'today').split('/'),page=['today','journey','practice','pocket','progress'].includes(parts[0])?parts[0]:'today';if(parts[1]&&Number.isInteger(+parts[1])&&+parts[1]>=1&&+parts[1]<=30)current=+parts[1];document.querySelectorAll('nav a').forEach(a=>{a.classList.toggle('active',a.hash==='#'+page);if(a.hash==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});const y=scrollY;const openPanels=keep?Array.from(document.querySelectorAll('#app details[open][id]'),panel=>panel.id):[];$('#app').innerHTML=({today,journey,practice,pocket,progress}[page])();if(!persisted)$('#app').insertAdjacentHTML('afterbegin','<p class="feedback" role="status">目前無法儲存進度，關閉頁面可能會遺失這次的紀錄。</p>');for(const id of openPanels){const panel=document.getElementById(id);if(panel)panel.open=true;}window.scrollTo(0,keep?y:0);}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='jump-quiz'){
   e.preventDefault();
   const quiz=$('#quiz');
   quiz.focus({preventScroll:true});
   quiz.scrollIntoView({block:'start'});
 }
-else if(a==='load-cloud')void loadCloud();
+else if(a==='load-cloud')void loadProfile();
 else if(a==='select-profile'){
   const profile=b.dataset.profile;
-  if(profile==='a'||profile==='b'){setCloudProfile(profile);void loadCloud();}
+  if(Object.hasOwn(profileNames, profile)){setCloudProfile(profile);void loadProfile();}
 }
 else if(a==='switch-profile'){
   if(!pendingSnapshot||confirm('本次紀錄尚未同步。確定要切換身分？')){
@@ -355,4 +381,4 @@ else if(a==='switch-profile'){
 else if(a==='retry-cloud')void syncCloud();
 else if(a==='reload-cloud'){if(confirm('重讀雲端會捨棄本次尚未同步的變更。要繼續嗎？')){pendingSnapshot=null;location.reload();}}
 else if(a==='speak'||a==='slow')speak(id,a==='slow',b);else if(a==='favorite'){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render(true);}else if(a==='master'){state.mastery[id]=b.dataset.value;save();render(true);}else if(a==='answer'){quizAnswers[+b.dataset.index]=b.dataset.answer;quizChecked=false;render(true);}else if(a==='check'){quizChecked=true;render(true);}else if(a==='complete'){if(state.done.includes(current)){toast('這一天已完成，可以繼續複習。');return;}if(!quizChecked||!quizData(displayPhrases(lessons[current-1])).every((q,i)=>quizAnswers[i]===q.p.zh)){toast('先完成並確認兩題測驗，再為今天蓋章。');return;}state.done.push(current);state.completedAt[current]=new Date().toISOString();save();render(true);toast('今天的學習，完成！');}else if(a==='swap'){roleSwap=!roleSwap;render(true);}else if(a==='hints'){hints=!hints;render(true);}else if(a==='show'){const p=findPhrase(id),d=document.createElement('dialog');d.className='modal';d.innerHTML=`<div class="thai" lang="th">${esc(p.th)}</div><p>${esc(p.zh)}</p><button class="btn" data-action="close">關閉</button>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();}else if(a==='close')b.closest('dialog').close();else if(a==='save-name'){state.name=$('#name').value.trim().slice(0,30)||'我的旅程';save();render(true);toast('名字已儲存。');}});
-document.addEventListener('input',e=>{if(e.target.id==='search'){search=e.target.value;$('#pocket-results').innerHTML=pocketCards();}});document.addEventListener('change',e=>{if(e.target.id==='pocket-filter'){filter=e.target.value;$('#pocket-results').innerHTML=pocketCards();}if(e.target.id==='practice-day')location.hash='#practice/'+e.target.value;});window.addEventListener('hashchange',()=>{quizAnswers={};quizChecked=false;activeQuiz=null;if(location.hash==='#today')current=nextDay();render();});if(useCloud){restoreCloudProfile();void loadCloud();}else render();
+document.addEventListener('input',e=>{if(e.target.id==='search'){search=e.target.value;$('#pocket-results').innerHTML=pocketCards();}});document.addEventListener('change',e=>{if(e.target.id==='pocket-filter'){filter=e.target.value;$('#pocket-results').innerHTML=pocketCards();}if(e.target.id==='practice-day')location.hash='#practice/'+e.target.value;});window.addEventListener('hashchange',()=>{quizAnswers={};quizChecked=false;activeQuiz=null;if(location.hash==='#today')current=nextDay();render();});if(hasProfilePicker){restoreCloudProfile();void loadProfile();}else render();

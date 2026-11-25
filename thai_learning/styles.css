@@ -227,7 +227,7 @@ nav a.active .icon-chat::after { background: var(--mint); }
 
 .profile-picker h1 { margin-bottom: 6px; }
 .profile-picker > p { color: var(--muted); }
-.profile-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.profile-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
 .profile-option {
   display: grid;
   justify-items: center;
@@ -241,6 +241,7 @@ nav a.active .icon-chat::after { background: var(--mint); }
   font-weight: 750;
 }
 .profile-option:nth-child(2) { background: var(--sand); }
+.profile-option:nth-child(3) { background: var(--mist); }
 .profile-option span { display: grid; place-items: center; min-width: 36px; height: 36px; border-radius: 50%; background: var(--white); }
 .cloud-profile strong { padding: 4px 10px; border-radius: 18px; background: var(--mint); font-size: .875rem; }
 @media (min-width: 720px) {

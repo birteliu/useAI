@@ -35,7 +35,7 @@ https://thailand.go.th/useful-information-detail/009_138?hl=en
 
 ## Cloudflare 雙人版
 
-開啟 GitHub Pages 後，選擇「旅伴 A」或「旅伴 B」即可開始。兩份紀錄分開存在 D1。這兩個身分無需驗證，知道網址的人可以查看或修改兩份紀錄。
+開啟 GitHub Pages 後，選擇「旅伴 A」、「旅伴 B」或「訪客」即可開始。A、B 的紀錄分開存在 D1，知道網址的人可以查看或修改。訪客的進度、收藏與熟悉度只存於目前的瀏覽器，不會送到 D1。
 
 既有的 D1 綁定及 progress 資料表可繼續使用。更新 GitHub 的 main 分支後，確認 GitHub Pages 和 Cloudflare Worker 都完成部署。若在新環境部署，先建立 D1，將資料庫 ID 填入 wrangler.toml，再執行 migrations/0001_progress.sql，最後部署 Worker。
 
