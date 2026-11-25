@@ -136,7 +136,7 @@ if (useCloud) {
 }
 
 let state={...validate({}),friend:null},persisted=true;try{const s=useCloud?null:JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object')state={...validate(s),friend:s.friend&&typeof s.friend==='object'?validate(s.friend):null};}catch(e){persisted=false;}
-let current=lessons.find(l=>!state.done.includes(l.day))?.day||30,filter='全部',search='',quizAnswers={},quizChecked=false,roleSwap=false,hints=true,timer=null,timerEnd=0,remaining=600;
+let current=lessons.find(l=>!state.done.includes(l.day))?.day||30,filter='全部',search='',quizAnswers={},quizChecked=false,roleSwap=false,hints=true;
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function save(){
   if (useCloud) {
     pendingSnapshot = {...validate(state), friend: state.friend};
@@ -197,11 +197,6 @@ function today() {
       <h1>${lesson.title}</h1>
       <progress class="daily-progress" aria-label="課程完成進度" value="${state.done.length}" max="30"></progress>
       <div class="daily-tools">
-        <div class="timer-controls" aria-label="十分鐘計時">
-          <span id="clock">${formatTime(remaining)}</span>
-          <button class="btn small" data-action="timer" id="timer-btn">${timer?'暫停':'開始計時'}</button>
-          <button class="btn small" data-action="reset-timer">重設</button>
-        </div>
         <a class="btn small" href="#quiz" data-action="jump-quiz">跳到測驗</a>
       </div>
     </section>
@@ -289,7 +284,6 @@ function progress() {
     </details>`;
 }
 function render(keep=false){if(useCloud&&!cloudReady)return;const parts=(location.hash.slice(1)||'today').split('/'),page=['today','journey','practice','pocket','progress'].includes(parts[0])?parts[0]:'today';if(parts[1]&&Number.isInteger(+parts[1])&&+parts[1]>=1&&+parts[1]<=30)current=+parts[1];document.querySelectorAll('nav a').forEach(a=>{a.classList.toggle('active',a.hash==='#'+page);if(a.hash==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});const y=scrollY;const openPanels=keep?Array.from(document.querySelectorAll('#app details[open][id]'),panel=>panel.id):[];$('#app').innerHTML=({today,journey,practice,pocket,progress}[page])();if(!persisted)$('#app').insertAdjacentHTML('afterbegin','<p class="feedback" role="status">目前無法儲存進度，關閉頁面可能會遺失這次的紀錄。</p>');for(const id of openPanels){const panel=document.getElementById(id);if(panel)panel.open=true;}window.scrollTo(0,keep?y:0);}
-function formatTime(n){return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;}function clockUpdate(){if($('#clock'))$('#clock').textContent=formatTime(remaining);if($('#timer-btn'))$('#timer-btn').textContent=timer?'暫停':'開始計時';}function stopTimer(){clearInterval(timer);timer=null;clockUpdate();}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='jump-quiz'){
   e.preventDefault();
   const quiz=$('#quiz');
@@ -310,5 +304,5 @@ else if(a==='switch-profile'){
 }
 else if(a==='retry-cloud')void syncCloud();
 else if(a==='reload-cloud'){if(confirm('重讀雲端會捨棄本次尚未同步的變更。要繼續嗎？')){pendingSnapshot=null;location.reload();}}
-else if(a==='speak'||a==='slow')speak(id,a==='slow');else if(a==='favorite'){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render(true);}else if(a==='master'){state.mastery[id]=b.dataset.value;save();render(true);}else if(a==='answer'){quizAnswers[+b.dataset.index]=b.dataset.answer;quizChecked=false;render(true);}else if(a==='check'){quizChecked=true;render(true);}else if(a==='complete'){if(state.done.includes(current)){toast('這一天已完成，可以繼續複習。');return;}if(!quizChecked||!quizData(displayPhrases(lessons[current-1])).every((q,i)=>quizAnswers[i]===q.p.zh)){toast('先完成並確認兩題測驗，再為今天蓋章。');return;}state.done.push(current);state.completedAt[current]=new Date().toISOString();save();render(true);toast('今天的學習，完成！');}else if(a==='swap'){roleSwap=!roleSwap;render(true);}else if(a==='hints'){hints=!hints;render(true);}else if(a==='show'){const p=findPhrase(id),d=document.createElement('dialog');d.className='modal';d.innerHTML=`<div class="thai" lang="th">${esc(p.th)}</div><p>${esc(p.zh)}</p><button class="btn" data-action="close">關閉</button>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();}else if(a==='close')b.closest('dialog').close();else if(a==='timer'){if(timer){remaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));stopTimer();}else{if(!remaining)remaining=600;timerEnd=Date.now()+remaining*1000;timer=setInterval(()=>{remaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));if(!remaining){stopTimer();toast('十分鐘到了，今天也有好好練習。');}clockUpdate();},250);clockUpdate();}}else if(a==='reset-timer'){stopTimer();remaining=600;clockUpdate();}else if(a==='save-name'){state.name=$('#name').value.trim().slice(0,30)||'我的旅程';save();render(true);toast('名字已儲存。');}});
+else if(a==='speak'||a==='slow')speak(id,a==='slow');else if(a==='favorite'){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render(true);}else if(a==='master'){state.mastery[id]=b.dataset.value;save();render(true);}else if(a==='answer'){quizAnswers[+b.dataset.index]=b.dataset.answer;quizChecked=false;render(true);}else if(a==='check'){quizChecked=true;render(true);}else if(a==='complete'){if(state.done.includes(current)){toast('這一天已完成，可以繼續複習。');return;}if(!quizChecked||!quizData(displayPhrases(lessons[current-1])).every((q,i)=>quizAnswers[i]===q.p.zh)){toast('先完成並確認兩題測驗，再為今天蓋章。');return;}state.done.push(current);state.completedAt[current]=new Date().toISOString();save();render(true);toast('今天的學習，完成！');}else if(a==='swap'){roleSwap=!roleSwap;render(true);}else if(a==='hints'){hints=!hints;render(true);}else if(a==='show'){const p=findPhrase(id),d=document.createElement('dialog');d.className='modal';d.innerHTML=`<div class="thai" lang="th">${esc(p.th)}</div><p>${esc(p.zh)}</p><button class="btn" data-action="close">關閉</button>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();}else if(a==='close')b.closest('dialog').close();else if(a==='save-name'){state.name=$('#name').value.trim().slice(0,30)||'我的旅程';save();render(true);toast('名字已儲存。');}});
 document.addEventListener('input',e=>{if(e.target.id==='search'){search=e.target.value;$('#pocket-results').innerHTML=pocketCards();}});document.addEventListener('change',e=>{if(e.target.id==='pocket-filter'){filter=e.target.value;$('#pocket-results').innerHTML=pocketCards();}if(e.target.id==='practice-day')location.hash='#practice/'+e.target.value;});window.addEventListener('hashchange',()=>{quizAnswers={};quizChecked=false;activeQuiz=null;if(location.hash==='#today')current=nextDay();render();});if(useCloud){restoreCloudProfile();void loadCloud();}else render();

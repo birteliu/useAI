@@ -48,14 +48,11 @@ p { margin: 0 0 12px; }
 .note { margin: 12px 0 0; }
 .card, .daily-head { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 16px; margin: 0 0 12px; min-width: 0; box-shadow: 0 3px 12px #2b4a3410; }
 .daily-head { background: var(--green); color: white; }
-.daily-meta, .daily-tools, .timer-controls, .actions, .cloud-profile { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.daily-meta, .daily-tools { justify-content: space-between; }
+.daily-meta, .daily-tools, .actions, .cloud-profile { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.daily-meta { justify-content: space-between; }
 .daily-meta { font-size: .875rem; margin-bottom: 8px; }
 .daily-meta a { min-height: 44px; display: inline-flex; align-items: center; }
 .daily-head h1 { margin-bottom: 14px; }
-.timer-controls { gap: 6px; }
-#clock { font-variant-numeric: tabular-nums; font-weight: 750; margin-right: 2px; }
-.daily-tools .btn { color: white; background: transparent; border-color: #9ab9aa; }
 .btn, .star {
   display: inline-flex;
   align-items: center;
@@ -203,7 +200,6 @@ nav a.active .icon-chat::after { background: var(--mint); }
 .daily-progress::-webkit-progress-value { background: #dae9aa; border-radius: 8px; }
 .daily-progress::-moz-progress-bar { background: #dae9aa; border-radius: 8px; }
 .daily-head :focus-visible { outline-color: #f6f9e6; }
-.daily-tools .btn { background: #1f3e3333; border-color: #e8f0e78c; }
 .daily-tools a.btn { background: #eef5dd; color: #254b38; border-color: transparent; }
 
 .lesson-card h2, .culture h2, .practice-card h2, .quiz-card h2 { margin-bottom: 12px; }
