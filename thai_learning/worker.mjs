@@ -82,7 +82,7 @@ async function handleRequest(request, env, fromPages = false) {
           .bind(JSON.stringify(data.state), account, data.revision).run();
     return result.meta.changes === 1 ? json({revision: data.revision + 1}) : json({error: 'conflict'}, 409);
   }
-  if (allowedAssets.has(path)) return env.ASSETS.fetch(request);
+  if (allowedAssets.has(path) || path === '/audio/catalog.js' || /^\/audio\/[0-9]+-[0-9]+-[a-f0-9]{12}\.(?:mp3|m4a)$/.test(path)) return env.ASSETS.fetch(request);
   if (path !== '/' && path !== '/index.html') return new Response('Not found', {status: 404});
   const asset = await env.ASSETS.fetch(new Request(new URL('/', url), request));
   const page = new HTMLRewriter().on('head', {element(element) {

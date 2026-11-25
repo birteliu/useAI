@@ -3,3 +3,7 @@
 !app.js
 !lessons.js
 !styles.css
+!audio/
+!audio/catalog.js
+!audio/*.mp3
+!audio/*.m4a
