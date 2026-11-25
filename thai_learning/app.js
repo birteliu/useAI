@@ -55,12 +55,12 @@ function cloudRequest(options = {}) {
 }
 
 function renderCloudProfiles() {
-  $('#app').innerHTML = `<section class="card">
+  $('#app').innerHTML = `<section class="card profile-picker">
     <h1>選擇你的旅伴身分</h1>
-    <p>選擇 A 或 B，繼續各自的學習進度。</p>
-    <div class="actions">
-      <button class="btn primary" data-action="select-profile" data-profile="a">旅伴 A</button>
-      <button class="btn primary" data-action="select-profile" data-profile="b">旅伴 B</button>
+    <p>繼續各自的學習進度。</p>
+    <div class="profile-options">
+      <button class="profile-option" data-action="select-profile" data-profile="a"><span aria-hidden="true">A</span>旅伴 A</button>
+      <button class="profile-option" data-action="select-profile" data-profile="b"><span aria-hidden="true">B</span>旅伴 B</button>
     </div>
     <p class="note">知道網站網址的人都可以查看或修改這兩份紀錄。</p>
   </section>`;
@@ -186,15 +186,16 @@ function quizData(phrases) {
   activeQuiz = {day: current, questions};
   return questions;
 }
-function quizMarkup(ps){return quizData(ps).map((q,i)=>`<div><p>${i+1}. <span lang="th" class="thai" style="font-size:24px">${esc(q.p.th)}</span> <span class="roman">(${esc(q.p.roman)})</span> 是什麼意思？</p>${q.options.map(o=>`<button class="btn quiz-option ${quizAnswers[i]===o?'chosen':''}" data-action="answer" data-index="${i}" data-answer="${esc(o)}">${esc(o)}</button>`).join('')}</div>`).join('')+`<button class="btn" data-action="check" style="margin-top:15px">確認答案</button>${quizChecked?`<p class="feedback" role="status">${quizData(ps).every((q,i)=>quizAnswers[i]===q.p.zh)?'✓ 兩題都答對了！可以完成今天的學習。':'再試一次，看看上方的意思，也可以重新聽一遍。'}</p>`:''}`;}
+function quizMarkup(ps){return quizData(ps).map((q,i)=>`<div><p>${i+1}. ${q.p.quizContext ? esc(q.p.quizContext) : ''}<span lang="th" class="thai" style="font-size:24px">${esc(q.p.th)}</span> <span class="roman">(${esc(q.p.roman)})</span> 是什麼意思？</p>${q.options.map(o=>`<button class="btn quiz-option ${quizAnswers[i]===o?'chosen':''}" data-action="answer" data-index="${i}" data-answer="${esc(o)}">${esc(o)}</button>`).join('')}</div>`).join('')+`<button class="btn" data-action="check" style="margin-top:15px">確認答案</button>${quizChecked?`<p class="feedback" role="status">${quizData(ps).every((q,i)=>quizAnswers[i]===q.p.zh)?'✓ 兩題都答對了！可以完成今天的學習。':'再試一次，看看上方的意思，也可以重新聽一遍。'}</p>`:''}`;}
 function today() {
   const lesson = lessons[current - 1];
   const phrases = displayPhrases(lesson);
   const completed = state.done.includes(current);
   return `
     <section class="daily-head">
-      <div class="daily-meta"><span>第 ${current} 天 · ${lesson.category}</span><a href="#progress">完成 ${state.done.length} / 30 天</a></div>
+      <div class="daily-meta"><span class="daily-day">第 ${current} 天 · ${lesson.category}</span><a href="#progress">完成 ${state.done.length} / 30 天</a></div>
       <h1>${lesson.title}</h1>
+      <progress class="daily-progress" aria-label="課程完成進度" value="${state.done.length}" max="30"></progress>
       <div class="daily-tools">
         <div class="timer-controls" aria-label="十分鐘計時">
           <span id="clock">${formatTime(remaining)}</span>
@@ -204,7 +205,7 @@ function today() {
         <a class="btn small" href="#quiz" data-action="jump-quiz">跳到測驗</a>
       </div>
     </section>
-    <article class="card">
+    <article class="card lesson-card">
       <h2>聽一聽，跟著念</h2>
       ${current > 1 ? `<details id="warmup" class="lesson-disclosure">
         <summary>複習前一天</summary>
@@ -223,11 +224,11 @@ function today() {
       <p>${lesson.culture}</p>
       ${current === 25 ? '<a class="source" href="https://thailand.go.th/useful-information-detail/009_138?hl=en" target="_blank" rel="noopener">泰國官方參訪指南</a>' : ''}
     </article>
-    <article class="card">
+    <article class="card practice-card">
       <h2>旅伴練習</h2><p>${lesson.role}</p>
       <a class="btn" href="#practice/${current}">開啟角色卡</a>
     </article>
-    <article class="card" id="quiz" tabindex="-1">
+    <article class="card quiz-card" id="quiz" tabindex="-1">
       <h2>今日測驗</h2>${quizMarkup(phrases)}
       <div class="divider"></div>
       <div class="actions complete-actions">
@@ -237,8 +238,8 @@ function today() {
     </article>`;
 }
 function journey(){return `<h1>30 天課表</h1><div class="actions"><a class="btn primary" href="${dayLink(nextDay())}">繼續我的學習</a><span class="muted">已完成 ${state.done.length} / 30 天</span></div>${[[1,7,'第一週 · 勇敢開口'],[8,14,'第二週 · 吃一口泰國'],[15,21,'第三週 · 自在移動'],[22,28,'第四週 · 探索與應變'],[29,30,'出發前 · 旅行總演練']].map(([a,b,t])=>`<div class="section-head"><h2>${t}</h2></div><div class="day-grid">${lessons.filter(l=>l.day>=a&&l.day<=b).map(l=>`<a class="day-card ${state.done.includes(l.day)?'done':''}" href="${dayLink(l.day)}"><span class="day-number">DAY ${String(l.day).padStart(2,'0')}</span>${state.done.includes(l.day)?'<span class="checkmark">✓</span>':''}<h3>${l.title}</h3></a>`).join('')}</div>`).join('')}`;}
-function practice(){const l=lessons[current-1];return `<h1>旅伴練習</h1><div class="card"><label for="practice-day">選擇情境 </label><select id="practice-day">${lessons.map(l=>`<option value="${l.day}" ${l.day===current?'selected':''}>Day ${l.day} · ${l.title}</option>`).join('')}</select><p class="prompt" style="margin-top:20px">${l.role}</p><div class="actions"><button class="btn primary" data-action="swap">交換角色</button><button class="btn" data-action="hints">${hints?'隱藏':'顯示'}句子提示</button></div></div><div class="two"><article class="card"><h2>${roleSwap?'旅伴 B':'旅伴 A'} · 旅客</h2><p>主動提出需求，試著說出今天的句子。卡住時用「可以說慢一點嗎？」接續。</p></article><article class="card"><h2>${roleSwap?'旅伴 A':'旅伴 B'} · 在地人</h2><p>用手勢、數字或學過的短語回應。不知道怎麼回答時，一起查看提示。</p><p lang="th">ได้ · 可以　／　ไม่ได้ · 不可以</p></article></div>${hints?`<div class="card"><h2>可以用這幾句開始</h2>${displayPhrases(l).map(phraseCard).join('')}</div>`:'<div class="card empty">提示已收起，想不起來再打開。</div>'}<a class="btn" href="${dayLink(current)}">回到這一天的課程</a>`;}
-function pocketCards(){const ps=allPhrases().filter(p=>(filter==='全部'||filter==='我的收藏'&&state.favorites.includes(p.id)||filter==='再練一次'&&state.mastery[p.id]==='again'||filter===p.category)&&(!search||[p.zh,p.th,p.roman].some(t=>t.toLowerCase().includes(search.toLowerCase()))));return ps.length?ps.map(p=>`<article class="card"><span class="pill">${p.category} · DAY ${p.day}</span>${phraseCard(p)}<button class="btn small" data-action="show" data-id="${p.id}" style="margin-top:16px">放大給對方看</button></article>`).join(''):'<div class="empty">這裡還沒有句子，試試其他分類或收藏。</div>';}
+function practice(){const l=lessons[current-1];return `<h1>旅伴練習</h1><div class="card practice-card"><label for="practice-day">選擇情境 </label><select id="practice-day">${lessons.map(l=>`<option value="${l.day}" ${l.day===current?'selected':''}>Day ${l.day} · ${l.title}</option>`).join('')}</select><p class="prompt" style="margin-top:20px">${l.role}</p><div class="actions"><button class="btn primary" data-action="swap">交換角色</button><button class="btn" data-action="hints">${hints?'隱藏':'顯示'}句子提示</button></div></div><div class="two"><article class="card"><h2>${roleSwap?'旅伴 B':'旅伴 A'} · 旅客</h2><p>主動提出需求，試著說出今天的句子。卡住時用「可以說慢一點嗎？」接續。</p></article><article class="card"><h2>${roleSwap?'旅伴 A':'旅伴 B'} · 在地人</h2><p>用手勢、數字或學過的短語回應。不知道怎麼回答時，一起查看提示。</p><p lang="th">ได้ · 可以　／　ไม่ได้ · 不可以</p></article></div>${hints?`<div class="card"><h2>可以用這幾句開始</h2>${displayPhrases(l).map(phraseCard).join('')}</div>`:'<div class="card empty">提示已收起，想不起來再打開。</div>'}<a class="btn" href="${dayLink(current)}">回到這一天的課程</a>`;}
+function pocketCards(){const ps=allPhrases().filter(p=>(filter==='全部'||filter==='我的收藏'&&state.favorites.includes(p.id)||filter==='再練一次'&&state.mastery[p.id]==='again'||filter===p.category)&&(!search||[p.zh,p.th,p.roman].some(t=>t.toLowerCase().includes(search.toLowerCase()))));return ps.length?ps.map(p=>`<article class="card pocket-card"><span class="pill">${p.category} · DAY ${p.day}</span>${phraseCard(p)}<button class="btn small" data-action="show" data-id="${p.id}" style="margin-top:16px">放大給對方看</button></article>`).join(''):'<div class="empty">這裡還沒有句子，試試其他分類或收藏。</div>';}
 function pocket(){return `<h1>旅行口袋卡</h1><label for="search" class="side-title">搜尋中文、泰文或轉寫</label><input class="search" id="search" placeholder="例如：謝謝、廁所、飯店" value="${esc(search)}"><label class="pocket-filter" for="pocket-filter">分類<select id="pocket-filter">${['全部','我的收藏','再練一次','暖身','美食','交通','住宿','購物','文化','行程','求助'].map(c=>`<option ${filter===c?'selected':''}>${c}</option>`).join('')}</select></label><p class="note" style="margin-bottom:20px">過敏或醫療情境請另備完整的個人需求翻譯，簡短句子無法涵蓋所有細節。</p><div class="pocket-grid" id="pocket-results">${pocketCards()}</div>`;}
 function learningHistory() {
   const days = [...state.done].reverse().sort((a, b) =>
@@ -258,7 +259,7 @@ function learningHistory() {
 function progress() {
   const weekly = [[1,7,'開口'],[8,14,'點餐'],[15,21,'移動'],[22,28,'探索']];
   return `<h1>學習進度</h1>
-    <article class="card">
+    <article class="card progress-summary">
       <h2>${esc(state.name)}</h2>
       <div class="stat-row">
         <div><div class="big">${state.done.length} / 30</div><span class="muted">已完成</span></div>

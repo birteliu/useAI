@@ -78,13 +78,13 @@ window.LESSONS = [
       {
         "id": "4-1",
         "th": "พูดช้า ๆ ได้ไหม",
-        "roman": "phut cha cha dai mai",
+        "roman": "phuut chaa chaa daai mai",
         "zh": "可以說慢一點嗎？"
       },
       {
         "id": "4-2",
         "th": "พูดอีกครั้งได้ไหม",
-        "roman": "phut ik khrang dai mai",
+        "roman": "phuut iik khrang daai mai",
         "zh": "可以再說一次嗎？"
       }
     ]
@@ -237,7 +237,7 @@ window.LESSONS = [
         "id": "11-0",
         "th": "น้ำเปล่า",
         "roman": "nam plao",
-        "zh": "飲用水／白開水"
+        "zh": "白水／不加料的飲用水"
       },
       {
         "id": "11-1",
@@ -378,6 +378,7 @@ window.LESSONS = [
     "phrases": [
       {
         "id": "17-0",
+        "quizContext": "詢問車資時，",
         "th": "เท่าไหร่",
         "roman": "thao rai",
         "zh": "多少錢？"
@@ -605,8 +606,8 @@ window.LESSONS = [
       },
       {
         "id": "27-2",
-        "th": "ต้องการไปโรงพยาบาล",
-        "roman": "tong kan pai rong phayaban",
+        "th": "ต้องไปโรงพยาบาล",
+        "roman": "tong pai rong phayaban",
         "zh": "需要去醫院"
       }
     ]
